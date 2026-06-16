@@ -1,8 +1,8 @@
-import Navbar from "../../shared/components/layout/Navbar";
-import Footer from "../../shared/components/layout/Footer";
-import HeroSection from "../../features/landing/components/HeroSection";
-import FeaturedProducts from "../../features/landing/components/FeaturedProducts";
-import TestimonialSection from "../../features/landing/components/TestimonialSection";
+import Navbar from "../shared/components/layout/Navbar";
+import Footer from "../shared/components/layout/Footer";
+import HeroSection from "../features/landing/components/HeroSection";
+import FeaturedProducts from "../features/landing/components/FeaturedProducts";
+import TestimonialSection from "../features/landing/components/TestimonialSection";
 
 const LandingPage = () => {
   return (
