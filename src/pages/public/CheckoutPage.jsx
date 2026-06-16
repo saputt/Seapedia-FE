@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useBlocker } from "react-router-dom";
 import Navbar from "../../shared/components/layout/Navbar";
 import Footer from "../../shared/components/layout/Footer";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -36,6 +36,28 @@ const CheckoutPage = () => {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !checkoutSuccess && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      setShowLeaveModal(true);
+    }
+  }, [blocker.state]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
 
   const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
     if (isInitial) {
@@ -419,6 +441,21 @@ const CheckoutPage = () => {
           setShowAddressSelector(false);
         }}
         selectedId={selectedAddress?.id}
+      />
+
+      <AlertModal
+        isOpen={showLeaveModal}
+        onClose={() => {
+          blocker.reset();
+          setShowLeaveModal(false);
+        }}
+        title="Yakin ingin keluar?"
+        message="Pesanan Anda akan hilang dan tidak tersimpan. Anda harus memulai dari awal lagi."
+        actionLabel="Keluar"
+        onAction={() => {
+          blocker.proceed();
+          setShowLeaveModal(false);
+        }}
       />
 
       <Footer />
