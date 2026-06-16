@@ -217,6 +217,16 @@ const Navbar = ({ variant = "default" }) => {
                     Dashboard
                   </Link>
 
+                  {activeRole === "BUYER" && (
+                    <Link
+                      to="/dashboard/buyer/wallet"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                    >
+                      Wallet
+                    </Link>
+                  )}
+
                   <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
                     <button
                       onClick={() => { logout(); setDropdownOpen(false); }}
