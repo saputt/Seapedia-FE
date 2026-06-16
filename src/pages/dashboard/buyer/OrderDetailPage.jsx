@@ -43,8 +43,7 @@ const OrderDetailPage = () => {
     setCancelError("");
     try {
       await cancelOrder(orderId);
-      const updated = await getOrderById(orderId);
-      setOrder(updated);
+      navigate("/dashboard/buyer/orders");
     } catch (err) {
       setCancelError(err?.message || "Gagal membatalkan pesanan.");
     } finally {
