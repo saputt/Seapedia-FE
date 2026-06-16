@@ -29,3 +29,6 @@ export const checkDiscount = (code) =>
 export const getBuyerOrders = () => apiFetch("orders/buyer");
 
 export const getOrderById = (orderId) => apiFetch(`orders/${orderId}`);
+
+export const cancelOrder = (orderId) =>
+  apiFetch(`orders/${orderId}/cancel`, { method: "PATCH" });

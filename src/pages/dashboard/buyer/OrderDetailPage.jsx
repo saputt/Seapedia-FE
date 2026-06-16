@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/layout/Navbar";
 import Footer from "../../../shared/components/layout/Footer";
-import { getOrderById } from "../../../features/order/api/order.api";
+import { getOrderById, cancelOrder } from "../../../features/order/api/order.api";
 
 const STATUS_LABEL = {
   PENDING: "Menunggu Konfirmasi",
@@ -71,6 +71,26 @@ const OrderDetailPage = () => {
       </div>
     );
   }
+
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
+
+  const handleCancel = async () => {
+    if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
+    setCancelling(true);
+    setCancelError("");
+    try {
+      await cancelOrder(orderId);
+      const updated = await getOrderById(orderId);
+      setOrder(updated);
+    } catch (err) {
+      setCancelError(err?.message || "Gagal membatalkan pesanan.");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const canCancel = order.status === "PENDING";
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
@@ -206,6 +226,24 @@ const OrderDetailPage = () => {
             minute: "2-digit",
           })}
         </p>
+
+        {/* Cancel */}
+        {cancelError && (
+          <p className="text-danger text-sm text-center">{cancelError}</p>
+        )}
+        <button
+          onClick={handleCancel}
+          disabled={!canCancel || cancelling}
+          className={`w-full text-sm !py-2 ${
+            canCancel ? "btn-danger" : "btn-ghost opacity-50 cursor-not-allowed"
+          }`}
+        >
+          {cancelling
+            ? "Membatalkan..."
+            : canCancel
+              ? "Batalkan Pesanan"
+              : "Pesanan Tidak Dapat Dibatalkan"}
+        </button>
 
         {/* Back */}
         <button
