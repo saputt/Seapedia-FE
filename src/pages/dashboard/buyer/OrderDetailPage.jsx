@@ -32,6 +32,23 @@ const OrderDetailPage = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
+
+  const handleCancel = async () => {
+    if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
+    setCancelling(true);
+    setCancelError("");
+    try {
+      await cancelOrder(orderId);
+      const updated = await getOrderById(orderId);
+      setOrder(updated);
+    } catch (err) {
+      setCancelError(err?.message || "Gagal membatalkan pesanan.");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   useEffect(() => {
     getOrderById(orderId)
@@ -71,24 +88,6 @@ const OrderDetailPage = () => {
       </div>
     );
   }
-
-  const [cancelling, setCancelling] = useState(false);
-  const [cancelError, setCancelError] = useState("");
-
-  const handleCancel = async () => {
-    if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
-    setCancelling(true);
-    setCancelError("");
-    try {
-      await cancelOrder(orderId);
-      const updated = await getOrderById(orderId);
-      setOrder(updated);
-    } catch (err) {
-      setCancelError(err?.message || "Gagal membatalkan pesanan.");
-    } finally {
-      setCancelling(false);
-    }
-  };
 
   const canCancel = order.status === "PENDING";
 
