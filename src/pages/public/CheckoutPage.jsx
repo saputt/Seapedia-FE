@@ -149,7 +149,7 @@ const CheckoutPage = () => {
         orderToken,
         addressId: selectedAddress.id,
       });
-      setCheckoutSuccess(true);
+      navigate("/checkout/success");
     } catch (err) {
       const msg = err?.message || "";
       if (msg.toLowerCase().includes("not sufficient")) {
@@ -162,32 +162,6 @@ const CheckoutPage = () => {
       setCheckingOut(false);
     }
   };
-
-  if (checkoutSuccess) {
-    return (
-      <div className="min-h-screen flex flex-col bg-bg-primary">
-        <Navbar variant="checkout" />
-        <main className="flex-1 flex items-center justify-center px-6">
-          <div className="card text-center max-w-md">
-            <div className="text-5xl mb-4">🎉</div>
-            <h2 className="text-2xl font-bold text-text-primary mb-2">
-              Pesanan Berhasil!
-            </h2>
-            <p className="text-text-secondary mb-6">
-              Pesanan Anda sedang diproses. Silakan cek status pesanan di halaman pesanan.
-            </p>
-            <button
-              onClick={() => navigate("/dashboard/buyer/orders")}
-              className="btn-primary text-sm !py-2 !px-6"
-            >
-              Lihat Pesanan
-            </button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   const subtotal = summary?.subtotal ?? 0;
   const discountValue = summary?.discountValue ?? 0;

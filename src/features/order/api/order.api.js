@@ -25,3 +25,5 @@ export const deleteAddress = (id) =>
 
 export const checkDiscount = (code) =>
   apiFetch(`discounts/check?code=${encodeURIComponent(code)}`);
+
+export const getBuyerOrders = () => apiFetch("orders/buyer");

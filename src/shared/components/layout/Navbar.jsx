@@ -218,13 +218,22 @@ const Navbar = ({ variant = "default" }) => {
                   </Link>
 
                   {activeRole === "BUYER" && (
-                    <Link
-                      to="/dashboard/buyer/wallet"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-                    >
-                      Wallet
-                    </Link>
+                    <>
+                      <Link
+                        to="/dashboard/buyer/wallet"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                      >
+                        Wallet
+                      </Link>
+                      <Link
+                        to="/dashboard/buyer/orders"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                      >
+                        Pesanan
+                      </Link>
+                    </>
                   )}
 
                   <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
