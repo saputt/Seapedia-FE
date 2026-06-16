@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 
@@ -8,13 +9,35 @@ const Navbar = () => {
   const userRoles = useAuthStore((s) => s.userRoles);
   const logout = useAuthStore((s) => s.logout);
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   const isLoggedIn = !!token;
   const dashboardRoute = activeRole
     ? `/dashboard/${activeRole.toLowerCase()}`
     : userRoles.length > 0
       ? `/dashboard/${userRoles[0].toLowerCase()}`
       : "/";
-  const initial = user?.email ? user.email[0].toUpperCase() : "?";
+
+  const displayName = user?.username || user?.email?.split("@")[0] || "User";
+  const initial = displayName[0].toUpperCase();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const roleColors = {
+    BUYER: "text-role-buyer",
+    SELLER: "text-role-seller",
+    DRIVER: "text-role-driver",
+    ADMIN: "text-role-admin",
+  };
 
   return (
     <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
@@ -34,33 +57,48 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-3">
           {isLoggedIn ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2">
-                <Link
-                  to={dashboardRoute}
-                  className="w-9 h-9 rounded-full bg-brand-deep text-white flex items-center justify-center text-sm font-bold hover:bg-brand-mid transition-colors"
-                >
-                  {initial}
-                </Link>
-                <Link
-                  to={dashboardRoute}
-                  className="text-sm text-text-secondary hover:text-brand-deep font-medium transition-colors truncate max-w-[120px]"
-                >
-                  {user?.email}
-                </Link>
-              </div>
-              <Link
-                to={dashboardRoute}
-                className="w-9 h-9 rounded-full bg-brand-deep text-white flex items-center justify-center text-sm font-bold hover:bg-brand-mid transition-colors sm:hidden"
-              >
-                {initial}
-              </Link>
+            <div className="relative" ref={dropdownRef}>
               <button
-                onClick={logout}
-                className="btn-ghost text-sm !py-2 !px-4"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-2 cursor-pointer"
               >
-                Keluar
+                <div className="w-9 h-9 rounded-full bg-brand-deep text-white flex items-center justify-center text-sm font-bold">
+                  {initial}
+                </div>
+                <span className="hidden sm:inline text-sm font-medium text-text-primary">
+                  {displayName}
+                </span>
               </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 card !p-2 min-w-[200px] z-50">
+                  <div className="px-3 py-2 border-b-[2px] border-bg-tertiary">
+                    <p className="text-sm font-semibold text-text-primary truncate">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-text-muted truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+
+                  <Link
+                    to={dashboardRoute}
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
+                    <button
+                      onClick={() => { logout(); setDropdownOpen(false); }}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-red-50 rounded transition-colors"
+                    >
+                      Keluar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <>

@@ -15,7 +15,7 @@ export const useLogin = () => {
 
       login({
         token: data.accessToken,
-        user: { id: payload?.id, email: payload?.email },
+        user: { id: payload?.id, email: payload?.email, username: data.username },
         roles: data.userRoles,
         activeRole: data.activeRole,
       });
