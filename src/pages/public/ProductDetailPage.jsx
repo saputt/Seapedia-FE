@@ -5,14 +5,56 @@ import Footer from "../../shared/components/layout/Footer";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
 import useAuthStore from "../../features/auth/store/authStore";
+import useCartStore from "../../features/cart/store/cartStore";
+import { addToCart, clearCart } from "../../features/cart/api/cart.api";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { data: product, isLoading, isError } = useProductDetail(productId);
   const token = useAuthStore((s) => s.token);
-  const [showAlert, setShowAlert] = useState(false);
+  const hideBadge = useCartStore((s) => s.hideBadge);
+  const refreshCart = useCartStore((s) => s.refreshCart);
+
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [showStoreAlert, setShowStoreAlert] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [adding, setAdding] = useState(false);
 
   const isLoggedIn = !!token;
+
+  const handleAddToCart = async () => {
+    setAdding(true);
+    setAddError("");
+    try {
+      await addToCart(productId, 1);
+      await refreshCart();
+      hideBadge();
+    } catch (err) {
+      const msg = err?.message || "";
+      if (msg.includes("cart must be one store only")) {
+        setShowStoreAlert(true);
+      } else {
+        setAddError(msg || "Gagal menambahkan ke keranjang.");
+      }
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleClearAndAdd = async () => {
+    setAdding(true);
+    try {
+      await clearCart();
+      await addToCart(productId, 1);
+      await refreshCart();
+      hideBadge();
+      setShowStoreAlert(false);
+    } catch {
+      setAddError("Gagal menambahkan ke keranjang.");
+    } finally {
+      setAdding(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
@@ -110,23 +152,27 @@ const ProductDetailPage = () => {
               </div>
 
               {isLoggedIn ? (
-                <>
-                  <button className="btn-primary w-full !py-3 mt-4 text-base" disabled>
-                    Tambah ke Keranjang
-                  </button>
-                  <p className="text-text-muted text-xs text-center">
-                    *Fitur keranjang akan tersedia setelah login sebagai Pembeli
-                  </p>
-                </>
-              ) : (
-                <>
+                <div className="flex flex-col gap-2">
                   <button
-                    onClick={() => setShowAlert(true)}
-                    className="btn-primary w-full !py-3 mt-4 text-base cursor-pointer"
+                    onClick={handleAddToCart}
+                    disabled={adding || product.stock < 1}
+                    className="btn-primary w-full !py-3 mt-4 text-base"
                   >
-                    Tambah ke Keranjang
+                    {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
                   </button>
-                </>
+                  {addError && (
+                    <p className="text-danger text-xs text-center">
+                      {addError}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowLoginAlert(true)}
+                  className="btn-primary w-full !py-3 mt-4 text-base cursor-pointer"
+                >
+                  Tambah ke Keranjang
+                </button>
               )}
             </div>
           </div>
@@ -134,13 +180,23 @@ const ProductDetailPage = () => {
       </main>
 
       <AlertModal
-        isOpen={showAlert}
-        onClose={() => setShowAlert(false)}
+        isOpen={showLoginAlert}
+        onClose={() => setShowLoginAlert(false)}
         icon="🔒"
         title="Login Diperlukan"
         message="Silakan masuk atau daftar akun terlebih dahulu untuk dapat menambahkan produk ke keranjang."
         actionLabel="Masuk"
         actionTo="/auth/login"
+      />
+
+      <AlertModal
+        isOpen={showStoreAlert}
+        onClose={() => setShowStoreAlert(false)}
+        icon="🛒"
+        title="Toko Berbeda"
+        message="Keranjang Anda sudah berisi produk dari toko lain. Tambah produk ini akan menghapus keranjang saat ini. Lanjutkan?"
+        actionLabel="Hapus & Tambah"
+        onAction={handleClearAndAdd}
       />
 
       <Footer />

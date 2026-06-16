@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, actionTo }) => {
+const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, actionTo, onAction }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,9 +41,13 @@ const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, action
           >
             Tutup
           </button>
-          {actionLabel && actionTo && (
+          {actionLabel && (actionTo || onAction) && (
             <button
-              onClick={() => { navigate(actionTo); onClose(); }}
+              onClick={() => {
+                if (onAction) onAction();
+                else if (actionTo) navigate(actionTo);
+                onClose();
+              }}
               className="btn-primary text-sm !py-2 !px-6"
             >
               {actionLabel}
