@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Navbar from "../../../shared/components/layout/Navbar";
 import Footer from "../../../shared/components/layout/Footer";
-import {
-  getWallet,
-  topUp,
-  getTransactions,
-} from "../../../features/wallet/api/wallet.api";
+import { useWallet, useTransactions, useTopUp } from "../../../features/wallet/hooks/useWallet";
 
 const TYPE_LABEL = {
   TOP_UP: "Top Up",
@@ -16,51 +12,25 @@ const TYPE_LABEL = {
 };
 
 const WalletPage = () => {
-  const [wallet, setWallet] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
+  const { data: transactions = [], isLoading: txLoading, error: txError } = useTransactions();
+  const topUpMutation = useTopUp();
 
   const [showAllTx, setShowAllTx] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState("");
   const [showTopUp, setShowTopUp] = useState(false);
-  const [topUpLoading, setTopUpLoading] = useState(false);
-  const [topUpError, setTopUpError] = useState("");
-  const [topUpSuccess, setTopUpSuccess] = useState("");
 
-  useEffect(() => {
-    Promise.all([getWallet(), getTransactions()])
-      .then(([walletData, txData]) => {
-        setWallet(walletData);
-        setTransactions(txData);
-      })
-      .catch((err) => setError(err?.message || "Gagal memuat dompet."))
-      .finally(() => setLoading(false));
-  }, []);
+  const loading = walletLoading || txLoading;
+  const error = walletError || txError;
 
   const handleTopUp = async () => {
     const amount = parseInt(topUpAmount, 10);
     if (!amount || amount < 1) return;
-
-    setTopUpLoading(true);
-    setTopUpError("");
-    setTopUpSuccess("");
     try {
-      await topUp(amount);
-      const [walletData, txData] = await Promise.all([
-        getWallet(),
-        getTransactions(),
-      ]);
-      setWallet(walletData);
-      setTransactions(txData);
-      setTopUpSuccess(`Top up Rp${amount.toLocaleString("id-ID")} berhasil!`);
+      await topUpMutation.mutateAsync(amount);
       setTopUpAmount("");
       setShowTopUp(false);
-    } catch (err) {
-      setTopUpError(err?.message || "Top up gagal.");
-    } finally {
-      setTopUpLoading(false);
-    }
+    } catch (e) { /* error handled by mutation state */ }
   };
 
   if (loading) {
@@ -82,7 +52,7 @@ const WalletPage = () => {
       <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">{error}</p>
+            <p className="text-danger font-semibold mb-4">{error?.message || "Gagal memuat dompet."}</p>
             <button
               onClick={() => window.location.reload()}
               className="btn-primary text-sm !py-2 !px-6"
@@ -94,7 +64,6 @@ const WalletPage = () => {
 
         {!error && (
           <>
-            {/* Balance Card */}
             <div className="card">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">
                 Saldo Dompet
@@ -118,16 +87,15 @@ const WalletPage = () => {
                   />
                   <button
                     onClick={handleTopUp}
-                    disabled={topUpLoading || !topUpAmount.trim()}
+                    disabled={topUpMutation.isPending || !topUpAmount.trim()}
                     className="btn-primary text-sm !py-2 !px-5"
                   >
-                    {topUpLoading ? "Memproses..." : "Konfirmasi"}
+                    {topUpMutation.isPending ? "Memproses..." : "Konfirmasi"}
                   </button>
                   <button
                     onClick={() => {
                       setShowTopUp(false);
-                      setTopUpError("");
-                      setTopUpSuccess("");
+                      topUpMutation.reset();
                     }}
                     className="btn-ghost text-sm !py-2 !px-5"
                   >
@@ -142,15 +110,14 @@ const WalletPage = () => {
                   Top Up
                 </button>
               )}
-              {topUpError && (
-                <p className="text-danger text-xs mt-2">{topUpError}</p>
+              {topUpMutation.isError && (
+                <p className="text-danger text-xs mt-2">{topUpMutation.error?.message || "Top up gagal."}</p>
               )}
-              {topUpSuccess && (
-                <p className="text-success text-xs mt-2">{topUpSuccess}</p>
+              {topUpMutation.isSuccess && topUpMutation.variables && (
+                <p className="text-success text-xs mt-2">Top up Rp{topUpMutation.variables.toLocaleString("id-ID")} berhasil!</p>
               )}
             </div>
 
-            {/* Transaction History */}
             <div className="card">
               <h2 className="text-sm font-bold text-text-primary mb-3">
                 Riwayat Transaksi
