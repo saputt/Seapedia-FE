@@ -21,6 +21,7 @@ const WalletPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [showAllTx, setShowAllTx] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState("");
   const [showTopUp, setShowTopUp] = useState(false);
   const [topUpLoading, setTopUpLoading] = useState(false);
@@ -160,7 +161,7 @@ const WalletPage = () => {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {transactions.map((tx) => (
+                  {(showAllTx ? transactions : transactions.slice(0, 10)).map((tx) => (
                     <div
                       key={tx.id}
                       className="flex items-center justify-between px-3 py-2 rounded hover:bg-brand-subtle transition-colors"
@@ -192,6 +193,14 @@ const WalletPage = () => {
                       </p>
                     </div>
                   ))}
+                  {!showAllTx && transactions.length > 10 && (
+                    <button
+                      onClick={() => setShowAllTx(true)}
+                      className="w-full text-center text-sm font-semibold text-brand-deep hover:bg-brand-subtle rounded px-3 py-2 transition-colors"
+                    >
+                      Lihat Semua ({transactions.length})
+                    </button>
+                  )}
                 </div>
               )}
             </div>
