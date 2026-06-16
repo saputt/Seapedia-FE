@@ -1,11 +1,18 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../../shared/components/layout/Navbar";
 import Footer from "../../shared/components/layout/Footer";
+import AlertModal from "../../shared/components/ui/AlertModal";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
+import useAuthStore from "../../features/auth/store/authStore";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { data: product, isLoading, isError } = useProductDetail(productId);
+  const token = useAuthStore((s) => s.token);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const isLoggedIn = !!token;
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
@@ -102,16 +109,39 @@ const ProductDetailPage = () => {
                 </p>
               </div>
 
-              <button className="btn-primary w-full !py-3 mt-4 text-base" disabled>
-                Tambah ke Keranjang
-              </button>
-              <p className="text-text-muted text-xs text-center">
-                *Fitur keranjang akan tersedia setelah login sebagai Pembeli
-              </p>
+              {isLoggedIn ? (
+                <>
+                  <button className="btn-primary w-full !py-3 mt-4 text-base" disabled>
+                    Tambah ke Keranjang
+                  </button>
+                  <p className="text-text-muted text-xs text-center">
+                    *Fitur keranjang akan tersedia setelah login sebagai Pembeli
+                  </p>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowAlert(true)}
+                    className="btn-primary w-full !py-3 mt-4 text-base cursor-pointer"
+                  >
+                    Tambah ke Keranjang
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
       </main>
+
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        icon="🔒"
+        title="Login Diperlukan"
+        message="Silakan masuk atau daftar akun terlebih dahulu untuk dapat menambahkan produk ke keranjang."
+        actionLabel="Masuk"
+        actionTo="/auth/login"
+      />
 
       <Footer />
     </div>
