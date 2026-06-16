@@ -36,6 +36,7 @@ const CheckoutPage = () => {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [showInsufficientModal, setShowInsufficientModal] = useState(false);
 
   const checkoutUrlRef = useRef(window.location.href);
 
@@ -150,7 +151,13 @@ const CheckoutPage = () => {
       });
       setCheckoutSuccess(true);
     } catch (err) {
-      setCheckoutError(err?.message || "Checkout gagal. Silakan coba lagi.");
+      const msg = err?.message || "";
+      if (msg.toLowerCase().includes("not sufficient")) {
+        setShowInsufficientModal(true);
+        setCheckoutError("");
+      } else {
+        setCheckoutError(msg || "Checkout gagal. Silakan coba lagi.");
+      }
     } finally {
       setCheckingOut(false);
     }
@@ -446,6 +453,15 @@ const CheckoutPage = () => {
           setShowAddressSelector(false);
         }}
         selectedId={selectedAddress?.id}
+      />
+
+      <AlertModal
+        isOpen={showInsufficientModal}
+        onClose={() => setShowInsufficientModal(false)}
+        title="Saldo Tidak Cukup"
+        message="Saldo dompet Anda tidak mencukupi untuk melakukan checkout. Silakan top up terlebih dahulu."
+        actionLabel="Top Up"
+        onAction={() => navigate("/dashboard/buyer/wallet")}
       />
 
       <Footer />

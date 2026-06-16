@@ -105,10 +105,12 @@ const WalletPage = () => {
               {showTopUp ? (
                 <div className="mt-4 flex flex-col sm:flex-row gap-2">
                   <input
-                    type="number"
-                    min="1"
+                    type="text"
+                    inputMode="numeric"
                     value={topUpAmount}
-                    onChange={(e) => setTopUpAmount(e.target.value)}
+                    onChange={(e) =>
+                      setTopUpAmount(e.target.value.replace(/[^0-9]/g, ""))
+                    }
                     onKeyDown={(e) => e.key === "Enter" && handleTopUp()}
                     className="input-neo w-full !py-2 !text-sm"
                     placeholder="Jumlah top up"
