@@ -37,10 +37,7 @@ const CheckoutPage = () => {
   const [checkoutError, setCheckoutError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
-  const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const leaveConfirmedRef = useRef(false);
   const checkoutUrlRef = useRef(window.location.href);
-  const prevUrlRef = useRef(null);
 
   useEffect(() => {
     if (checkoutSuccess) return;
@@ -55,18 +52,16 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (checkoutSuccess) return;
-    const checkoutUrl = checkoutUrlRef.current;
 
-    const handlePopState = (e) => {
-      if (leaveConfirmedRef.current) return;
-      e.stopImmediatePropagation();
-      prevUrlRef.current = window.location.href;
-      window.history.pushState(null, "", checkoutUrl);
-      setShowLeaveModal(true);
+    const handlePopState = () => {
+      const stay = window.confirm("Yakin ingin keluar? Pesanan Anda akan hilang.");
+      if (!stay) {
+        window.history.pushState(null, "", checkoutUrlRef.current);
+      }
     };
 
-    window.addEventListener("popstate", handlePopState, true);
-    return () => window.removeEventListener("popstate", handlePopState, true);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [checkoutSuccess]);
 
   const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
@@ -451,25 +446,6 @@ const CheckoutPage = () => {
           setShowAddressSelector(false);
         }}
         selectedId={selectedAddress?.id}
-      />
-
-      <AlertModal
-        isOpen={showLeaveModal}
-        onClose={() => {
-          setShowLeaveModal(false);
-        }}
-        title="Yakin ingin keluar?"
-        message="Pesanan Anda akan hilang dan tidak tersimpan. Anda harus memulai dari awal lagi."
-        actionLabel="Keluar"
-        onAction={() => {
-          leaveConfirmedRef.current = true;
-          setShowLeaveModal(false);
-          if (prevUrlRef.current) {
-            navigate(prevUrlRef.current);
-          } else {
-            window.history.back();
-          }
-        }}
       />
 
       <Footer />
