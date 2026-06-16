@@ -110,7 +110,11 @@ const OrderHistoryPage = () => {
             ) : (
               <div className="space-y-4">
                 {filtered.map((order) => (
-                  <div key={order.id} className="card">
+                  <div
+                    key={order.id}
+                    onClick={() => navigate(`/dashboard/buyer/orders/${order.id}`)}
+                    className="card cursor-pointer hover:bg-brand-subtle transition-colors"
+                  >
                     {/* Store Header */}
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-sm font-semibold text-text-primary">

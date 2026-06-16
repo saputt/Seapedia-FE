@@ -43,6 +43,7 @@ const CheckoutPage = lazyLoad(() => import("../pages/dashboard/buyer/CheckoutPag
 const PublicCheckoutPage = lazyLoad(() => import("../pages/public/CheckoutPage"), "PublicCheckoutPage");
 const CheckoutSuccessPage = lazyLoad(() => import("../pages/public/CheckoutSuccessPage"), "CheckoutSuccessPage");
 const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHistoryPage"), "OrderHistoryPage");
+const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
 const SellerDashboard = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboard"), "SellerDashboard");
 const StoreSettingPage = lazyLoad(() => import("../pages/dashboard/seller/StoreSettingPage"), "StoreSettingPage");
@@ -149,6 +150,16 @@ const AppRoutes = () => {
           <PrivateRoute>
             <RoleRoute role="buyer">
               <OrderHistoryPage />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/buyer/orders/:orderId"
+        element={
+          <PrivateRoute>
+            <RoleRoute role="buyer">
+              <OrderDetailPage />
             </RoleRoute>
           </PrivateRoute>
         }

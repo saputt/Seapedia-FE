@@ -27,3 +27,5 @@ export const checkDiscount = (code) =>
   apiFetch(`discounts/check?code=${encodeURIComponent(code)}`);
 
 export const getBuyerOrders = () => apiFetch("orders/buyer");
+
+export const getOrderById = (orderId) => apiFetch(`orders/${orderId}`);
