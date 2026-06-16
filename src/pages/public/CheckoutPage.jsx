@@ -20,13 +20,15 @@ const CheckoutPage = () => {
 
   const [summary, setSummary] = useState(null);
   const [orderToken, setOrderToken] = useState(null);
-  const [loadingSummary, setLoadingSummary] = useState(true);
-  const [summaryError, setSummaryError] = useState("");
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [initialError, setInitialError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const [shippingMethod, setShippingMethod] = useState("REGULAR");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
   const [discountError, setDiscountError] = useState("");
+  const [discountSuccess, setDiscountSuccess] = useState("");
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
@@ -35,9 +37,13 @@ const CheckoutPage = () => {
   const [checkoutError, setCheckoutError] = useState("");
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
-  const fetchSummary = useCallback(async (discount, shipping) => {
-    setLoadingSummary(true);
-    setSummaryError("");
+  const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
+    if (isInitial) {
+      setInitialLoading(true);
+      setInitialError("");
+    } else {
+      setRefreshing(true);
+    }
     try {
       const body = {};
       if (discount) body.discountCode = discount;
@@ -45,30 +51,53 @@ const CheckoutPage = () => {
       const result = await getOrderSummary(body);
       setSummary(result.order);
       setOrderToken(result.orderToken);
+      if (discount) {
+        setDiscountSuccess(`Diskon ${discount} berhasil diterapkan!`);
+        setDiscountError("");
+      }
     } catch (err) {
-      setSummaryError(err?.message || "Gagal memuat ringkasan pesanan.");
-      setSummary(null);
-      setOrderToken(null);
+      const msg = err?.message || "";
+      if (discount && msg.toLowerCase().includes("not found")) {
+        setDiscountError("Kode diskon tidak ditemukan.");
+        setDiscountSuccess("");
+      } else if (discount && (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("not available"))) {
+        setDiscountError("Kode diskon sudah tidak berlaku.");
+        setDiscountSuccess("");
+      } else if (isInitial) {
+        setInitialError(msg || "Gagal memuat ringkasan pesanan.");
+      } else {
+        setDiscountError(msg || "Gagal menerapkan diskon.");
+        setDiscountSuccess("");
+      }
     } finally {
-      setLoadingSummary(false);
+      if (isInitial) setInitialLoading(false);
+      else setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSummary(appliedCode, shippingMethod);
-  }, [appliedCode, shippingMethod, fetchSummary]);
+    fetchSummary(null, null, true);
+  }, [fetchSummary]);
+
+  useEffect(() => {
+    if (!initialLoading && !initialError) {
+      fetchSummary(appliedCode, shippingMethod, false);
+    }
+  }, [appliedCode, shippingMethod]);
 
   const handleApplyDiscount = () => {
     const trimmed = discountCode.trim().toUpperCase();
     if (!trimmed) return;
     setAppliedCode(trimmed);
     setDiscountError("");
+    setDiscountSuccess("");
   };
 
   const handleRemoveDiscount = () => {
     setDiscountCode("");
     setAppliedCode("");
     setDiscountError("");
+    setDiscountSuccess("");
   };
 
   const handleCheckout = async () => {
@@ -99,7 +128,7 @@ const CheckoutPage = () => {
   if (checkoutSuccess) {
     return (
       <div className="min-h-screen flex flex-col bg-bg-primary">
-        <Navbar />
+        <Navbar variant="checkout" />
         <main className="flex-1 flex items-center justify-center px-6">
           <div className="card text-center max-w-md">
             <div className="text-5xl mb-4">🎉</div>
@@ -130,14 +159,10 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
+      <Navbar variant="checkout" />
 
       <main className="flex-1 max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
-        <h1 className="text-[1.75rem] font-bold text-text-primary mb-8">
-          Checkout
-        </h1>
-
-        {loadingSummary && (
+        {initialLoading && (
           <div className="space-y-6 animate-pulse">
             <div className="card h-24 bg-bg-tertiary" />
             <div className="card h-48 bg-bg-tertiary" />
@@ -145,13 +170,13 @@ const CheckoutPage = () => {
           </div>
         )}
 
-        {summaryError && !loadingSummary && (
+        {initialError && !initialLoading && (
           <div className="text-center py-20">
             <p className="text-danger font-semibold text-lg mb-4">
-              {summaryError}
+              {initialError}
             </p>
             <button
-              onClick={() => fetchSummary(appliedCode, shippingMethod)}
+              onClick={() => fetchSummary(null, null, true)}
               className="btn-primary text-sm !py-2 !px-6"
             >
               Coba Lagi
@@ -159,7 +184,7 @@ const CheckoutPage = () => {
           </div>
         )}
 
-        {!loadingSummary && !summaryError && summary && (
+        {!initialLoading && !initialError && summary && (
           <div className="space-y-6">
             {/* Address */}
             <div className="card">
@@ -240,7 +265,7 @@ const CheckoutPage = () => {
                 Kode Diskon
               </h2>
               {appliedCode ? (
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-success">{appliedCode}</p>
                     {discountValue > 0 && (
@@ -251,25 +276,25 @@ const CheckoutPage = () => {
                   </div>
                   <button
                     onClick={handleRemoveDiscount}
-                    className="text-sm text-danger hover:underline"
+                    className="text-sm text-danger hover:underline self-start sm:self-auto"
                   >
                     Hapus
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={discountCode}
                     onChange={(e) => setDiscountCode(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleApplyDiscount()}
-                    className="input-neo flex-1 !py-2 !text-sm"
+                    className="input-neo w-full !py-2 !text-sm"
                     placeholder="Masukkan kode diskon"
                   />
                   <button
                     onClick={handleApplyDiscount}
                     disabled={!discountCode.trim()}
-                    className="btn-primary text-sm !py-2 !px-5"
+                    className="btn-primary text-sm !py-2 !px-5 w-full sm:w-auto whitespace-nowrap"
                   >
                     Pakai
                   </button>
@@ -278,10 +303,13 @@ const CheckoutPage = () => {
               {discountError && (
                 <p className="text-danger text-xs mt-1">{discountError}</p>
               )}
+              {discountSuccess && (
+                <p className="text-success text-xs mt-1">{discountSuccess}</p>
+              )}
             </div>
 
             {/* Shipping */}
-            <div className="card">
+            <div className="card relative">
               <h2 className="text-sm font-bold text-text-primary mb-3">
                 Metode Pengiriman
               </h2>
@@ -301,20 +329,26 @@ const CheckoutPage = () => {
                       value={s.id}
                       checked={shippingMethod === s.id}
                       onChange={() => setShippingMethod(s.id)}
-                      className="accent-brand-deep"
+                      className="accent-brand-deep shrink-0"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-text-primary">
                         {s.name}
                       </p>
                       <p className="text-xs text-text-secondary">{s.desc}</p>
                     </div>
-                    <p className="text-sm font-semibold text-text-primary">
+                    <p className="text-sm font-semibold text-text-primary shrink-0">
                       Rp{s.price.toLocaleString("id-ID")}
                     </p>
                   </label>
                 ))}
               </div>
+
+              {refreshing && (
+                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded">
+                  <span className="w-6 h-6 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
             </div>
 
             {/* Price Summary */}
