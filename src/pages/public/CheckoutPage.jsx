@@ -39,10 +39,8 @@ const CheckoutPage = () => {
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const leaveConfirmedRef = useRef(false);
-
-  useEffect(() => {
-    leaveConfirmedRef.current = false;
-  }, []);
+  const checkoutUrlRef = useRef(window.location.href);
+  const prevUrlRef = useRef(null);
 
   useEffect(() => {
     if (checkoutSuccess) return;
@@ -57,19 +55,19 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (checkoutSuccess) return;
+    const checkoutUrl = checkoutUrlRef.current;
 
-    const handlePopState = () => {
+    const handlePopState = (e) => {
       if (leaveConfirmedRef.current) return;
-      const path = window.location.pathname;
-      if (path !== "/dashboard/buyer/checkout") {
-        setShowLeaveModal(true);
-        navigate("/dashboard/buyer/checkout", { replace: true });
-      }
+      e.stopImmediatePropagation();
+      prevUrlRef.current = window.location.href;
+      window.history.pushState(null, "", checkoutUrl);
+      setShowLeaveModal(true);
     };
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [checkoutSuccess, navigate]);
+    window.addEventListener("popstate", handlePopState, true);
+    return () => window.removeEventListener("popstate", handlePopState, true);
+  }, [checkoutSuccess]);
 
   const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
     if (isInitial) {
@@ -466,7 +464,11 @@ const CheckoutPage = () => {
         onAction={() => {
           leaveConfirmedRef.current = true;
           setShowLeaveModal(false);
-          window.history.back();
+          if (prevUrlRef.current) {
+            navigate(prevUrlRef.current);
+          } else {
+            window.history.back();
+          }
         }}
       />
 
