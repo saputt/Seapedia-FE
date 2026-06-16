@@ -58,9 +58,13 @@ const CheckoutPage = () => {
     } catch (err) {
       const msg = err?.message || "";
       if (discount && msg.toLowerCase().includes("not found")) {
+        setAppliedCode("");
+        setDiscountCode("");
         setDiscountError("Kode diskon tidak ditemukan.");
         setDiscountSuccess("");
       } else if (discount && (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("not available"))) {
+        setAppliedCode("");
+        setDiscountCode("");
         setDiscountError("Kode diskon sudah tidak berlaku.");
         setDiscountSuccess("");
       } else if (isInitial) {
