@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../shared/components/layout/Navbar";
 import Footer from "../../../shared/components/layout/Footer";
+import AlertModal from "../../../shared/components/ui/AlertModal";
 import { getOrderById, cancelOrder } from "../../../features/order/api/order.api";
 
 const STATUS_LABEL = {
@@ -34,9 +35,10 @@ const OrderDetailPage = () => {
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleCancel = async () => {
-    if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) return;
+    setShowCancelModal(false);
     setCancelling(true);
     setCancelError("");
     try {
@@ -231,7 +233,7 @@ const OrderDetailPage = () => {
           <p className="text-danger text-sm text-center">{cancelError}</p>
         )}
         <button
-          onClick={handleCancel}
+          onClick={() => setShowCancelModal(true)}
           disabled={!canCancel || cancelling}
           className={`w-full text-sm !py-2 ${
             canCancel ? "btn-danger" : "btn-ghost opacity-50 cursor-not-allowed"
@@ -252,6 +254,16 @@ const OrderDetailPage = () => {
           Kembali ke Pesanan
         </button>
       </main>
+
+      <AlertModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        icon="⚠️"
+        title="Batalkan Pesanan?"
+        message="Pesanan yang dibatalkan tidak dapat dikembalikan. Apakah Anda yakin?"
+        actionLabel="Ya, Batalkan"
+        onAction={handleCancel}
+      />
 
       <Footer />
     </div>
