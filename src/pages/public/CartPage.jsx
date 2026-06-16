@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../shared/components/layout/Navbar";
 import Footer from "../../shared/components/layout/Footer";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -11,6 +11,7 @@ import {
 } from "../../features/cart/api/cart.api";
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const { items, setItems, refreshCart } = useCartStore();
   const [loading, setLoading] = useState(true);
   const [busyItems, setBusyItems] = useState({});
@@ -284,7 +285,10 @@ const CartPage = () => {
                     Rp{subtotal.toLocaleString("id-ID")}
                   </p>
                 </div>
-                <button className="btn-primary text-sm !py-2 !px-6 w-full sm:w-auto" disabled>
+                <button
+                  onClick={() => navigate("/checkout")}
+                  className="btn-primary text-sm !py-2 !px-6 w-full sm:w-auto"
+                >
                   Lanjut ke Checkout
                 </button>
               </div>
