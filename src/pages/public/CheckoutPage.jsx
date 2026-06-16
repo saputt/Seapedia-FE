@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate, useBlocker } from "react-router-dom";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../shared/components/layout/Navbar";
 import Footer from "../../shared/components/layout/Footer";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -38,26 +38,38 @@ const CheckoutPage = () => {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      !checkoutSuccess && currentLocation.pathname !== nextLocation.pathname
-  );
+  const leaveConfirmedRef = useRef(false);
 
   useEffect(() => {
-    if (blocker.state === "blocked") {
-      setShowLeaveModal(true);
-    }
-  }, [blocker.state]);
+    leaveConfirmedRef.current = false;
+  }, []);
 
   useEffect(() => {
+    if (checkoutSuccess) return;
+
     const handler = (e) => {
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
-  }, []);
+  }, [checkoutSuccess]);
+
+  useEffect(() => {
+    if (checkoutSuccess) return;
+
+    const handlePopState = () => {
+      if (leaveConfirmedRef.current) return;
+      const path = window.location.pathname;
+      if (path !== "/dashboard/buyer/checkout") {
+        setShowLeaveModal(true);
+        navigate("/dashboard/buyer/checkout", { replace: true });
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [checkoutSuccess, navigate]);
 
   const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
     if (isInitial) {
@@ -446,15 +458,15 @@ const CheckoutPage = () => {
       <AlertModal
         isOpen={showLeaveModal}
         onClose={() => {
-          blocker.reset();
           setShowLeaveModal(false);
         }}
         title="Yakin ingin keluar?"
         message="Pesanan Anda akan hilang dan tidak tersimpan. Anda harus memulai dari awal lagi."
         actionLabel="Keluar"
         onAction={() => {
-          blocker.proceed();
+          leaveConfirmedRef.current = true;
           setShowLeaveModal(false);
+          window.history.back();
         }}
       />
 
