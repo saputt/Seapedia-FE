@@ -1,54 +1,47 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router";
 import Navbar from "../../../shared/components/layout/Navbar";
 import Footer from "../../../shared/components/layout/Footer";
-import { getBuyerOrders } from "../../../features/order/api/order.api";
+import { useBuyerOrders, useCancelOrder } from "../../../features/order/hooks/useOrders";
 
-const STATUS_TABS = [
-  { key: "ALL", label: "Semua" },
-  { key: "PENDING", label: "Menunggu" },
-  { key: "READY_FOR_DELIVERY", label: "Siap Dikirim" },
-  { key: "ON_DELIVERY", label: "Dikirim" },
-  { key: "DELIVERED", label: "Selesai" },
-  { key: "CANCELLED", label: "Dibatalkan" },
-];
-
-const STATUS_STYLE = {
-  PENDING: "text-yellow-600 bg-yellow-50",
-  READY_FOR_DELIVERY: "text-blue-600 bg-blue-50",
-  ON_DELIVERY: "text-purple-600 bg-purple-50",
-  DELIVERED: "text-green-600 bg-green-50",
-  CANCELLED: "text-red-600 bg-red-50",
+const STATUS_COLOR = {
+  PENDING: "text-warning",
+  READY_FOR_DELIVERY: "text-info",
+  ON_DELIVERY: "text-info",
+  DELIVERED: "text-success",
+  CANCELLED: "text-danger",
 };
 
 const STATUS_LABEL = {
   PENDING: "Menunggu Konfirmasi",
   READY_FOR_DELIVERY: "Siap Dikirim",
   ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Selesai",
+  DELIVERED: "Diterima",
   CANCELLED: "Dibatalkan",
 };
 
 const OrderHistoryPage = () => {
-  const navigate = useNavigate();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("ALL");
+  const { data: orders = [], isLoading, error } = useBuyerOrders();
+  const cancelMutation = useCancelOrder();
+  const [filter, setFilter] = useState("ALL");
+  const [cancellingId, setCancellingId] = useState(null);
 
-  useEffect(() => {
-    getBuyerOrders()
-      .then(setOrders)
-      .catch((err) => setError(err?.message || "Gagal memuat pesanan."))
-      .finally(() => setLoading(false));
-  }, []);
+  const statuses = ["ALL", ...new Set(orders.map((o) => o.status))];
 
   const filtered =
-    activeTab === "ALL"
+    filter === "ALL"
       ? orders
-      : orders.filter((o) => o.status === activeTab);
+      : orders.filter((o) => o.status === filter);
 
-  if (loading) {
+  const handleCancel = async (orderId) => {
+    setCancellingId(orderId);
+    try {
+      await cancelMutation.mutateAsync(orderId);
+    } catch (e) { /* handled */ }
+    setCancellingId(null);
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-bg-primary">
         <Navbar />
@@ -60,16 +53,13 @@ const OrderHistoryPage = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-
-      <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
-        <h1 className="text-xl font-bold text-text-primary">Pesanan Saya</h1>
-
-        {error && (
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col bg-bg-primary">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
           <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">{error}</p>
+            <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
             <button
               onClick={() => window.location.reload()}
               className="btn-primary text-sm !py-2 !px-6"
@@ -77,114 +67,122 @@ const OrderHistoryPage = () => {
               Coba Lagi
             </button>
           </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-bg-primary">
+      <Navbar />
+      <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+        <h1 className="text-xl font-bold text-text-primary">Riwayat Pesanan</h1>
+
+        <div className="flex flex-wrap gap-2">
+          {statuses.map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+                filter === s
+                  ? "bg-brand-deep text-white border-brand-deep"
+                  : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
+              }`}
+            >
+              {s === "ALL" ? "Semua" : (STATUS_LABEL[s] || s)}
+            </button>
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="card text-center py-10">
+            <p className="text-sm text-text-secondary">
+              {filter === "ALL"
+                ? "Belum ada pesanan."
+                : `Tidak ada pesanan dengan status "${STATUS_LABEL[filter] || filter}".`}
+            </p>
+          </div>
         )}
 
-        {!error && (
-          <>
-            {/* Status Tabs */}
-            <div className="flex gap-1 overflow-x-auto pb-1">
-              {STATUS_TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`whitespace-nowrap text-sm font-medium px-4 py-2 rounded transition-colors ${
-                    activeTab === tab.key
-                      ? "bg-brand-deep text-white"
-                      : "text-text-secondary hover:text-brand-deep hover:bg-brand-subtle"
-                  }`}
+        <div className="space-y-4">
+          {filtered.map((order) => (
+            <Link
+              key={order.id}
+              to={`/dashboard/buyer/orders/${order.id}`}
+              className="card block hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="text-xs text-text-muted">
+                    {new Date(order.createdAt).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+                <span
+                  className={`text-xs font-bold ${STATUS_COLOR[order.status] || "text-text-secondary"}`}
                 >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Order List */}
-            {filtered.length === 0 ? (
-              <div className="card text-center py-12">
-                <p className="text-text-secondary">
-                  {activeTab === "ALL"
-                    ? "Belum ada pesanan."
-                    : `Tidak ada pesanan dengan status ini.`}
-                </p>
+                  {STATUS_LABEL[order.status] || order.status}
+                </span>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {filtered.map((order) => (
-                  <div
-                    key={order.id}
-                    onClick={() => navigate(`/dashboard/buyer/orders/${order.id}`)}
-                    className="card cursor-pointer hover:bg-brand-subtle transition-colors"
-                  >
-                    {/* Store Header */}
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-sm font-semibold text-text-primary">
-                        {order.store?.name || "Toko"}
+
+              {order.store && (
+                <p className="text-sm font-semibold text-text-primary mb-3">
+                  {order.store.storeName}
+                </p>
+              )}
+
+              <div className="space-y-2">
+                {order.orderItems?.slice(0, 3).map((item, i) => (
+                  <div key={item.id || i} className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden">
+                      <img
+                        src={item.product?.imageUrl || "/placeholder.png"}
+                        alt={item.product?.name || "Product"}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-text-primary truncate">
+                        {item.product?.name || "Produk"}
                       </p>
-                      <span
-                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-                          STATUS_STYLE[order.status] || "text-gray-600 bg-gray-50"
-                        }`}
-                      >
-                        {STATUS_LABEL[order.status] || order.status}
-                      </span>
-                    </div>
-
-                    {/* Order Items */}
-                    <div className="space-y-2 mb-3">
-                      {order.orderItems?.slice(0, 3).map((item) => (
-                        <div key={item.id} className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-bg-tertiary rounded flex items-center justify-center overflow-hidden shrink-0">
-                            {item.product?.imageUrl ? (
-                              <img
-                                src={item.product.imageUrl}
-                                alt={item.product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-xs text-text-muted">Img</span>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-text-primary truncate">
-                              {item.product?.name}
-                            </p>
-                            <p className="text-xs text-text-secondary">
-                              Rp{item.price?.toLocaleString("id-ID")} x {item.quantity}
-                            </p>
-                          </div>
-                          <p className="text-sm font-semibold text-text-primary shrink-0">
-                            Rp{(item.price * item.quantity).toLocaleString("id-ID")}
-                          </p>
-                        </div>
-                      ))}
-                      {order.orderItems?.length > 3 && (
-                        <p className="text-xs text-text-muted text-center">
-                          ...dan {order.orderItems.length - 3} produk lainnya
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Total */}
-                    <div className="flex items-center justify-between pt-2 border-t-[2px] border-bg-tertiary">
                       <p className="text-xs text-text-muted">
-                        {new Date(order.createdAt).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </p>
-                      <p className="text-sm font-bold text-brand-deep">
-                        Rp{order.totalPrice?.toLocaleString("id-ID")}
+                        {item.quantity}x @ Rp{item.price?.toLocaleString("id-ID")}
                       </p>
                     </div>
                   </div>
                 ))}
+                {order.orderItems?.length > 3 && (
+                  <p className="text-xs text-text-muted">
+                    +{order.orderItems.length - 3} item lainnya
+                  </p>
+                )}
               </div>
-            )}
-          </>
-        )}
-      </main>
 
+              <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                <p className="text-sm font-bold text-text-primary">
+                  Total Rp{order.totalPrice?.toLocaleString("id-ID")}
+                </p>
+                {order.status === "PENDING" && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCancel(order.id);
+                    }}
+                    disabled={cancellingId === order.id}
+                    className="text-xs font-bold text-danger hover:text-danger/80 transition-colors disabled:opacity-50"
+                  >
+                    {cancellingId === order.id ? "Membatalkan..." : "Batalkan"}
+                  </button>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </main>
       <Footer />
     </div>
   );
