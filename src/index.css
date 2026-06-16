@@ -1,1 +1,148 @@
 @import "tailwindcss";
+
+@theme {
+  /* ── Neutral ── */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #FAFAF8;
+  --color-bg-tertiary: #F3F2EF;
+  --color-text-primary: #1C1B1A;
+  --color-text-secondary: #6B6560;
+  --color-text-muted: #A39D97;
+
+  /* ── Brand / Structural ── */
+  --color-brand-deep: #1B3A5C;
+  --color-brand-mid: #2C5F8A;
+  --color-brand-light: #4A90C4;
+  --color-brand-subtle: #E8F0F8;
+
+  /* ── Role Colors ── */
+  --color-role-buyer: #D97706;
+  --color-role-seller: #1A8A5C;
+  --color-role-driver: #0A7EAD;
+  --color-role-admin: #6D28D9;
+
+  /* ── Functional ── */
+  --color-success: #1A8A5C;
+  --color-warning: #D97706;
+  --color-danger: #B91C1C;
+  --color-info: #0A7EAD;
+
+  /* ── Font ── */
+  --font-family-sans: "Inter", sans-serif;
+}
+
+/* ── Base Styles ── */
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* ── Neobrutalism Utility Classes ── */
+
+/* Border tebal khas neobrutalism */
+.neoborder {
+  border: 3px solid var(--color-brand-deep);
+}
+
+/* Offset shadow khas neobrutalism */
+.neoshadow {
+  box-shadow: 6px 6px 0px 0px var(--color-brand-deep);
+}
+.neoshadow-sm {
+  box-shadow: 4px 4px 0px 0px var(--color-brand-deep);
+}
+.neoshadow-lg {
+  box-shadow: 8px 8px 0px 0px var(--color-brand-deep);
+}
+
+/* Primary Button */
+.btn-primary {
+  background: var(--color-brand-deep);
+  color: white;
+  border: 3px solid var(--color-brand-deep);
+  box-shadow: 4px 4px 0px 0px var(--color-brand-deep);
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.btn-primary:hover {
+  background: var(--color-brand-mid);
+  box-shadow: 6px 6px 0px 0px var(--color-brand-deep);
+  transform: translate(-1px, -1px);
+}
+.btn-primary:active {
+  box-shadow: 2px 2px 0px 0px var(--color-brand-deep);
+  transform: translate(2px, 2px);
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background: white;
+  color: var(--color-brand-deep);
+  border: 3px solid var(--color-brand-deep);
+  box-shadow: 4px 4px 0px 0px var(--color-brand-deep);
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.btn-ghost:hover {
+  background: var(--color-brand-subtle);
+  box-shadow: 6px 6px 0px 0px var(--color-brand-deep);
+  transform: translate(-1px, -1px);
+}
+.btn-ghost:active {
+  box-shadow: 2px 2px 0px 0px var(--color-brand-deep);
+  transform: translate(2px, 2px);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+  border: 3px solid var(--color-danger);
+  box-shadow: 4px 4px 0px 0px #7F1D1D;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+.btn-danger:hover {
+  box-shadow: 6px 6px 0px 0px #7F1D1D;
+  transform: translate(-1px, -1px);
+}
+.btn-danger:active {
+  box-shadow: 2px 2px 0px 0px #7F1D1D;
+  transform: translate(2px, 2px);
+}
+
+/* Card */
+.card {
+  background: white;
+  border: 3px solid var(--color-brand-deep);
+  box-shadow: 6px 6px 0px 0px var(--color-brand-deep);
+  padding: 1.5rem;
+  transition: all 0.15s ease;
+}
+.card:hover {
+  box-shadow: 8px 8px 0px 0px var(--color-brand-deep);
+  transform: translate(-2px, -2px);
+}
+
+/* Form Input */
+.input-neo {
+  border: 3px solid var(--color-brand-deep);
+  padding: 12px 16px;
+  font-size: 16px;
+  background: white;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.input-neo:focus {
+  box-shadow: 3px 3px 0px 0px var(--color-brand-deep);
+}

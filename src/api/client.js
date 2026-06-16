@@ -15,10 +15,11 @@ export async function apiFetch(
     },
    })
 
+   const result = await res.json();
+
    if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || 'Something went wrong')
+    throw new Error(result.message || 'Something went wrong');
    }
 
-   return res.json()
+   return result.data !== undefined ? result.data : result;
 }
