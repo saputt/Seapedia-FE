@@ -33,9 +33,10 @@ const useAuthStore = create((set) => ({
     set({ token: null, user: null, userRoles: [], activeRole: null });
   },
 
-  switchRole: (role) => {
+  switchRole: (role, newToken) => {
     localStorage.setItem("activeRole", role);
-    set({ activeRole: role });
+    if (newToken) localStorage.setItem("token", newToken);
+    set({ activeRole: role, ...(newToken ? { token: newToken } : {}) });
   },
 }));
 
