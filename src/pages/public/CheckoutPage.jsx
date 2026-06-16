@@ -7,6 +7,7 @@ import AddressSelector from "../../features/order/components/AddressSelector";
 import {
   getOrderSummary,
   checkoutOrder,
+  fetchAddresses,
 } from "../../features/order/api/order.api";
 
 const SHIPPING_LIST = [
@@ -116,6 +117,18 @@ const CheckoutPage = () => {
       fetchSummary(appliedCode, shippingMethod, false);
     }
   }, [appliedCode, shippingMethod]);
+
+  useEffect(() => {
+    if (initialLoading || initialError) return;
+    fetchAddresses()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        if (list.length > 0 && !selectedAddress) {
+          setSelectedAddress(list[0]);
+        }
+      })
+      .catch(() => {});
+  }, [initialLoading, initialError]);
 
   const handleApplyDiscount = () => {
     const trimmed = discountCode.trim().toUpperCase();

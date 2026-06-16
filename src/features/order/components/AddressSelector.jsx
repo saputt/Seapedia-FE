@@ -20,9 +20,6 @@ const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }) => {
       .then((data) => {
         const list = Array.isArray(data) ? data : [];
         setAddresses(list);
-        if (!selectedId && list.length > 0) {
-          onSelect(list[0]);
-        }
       })
       .catch(() => setAddresses([]))
       .finally(() => setLoading(false));
