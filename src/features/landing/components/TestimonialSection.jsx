@@ -51,7 +51,7 @@ const TestimonialSection = () => {
   const { data, isLoading, isError } = useAppReviews();
   const submitReview = useSubmitAppReview();
 
-  const reviews = data?.data?.data || data?.data || data?.reviews || [];
+  const reviews = data?.reviews || [];
 
   const [form, setForm] = useState({ reviewerName: "", rating: 0, comment: "" });
   const [submitted, setSubmitted] = useState(false);

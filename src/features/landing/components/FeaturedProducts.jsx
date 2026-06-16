@@ -29,7 +29,7 @@ const ProductCard = ({ product }) => {
 const FeaturedProducts = () => {
   const { data, isLoading, isError } = useFeaturedProducts(6);
 
-  const products = data?.data?.data || data?.data || [];
+  const products = Array.isArray(data) ? data : data?.data || [];
 
   return (
     <section className="bg-bg-secondary py-16 md:py-20">
