@@ -1,5 +1,5 @@
-import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import useAuthStore from "../features/auth/store/authStore";
 
 const roleMap = {
   buyer: "BUYER",
@@ -9,7 +9,7 @@ const roleMap = {
 };
 
 const RoleRoute = ({ children, role }) => {
-  const { activeRole } = useAuth();
+  const activeRole = useAuthStore((s) => s.activeRole);
 
   if (activeRole !== roleMap[role]) {
     return <Navigate to="/" replace />;

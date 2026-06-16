@@ -1,8 +1,8 @@
-import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import useAuthStore from "../features/auth/store/authStore";
 
 const PrivateRoute = ({ children }) => {
-  const { token } = useAuth();
+  const token = useAuthStore((s) => s.token);
 
   if (!token) {
     return <Navigate to="/auth/login" replace />;
