@@ -35,6 +35,7 @@ const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDet
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
 const StoreManagementPage = lazyLoad(() => import("../pages/stores/StoreManagementPage"), "StoreManagementPage");
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
+const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
 
 const AppRoutes = () => {
   return (
@@ -160,7 +161,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <ComingSoon title="Dashboard Penjual" />
+              <SellerDashboardPage />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -179,9 +180,7 @@ const AppRoutes = () => {
         path="/dashboard/seller/create-store"
         element={
           <PrivateRoute>
-            <RoleRoute role="seller">
-              <CreateStorePage />
-            </RoleRoute>
+            <CreateStorePage />
           </PrivateRoute>
         }
       />

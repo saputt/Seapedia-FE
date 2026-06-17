@@ -28,6 +28,14 @@ export const checkDiscount = (code) =>
 
 export const getBuyerOrders = () => apiFetch("orders/buyer");
 
+export const getSellerOrders = (params = {}) => {
+  const query = new URLSearchParams();
+  if (params.status) query.set("status", params.status);
+  if (params.orderBy) query.set("orderBy", params.orderBy);
+  const qs = query.toString();
+  return apiFetch(`orders/seller${qs ? `?${qs}` : ""}`);
+};
+
 export const getOrderById = (orderId) => apiFetch(`orders/${orderId}`);
 
 export const cancelOrder = (orderId) =>

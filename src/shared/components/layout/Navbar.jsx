@@ -26,17 +26,22 @@ const Navbar = ({ variant = "default" }) => {
   const profileRef = useRef(null);
   const cartRef = useRef(null);
 
-  const handleSellerClick = useCallback(async () => {
+  const handleSellerClick = useCallback(() => {
     setDropdownOpen(false);
-    if (activeRole !== "SELLER") {
+    navigate("/dashboard/seller/create-store");
+  }, [navigate]);
+
+  const handleBuyerClick = useCallback(async () => {
+    setDropdownOpen(false);
+    if (activeRole !== "BUYER") {
       try {
-        const res = await switchUserRole("SELLER");
-        switchRole("SELLER", res.accessToken);
+        const res = await switchUserRole("BUYER");
+        switchRole("BUYER", res.accessToken);
       } catch {
         return;
       }
     }
-    navigate("/dashboard/seller/store");
+    navigate("/dashboard/buyer");
   }, [activeRole, navigate, switchRole]);
 
   useEffect(() => {
@@ -252,12 +257,21 @@ const Navbar = ({ variant = "default" }) => {
                     </>
                   )}
 
-                  <button
-                    onClick={handleSellerClick}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-                  >
-                    Seller
-                  </button>
+                  {activeRole === "SELLER" ? (
+                    <button
+                      onClick={handleBuyerClick}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                    >
+                      Buyer
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSellerClick}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                    >
+                      Seller
+                    </button>
+                  )}
 
                   <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
                     <button
