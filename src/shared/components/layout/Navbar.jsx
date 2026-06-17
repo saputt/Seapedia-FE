@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
+import { switchUserRole } from "../../../features/auth/api/auth.api";
 
 const Navbar = ({ variant = "default" }) => {
   const navigate = useNavigate();
@@ -16,12 +17,27 @@ const Navbar = ({ variant = "default" }) => {
   const hideBadge = useCartStore((s) => s.hideBadge);
   const refreshCart = useCartStore((s) => s.refreshCart);
 
+  const switchRole = useAuthStore((s) => s.switchRole);
+
   const isLoggedIn = !!token;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartHover, setCartHover] = useState(false);
   const profileRef = useRef(null);
   const cartRef = useRef(null);
+
+  const handleSellerClick = useCallback(async () => {
+    setDropdownOpen(false);
+    if (activeRole !== "SELLER") {
+      try {
+        const res = await switchUserRole("SELLER");
+        switchRole("SELLER", res.accessToken);
+      } catch {
+        return;
+      }
+    }
+    navigate("/dashboard/seller/store");
+  }, [activeRole, navigate, switchRole]);
 
   useEffect(() => {
     if (isLoggedIn) refreshCart();
@@ -235,6 +251,13 @@ const Navbar = ({ variant = "default" }) => {
                       </Link>
                     </>
                   )}
+
+                  <button
+                    onClick={handleSellerClick}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                  >
+                    Seller
+                  </button>
 
                   <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
                     <button

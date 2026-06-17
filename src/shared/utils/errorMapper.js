@@ -3,6 +3,8 @@ const errorMap = {
   "invalid credential": "Kata sandi salah",
   "email already exist": "Email sudah digunakan",
   "Too many requests": "Terlalu banyak percobaan. Silakan coba lagi nanti.",
+  "storename": "Nama toko sudah digunakan",
+  "already have store": "Anda sudah memiliki toko",
 };
 
 export const getReadableError = (err) => {

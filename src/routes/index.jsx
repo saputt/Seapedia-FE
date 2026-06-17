@@ -33,6 +33,8 @@ const CheckoutSuccessPage = lazyLoad(() => import("../pages/checkout/CheckoutSuc
 const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHistoryPage"), "OrderHistoryPage");
 const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
+const StoreManagementPage = lazyLoad(() => import("../pages/stores/StoreManagementPage"), "StoreManagementPage");
+const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 
 const AppRoutes = () => {
   return (
@@ -168,7 +170,17 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <ComingSoon title="Pengaturan Toko" />
+              <StoreManagementPage />
+            </RoleRoute>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/dashboard/seller/create-store"
+        element={
+          <PrivateRoute>
+            <RoleRoute role="seller">
+              <CreateStorePage />
             </RoleRoute>
           </PrivateRoute>
         }
