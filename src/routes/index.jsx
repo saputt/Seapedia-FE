@@ -26,6 +26,7 @@ const RegisterPage = lazyLoad(() => import("../pages/auth/RegisterPage"), "Regis
 const RoleSelectPage = lazyLoad(() => import("../pages/auth/RoleSelectPage"), "RoleSelectPage");
 const ProductListPage = lazyLoad(() => import("../pages/products/ProductListPage"), "ProductListPage");
 const ProductDetailPage = lazyLoad(() => import("../pages/products/ProductDetailPage"), "ProductDetailPage");
+const StoreDetailPage = lazyLoad(() => import("../pages/stores/StoreDetailPage"), "StoreDetailPage");
 const CartMainPage = lazyLoad(() => import("../pages/cart/CartPage"), "CartMainPage");
 const CheckoutMainPage = lazyLoad(() => import("../pages/checkout/CheckoutPage"), "CheckoutMainPage");
 const CheckoutSuccessPage = lazyLoad(() => import("../pages/checkout/CheckoutSuccessPage"), "CheckoutSuccessPage");
@@ -39,7 +40,7 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/products" element={<ProductListPage />} />
       <Route path="/products/:productId" element={<ProductDetailPage />} />
-      <Route path="/stores/:storeId" element={<ComingSoon title="Detail Toko" />} />
+      <Route path="/stores/:storeId" element={<StoreDetailPage />} />
       <Route
         path="/cart"
         element={
