@@ -40,3 +40,9 @@ export const getOrderById = (orderId) => apiFetch(`orders/${orderId}`);
 
 export const cancelOrder = (orderId) =>
   apiFetch(`orders/${orderId}/cancel`, { method: "PATCH" });
+
+export const updateOrderStatus = (orderId, storeId) =>
+  apiFetch(`orders/${orderId}/progress`, {
+    method: "PATCH",
+    body: JSON.stringify({ storeId }),
+  });

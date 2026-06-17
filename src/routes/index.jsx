@@ -38,6 +38,7 @@ const StoreManagement = lazyLoad(() => import("../pages/dashboard/seller/StoreMa
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
 const ProductManagementPage = lazyLoad(() => import("../pages/dashboard/seller/ProductManagementPage"), "ProductManagementPage");
+const OrderManagementPage = lazyLoad(() => import("../pages/dashboard/seller/OrderManagementPage"), "OrderManagementPage");
 
 const AppRoutes = () => {
   return (
@@ -171,7 +172,7 @@ const AppRoutes = () => {
         <Route index element={<SellerDashboardPage />} />
         <Route path="manage-store" element={<StoreManagement />} />
         <Route path="products" element={<ProductManagementPage />} />
-        <Route path="orders" element={<ComingSoon title="Pesanan" />} />
+        <Route path="orders" element={<OrderManagementPage />} />
       </Route>
 
       <Route
