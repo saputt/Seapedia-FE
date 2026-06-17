@@ -4,15 +4,7 @@ import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
 import LandingPage from "../pages/LandingPage";
-
-const Placeholder = ({ title }) => (
-  <div className="min-h-screen flex items-center justify-center bg-bg-primary">
-    <div className="card text-center max-w-md">
-      <h2 className="text-2xl font-bold text-brand-deep mb-2">{title}</h2>
-      <p className="text-text-secondary">Halaman ini sedang dalam pengembangan.</p>
-    </div>
-  </div>
-);
+import ComingSoon from "../shared/components/ui/ComingSoon";
 
 const lazyLoad = (importFn, name) => {
   const Component = lazy(importFn);
@@ -34,26 +26,12 @@ const RegisterPage = lazyLoad(() => import("../pages/auth/RegisterPage"), "Regis
 const RoleSelectPage = lazyLoad(() => import("../pages/auth/RoleSelectPage"), "RoleSelectPage");
 const ProductListPage = lazyLoad(() => import("../pages/products/ProductListPage"), "ProductListPage");
 const ProductDetailPage = lazyLoad(() => import("../pages/products/ProductDetailPage"), "ProductDetailPage");
-const StoreDetailPage = lazyLoad(() => import("../pages/stores/StoreDetailPage"), "StoreDetailPage");
-const BuyerDashboard = lazyLoad(() => import("../pages/dashboard/buyer/BuyerDashboard"), "BuyerDashboard");
-const CartPage = lazyLoad(() => import("../pages/dashboard/buyer/CartPage"), "CartPage");
 const CartMainPage = lazyLoad(() => import("../pages/cart/CartPage"), "CartMainPage");
-const CheckoutPage = lazyLoad(() => import("../pages/dashboard/buyer/CheckoutPage"), "CheckoutPage");
 const CheckoutMainPage = lazyLoad(() => import("../pages/checkout/CheckoutPage"), "CheckoutMainPage");
 const CheckoutSuccessPage = lazyLoad(() => import("../pages/checkout/CheckoutSuccessPage"), "CheckoutSuccessPage");
 const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHistoryPage"), "OrderHistoryPage");
 const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
-const SellerDashboard = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboard"), "SellerDashboard");
-const StoreSettingPage = lazyLoad(() => import("../pages/dashboard/seller/StoreSettingPage"), "StoreSettingPage");
-const ProductManagePage = lazyLoad(() => import("../pages/dashboard/seller/ProductManagePage"), "ProductManagePage");
-const SellerOrderPage = lazyLoad(() => import("../pages/dashboard/seller/SellerOrderPage"), "SellerOrderPage");
-const DriverDashboard = lazyLoad(() => import("../pages/dashboard/driver/DriverDashboard"), "DriverDashboard");
-const AvailableJobPage = lazyLoad(() => import("../pages/dashboard/driver/AvailableJobPage"), "AvailableJobPage");
-const JobHIstoryPage = lazyLoad(() => import("../pages/dashboard/driver/JobHIstoryPage"), "JobHIstoryPage");
-const AdminDashboard = lazyLoad(() => import("../pages/dashboard/admin/AdminDashboard"), "AdminDashboard");
-const PromoPage = lazyLoad(() => import("../pages/dashboard/admin/PromoPage"), "PromoPage");
-const VoucherPage = lazyLoad(() => import("../pages/dashboard/admin/VoucherPage"), "VoucherPage");
 
 const AppRoutes = () => {
   return (
@@ -61,7 +39,7 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/products" element={<ProductListPage />} />
       <Route path="/products/:productId" element={<ProductDetailPage />} />
-      <Route path="/stores/:storeId" element={<StoreDetailPage />} />
+      <Route path="/stores/:storeId" element={<ComingSoon title="Detail Toko" />} />
       <Route
         path="/cart"
         element={
@@ -118,7 +96,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="buyer">
-              <BuyerDashboard />
+              <ComingSoon title="Dashboard Pembeli" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -128,7 +106,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="buyer">
-              <CartPage />
+              <ComingSoon title="Keranjang" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -138,7 +116,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="buyer">
-              <CheckoutPage />
+              <CheckoutMainPage />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -179,7 +157,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <SellerDashboard />
+              <ComingSoon title="Dashboard Penjual" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -189,7 +167,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <StoreSettingPage />
+              <ComingSoon title="Pengaturan Toko" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -199,7 +177,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <ProductManagePage />
+              <ComingSoon title="Kelola Produk" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -209,7 +187,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <SellerOrderPage />
+              <ComingSoon title="Pesanan" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -220,7 +198,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="driver">
-              <DriverDashboard />
+              <ComingSoon title="Dashboard Kurir" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -230,7 +208,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="driver">
-              <AvailableJobPage />
+              <ComingSoon title="Pekerjaan Tersedia" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -240,7 +218,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="driver">
-              <JobHIstoryPage />
+              <ComingSoon title="Riwayat Pekerjaan" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -251,7 +229,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="admin">
-              <AdminDashboard />
+              <ComingSoon title="Dashboard Admin" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -261,7 +239,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="admin">
-              <PromoPage />
+              <ComingSoon title="Kelola Promo" />
             </RoleRoute>
           </PrivateRoute>
         }
@@ -271,7 +249,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="admin">
-              <VoucherPage />
+              <ComingSoon title="Kelola Voucher" />
             </RoleRoute>
           </PrivateRoute>
         }

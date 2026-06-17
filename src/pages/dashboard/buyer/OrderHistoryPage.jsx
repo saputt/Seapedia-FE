@@ -2,22 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import { useBuyerOrders, useCancelOrder } from "../../../features/order/hooks/useOrders";
-
-const STATUS_COLOR = {
-  PENDING: "text-warning",
-  READY_FOR_DELIVERY: "text-info",
-  ON_DELIVERY: "text-info",
-  DELIVERED: "text-success",
-  CANCELLED: "text-danger",
-};
-
-const STATUS_LABEL = {
-  PENDING: "Menunggu Konfirmasi",
-  READY_FOR_DELIVERY: "Siap Dikirim",
-  ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Diterima",
-  CANCELLED: "Dibatalkan",
-};
+import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 
 const OrderHistoryPage = () => {
   const { data: orders = [], isLoading, error } = useBuyerOrders();

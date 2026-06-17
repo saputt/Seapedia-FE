@@ -2,29 +2,8 @@ import { useParams } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder } from "../../../features/order/hooks/useOrders";
+import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
 import { useState } from "react";
-
-const STATUS_LABEL = {
-  PENDING: "Menunggu Konfirmasi",
-  READY_FOR_DELIVERY: "Siap Dikirim",
-  ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Diterima",
-  CANCELLED: "Dibatalkan",
-};
-
-const STATUS_COLOR = {
-  PENDING: "text-warning",
-  READY_FOR_DELIVERY: "text-info",
-  ON_DELIVERY: "text-info",
-  DELIVERED: "text-success",
-  CANCELLED: "text-danger",
-};
-
-const SHIPPING_LABEL = {
-  REGULAR: "Reguler",
-  INSTANT: "Instan",
-  NEXT_DAY: "Besok",
-};
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
