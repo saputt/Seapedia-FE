@@ -39,10 +39,10 @@ const SellerLayout = ({ children }) => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 neoborder ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? "bg-brand-subtle text-brand-deep border-brand-deep neoshadow-sm -translate-y-0.5"
-                      : "border-transparent text-text-secondary hover:text-brand-deep hover:bg-brand-subtle hover:border-brand-deep hover:neoshadow-sm hover:-translate-y-0.5 active:neoshadow active:translate-y-0"
+                      ? "bg-brand-deep text-white neoborder neoshadow-sm"
+                      : "text-text-secondary hover:text-brand-deep hover:bg-white hover:neoborder hover:neoshadow-sm hover:-translate-y-0.5 active:neoshadow active:translate-y-0"
                   }`}
                 >
                   <NavIcon path={link.icon} />
