@@ -34,7 +34,7 @@ const CheckoutSuccessPage = lazyLoad(() => import("../pages/checkout/CheckoutSuc
 const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHistoryPage"), "OrderHistoryPage");
 const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
-const StoreManagementPage = lazyLoad(() => import("../pages/stores/StoreManagementPage"), "StoreManagementPage");
+const StoreManagement = lazyLoad(() => import("../pages/dashboard/seller/StoreManagement"), "StoreManagement");
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
 const ProductManagementPage = lazyLoad(() => import("../pages/dashboard/seller/ProductManagementPage"), "ProductManagementPage");
@@ -169,7 +169,7 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<SellerDashboardPage />} />
-        <Route path="store" element={<StoreManagementPage />} />
+        <Route path="manage-store" element={<StoreManagement />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<ComingSoon title="Pesanan" />} />
       </Route>

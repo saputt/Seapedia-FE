@@ -1,11 +1,10 @@
 import { useLocation, Link, Outlet } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import MainLayout from "./MainLayout";
-import { getMyStore } from "../../../features/store/api/store.api";
+import { useMyStore } from "../../../features/store/hooks/useMyStore";
 
 const sidebarLinks = [
   { to: "/dashboard/seller", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-  { to: "/dashboard/seller/store", label: "Toko Saya", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
+  { to: "/dashboard/seller/manage-store", label: "Manajemen Toko", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
   { to: "/dashboard/seller/products", label: "Produk", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
   { to: "/dashboard/seller/orders", label: "Pesanan", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
 ];
@@ -19,10 +18,7 @@ const NavIcon = ({ path }) => (
 const SellerLayout = () => {
   const location = useLocation();
 
-  const { data: store } = useQuery({
-    queryKey: ["myStore"],
-    queryFn: getMyStore,
-  });
+  const { data: store } = useMyStore();
 
   return (
     <MainLayout navbarVariant="default">
