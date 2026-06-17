@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Navbar from "../../../shared/components/layout/Navbar";
-import Footer from "../../../shared/components/layout/Footer";
+import MainLayout from "../../../shared/components/layout/MainLayout";
 import { useWallet, useTransactions, useTopUp } from "../../../features/wallet/hooks/useWallet";
 
 const TYPE_LABEL = {
@@ -35,21 +34,17 @@ const WalletPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-bg-primary">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
+      <MainLayout>
+        <div className="flex items-center justify-center py-20">
           <span className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-
-      <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <MainLayout>
+      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="card text-center py-10">
             <p className="text-danger font-semibold mb-4">{error?.message || "Gagal memuat dompet."}</p>
@@ -173,10 +168,8 @@ const WalletPage = () => {
             </div>
           </>
         )}
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

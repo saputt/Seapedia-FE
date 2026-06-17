@@ -1,14 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../shared/components/layout/Navbar";
-import Footer from "../../shared/components/layout/Footer";
+import MainLayout from "../../shared/components/layout/MainLayout";
 
 const CheckoutSuccessPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar variant="checkout" />
-      <main className="flex-1 flex items-center justify-center px-6">
+    <MainLayout navbarVariant="checkout">
+      <div className="flex items-center justify-center py-20 px-6">
         <div className="card text-center max-w-md">
           <div className="text-5xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-text-primary mb-2">
@@ -32,9 +30,8 @@ const CheckoutSuccessPage = () => {
             </button>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
-import Navbar from "../../../shared/components/layout/Navbar";
-import Footer from "../../../shared/components/layout/Footer";
+import MainLayout from "../../../shared/components/layout/MainLayout";
 import AddressSelector from "../../../features/order/components/AddressSelector";
 import { useOrderSummary } from "../../../features/order/hooks/useOrderSummary";
 import { checkoutOrder } from "../../../features/order/api/order.api";
@@ -98,9 +97,8 @@ const CheckoutPage = () => {
   const total = subtotal + shippingCost - discount;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-      <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <MainLayout>
+      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         <h1 className="text-xl font-bold text-text-primary">Checkout</h1>
 
         <div
@@ -281,7 +279,7 @@ const CheckoutPage = () => {
         >
           {checkoutMutation.isPending ? "Memproses..." : "Buat Pesanan"}
         </button>
-      </main>
+      </div>
 
       <AddressSelector
         isOpen={showAddressSelector}
@@ -289,9 +287,7 @@ const CheckoutPage = () => {
         onSelect={handleSelectAddress}
         selectedId={selectedAddress}
       />
-
-      <Footer />
-    </div>
+    </MainLayout>
   );
 };
 

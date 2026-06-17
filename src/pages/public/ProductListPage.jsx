@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import Navbar from "../../shared/components/layout/Navbar";
-import Footer from "../../shared/components/layout/Footer";
+import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 
@@ -47,10 +46,8 @@ const ProductListPage = () => {
   }, [handleObserver]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-
-      <main className="flex-1 max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
+    <MainLayout>
+      <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
         {/* Search */}
         <div className="mb-8">
           <input
@@ -121,10 +118,8 @@ const ProductListPage = () => {
             </div>
           </>
         )}
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

@@ -1,20 +1,15 @@
-import Navbar from "../shared/components/layout/Navbar";
-import Footer from "../shared/components/layout/Footer";
+import MainLayout from "../shared/components/layout/MainLayout";
 import HeroSection from "../features/landing/components/HeroSection";
 import FeaturedProducts from "../features/landing/components/FeaturedProducts";
 import TestimonialSection from "../features/landing/components/TestimonialSection";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
-        <HeroSection />
-        <FeaturedProducts />
-        <TestimonialSection />
-      </main>
-      <Footer />
-    </div>
+    <MainLayout navbarVariant="default">
+      <HeroSection />
+      <FeaturedProducts />
+      <TestimonialSection />
+    </MainLayout>
   );
 };
 

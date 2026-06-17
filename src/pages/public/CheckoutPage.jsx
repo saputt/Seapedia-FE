@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../shared/components/layout/Navbar";
-import Footer from "../../shared/components/layout/Footer";
+import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import AddressSelector from "../../features/order/components/AddressSelector";
 import {
@@ -183,10 +182,8 @@ const CheckoutPage = () => {
   const totalPrice = summary?.totalPrice ?? 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar variant="checkout" />
-
-      <main className="flex-1 max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
+    <MainLayout navbarVariant="checkout">
+      <div className="max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
         {initialLoading && (
           <div className="space-y-6 animate-pulse">
             <div className="card h-24 bg-bg-tertiary" />
@@ -430,7 +427,7 @@ const CheckoutPage = () => {
             </button>
           </div>
         )}
-      </main>
+      </div>
 
       <AddressSelector
         isOpen={showAddressSelector}
@@ -450,9 +447,7 @@ const CheckoutPage = () => {
         actionLabel="Top Up"
         onAction={() => navigate("/dashboard/buyer/wallet")}
       />
-
-      <Footer />
-    </div>
+    </MainLayout>
   );
 };
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../../shared/components/layout/Navbar";
-import Footer from "../../shared/components/layout/Footer";
+import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import useCartStore from "../../features/cart/store/cartStore";
 import {
@@ -64,10 +63,8 @@ const CartPage = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-
-      <main className="flex-1 max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
+    <MainLayout>
+      <div className="max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
         <h1 className="text-[1.75rem] font-bold text-text-primary mb-8">
           Keranjang
         </h1>
@@ -295,7 +292,7 @@ const CartPage = () => {
             </div>
           </>
         )}
-      </main>
+      </div>
 
       <AlertModal
         isOpen={confirmClear}
@@ -306,9 +303,7 @@ const CartPage = () => {
         actionLabel="Hapus"
         onAction={handleClear}
       />
-
-      <Footer />
-    </div>
+    </MainLayout>
   );
 };
 

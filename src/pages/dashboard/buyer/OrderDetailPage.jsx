@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import Navbar from "../../../shared/components/layout/Navbar";
-import Footer from "../../../shared/components/layout/Footer";
+import MainLayout from "../../../shared/components/layout/MainLayout";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder } from "../../../features/order/hooks/useOrders";
 import { useState } from "react";
@@ -44,21 +43,18 @@ const OrderDetailPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-bg-primary">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
+      <MainLayout>
+        <div className="flex items-center justify-center py-20">
           <span className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </MainLayout>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen flex flex-col bg-bg-primary">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
+      <MainLayout>
+        <div className="flex items-center justify-center py-20">
           <div className="card text-center py-10">
             <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
             <button
@@ -68,9 +64,8 @@ const OrderDetailPage = () => {
               Coba Lagi
             </button>
           </div>
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </MainLayout>
     );
   }
 
@@ -81,9 +76,8 @@ const OrderDetailPage = () => {
   const totalPrice = order.totalPrice ?? 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar />
-      <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <MainLayout>
+      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Detail Pesanan</h1>
           <span className={`text-xs font-bold ${STATUS_COLOR[order.status] || "text-text-secondary"}`}>
@@ -205,9 +199,8 @@ const OrderDetailPage = () => {
             </button>
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 
