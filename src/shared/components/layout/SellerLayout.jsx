@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, Outlet } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "./MainLayout";
 import { getMyStore } from "../../../features/store/api/store.api";
@@ -16,7 +16,7 @@ const NavIcon = ({ path }) => (
   </svg>
 );
 
-const SellerLayout = ({ children }) => {
+const SellerLayout = () => {
   const location = useLocation();
 
   const { data: store } = useQuery({
@@ -41,8 +41,8 @@ const SellerLayout = ({ children }) => {
                   to={link.to}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? "bg-brand-deep text-white neoborder neoshadow-sm"
-                      : "text-text-secondary hover:text-brand-deep hover:bg-white hover:neoborder hover:neoshadow-sm hover:-translate-y-0.5 active:neoshadow active:translate-y-0"
+                      ? "bg-brand-deep text-white border-2 border-brand-deep neoshadow-sm"
+                      : "text-text-secondary border-2 border-transparent hover:text-brand-deep hover:bg-white hover:border-brand-deep hover:neoshadow-sm hover:-translate-y-0.5 active:neoshadow active:translate-y-0"
                   }`}
                 >
                   <NavIcon path={link.icon} />
@@ -53,7 +53,7 @@ const SellerLayout = ({ children }) => {
           </nav>
         </aside>
         <div className="flex-1 p-6 lg:p-8 overflow-auto">
-          {children}
+          <Outlet />
         </div>
       </div>
     </MainLayout>

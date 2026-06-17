@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import SellerLayout from "../../../shared/components/layout/SellerLayout";
 import { getMyStore } from "../../../features/store/api/store.api";
 import { getSellerOrders } from "../../../features/order/api/order.api";
 import { getAllProducts } from "../../../features/catalog/api/catalog.api";
@@ -76,16 +75,14 @@ const SellerDashboardPage = () => {
 
   if (isLoading) {
     return (
-      <SellerLayout>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-        </div>
-      </SellerLayout>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <SellerLayout>
+    <>
       <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard</h1>
       <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
 
@@ -129,7 +126,7 @@ const SellerDashboardPage = () => {
           </div>
         </div>
       )}
-    </SellerLayout>
+    </>
   );
 };
 

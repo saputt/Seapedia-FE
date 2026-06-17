@@ -5,6 +5,7 @@ import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
 import LandingPage from "../pages/LandingPage";
 import ComingSoon from "../shared/components/ui/ComingSoon";
+import SellerLayout from "../shared/components/layout/SellerLayout";
 
 const lazyLoad = (importFn, name) => {
   const Component = lazy(importFn);
@@ -162,46 +163,22 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <SellerDashboardPage />
+              <SellerLayout />
             </RoleRoute>
           </PrivateRoute>
         }
-      />
-      <Route
-        path="/dashboard/seller/store"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="seller">
-              <StoreManagementPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
+      >
+        <Route index element={<SellerDashboardPage />} />
+        <Route path="store" element={<StoreManagementPage />} />
+        <Route path="products" element={<ProductManagementPage />} />
+        <Route path="orders" element={<ComingSoon title="Pesanan" />} />
+      </Route>
+
       <Route
         path="/dashboard/seller/create-store"
         element={
           <PrivateRoute>
             <CreateStorePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/seller/products"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="seller">
-              <ProductManagementPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/seller/orders"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="seller">
-              <ComingSoon title="Pesanan" />
-            </RoleRoute>
           </PrivateRoute>
         }
       />

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import SellerLayout from "../../../shared/components/layout/SellerLayout";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import { getReadableError } from "../../../shared/utils/errorMapper";
@@ -121,7 +120,7 @@ const ProductManagementPage = () => {
   const total = productsData?.total || 0;
 
   return (
-    <SellerLayout>
+    <>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Produk</h1>
         <button onClick={() => { setEditingProduct(null); setShowForm(true); }} className="btn-primary text-sm !py-2 !px-4">
@@ -221,7 +220,7 @@ const ProductManagementPage = () => {
           onClose={() => { setShowForm(false); setEditingProduct(null); }}
         />
       )}
-    </SellerLayout>
+    </>
   );
 };
 
