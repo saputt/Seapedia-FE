@@ -9,3 +9,9 @@ export const createStore = (dto) =>
     method: "POST",
     body: JSON.stringify(dto),
   });
+
+export const updateStore = (storeId, dto) =>
+  apiFetch(`stores/${storeId}`, {
+    method: "PUT",
+    body: JSON.stringify(dto),
+  });

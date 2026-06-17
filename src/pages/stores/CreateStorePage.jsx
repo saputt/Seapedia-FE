@@ -1,20 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import { useCreateStore } from "../../features/store/hooks/useCreateStore";
+import { getMyStore } from "../../features/store/api/store.api";
 import { getReadableError } from "../../shared/utils/errorMapper";
 
 const CreateStorePage = () => {
+  const navigate = useNavigate();
+  const { data: store, isLoading } = useQuery({
+    queryKey: ["myStore"],
+    queryFn: getMyStore,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!isLoading && store) {
+      navigate("/dashboard/seller", { replace: true });
+    }
+  }, [store, isLoading, navigate]);
+
   const [storeName, setStoreName] = useState("");
   const [description, setDescription] = useState("");
   const createStoreMutation = useCreateStore();
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!storeName.trim() || !description.trim()) return;
     createStoreMutation.mutate({ storeName: storeName.trim(), description: description.trim() });
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout navbarVariant="default">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout navbarVariant="default">
