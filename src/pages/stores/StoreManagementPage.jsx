@@ -11,17 +11,17 @@ const StoreManagementPage = () => {
   const [storeName, setStoreName] = useState("");
   const [description, setDescription] = useState("");
 
-  const { data: store, isLoading } = useQuery({
+  const { data: store, isLoading, isFetching } = useQuery({
     queryKey: ["myStore"],
     queryFn: getMyStore,
     retry: false,
   });
 
   useEffect(() => {
-    if (!isLoading && !store) {
+    if (!isLoading && !isFetching && !store) {
       navigate("/dashboard/seller/create-store", { replace: true });
     }
-  }, [store, isLoading, navigate]);
+  }, [store, isLoading, isFetching, navigate]);
 
   const updateMutation = useMutation({
     mutationFn: () => updateStore(store.id, { storeName: storeName.trim(), description: description.trim() }),
