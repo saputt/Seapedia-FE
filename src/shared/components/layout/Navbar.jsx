@@ -110,6 +110,7 @@ const Navbar = ({ variant = "default" }) => {
 
   if (variant === "seller") {
     return (
+      <>
       <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
           <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
@@ -172,6 +173,8 @@ const Navbar = ({ variant = "default" }) => {
           </div>
         </div>
       </nav>
+        <SwitchRoleModal role={switchingRole} />
+      </>
     );
   }
 
