@@ -1,64 +1,48 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router";
 import Navbar from "../../../shared/components/layout/Navbar";
 import Footer from "../../../shared/components/layout/Footer";
-import AlertModal from "../../../shared/components/ui/AlertModal";
-import { getOrderById, cancelOrder } from "../../../features/order/api/order.api";
+import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
+import { useCancelOrder } from "../../../features/order/hooks/useOrders";
+import { useState } from "react";
 
 const STATUS_LABEL = {
   PENDING: "Menunggu Konfirmasi",
   READY_FOR_DELIVERY: "Siap Dikirim",
   ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Selesai",
+  DELIVERED: "Diterima",
   CANCELLED: "Dibatalkan",
 };
 
-const STATUS_STYLE = {
-  PENDING: "text-yellow-600 bg-yellow-50",
-  READY_FOR_DELIVERY: "text-blue-600 bg-blue-50",
-  ON_DELIVERY: "text-purple-600 bg-purple-50",
-  DELIVERED: "text-green-600 bg-green-50",
-  CANCELLED: "text-red-600 bg-red-50",
+const STATUS_COLOR = {
+  PENDING: "text-warning",
+  READY_FOR_DELIVERY: "text-info",
+  ON_DELIVERY: "text-info",
+  DELIVERED: "text-success",
+  CANCELLED: "text-danger",
 };
 
 const SHIPPING_LABEL = {
-  REGULAR: "Reguler (3-5 hari)",
-  INSTANT: "Instant (1-2 hari)",
-  NEXT_DAY: "Next Day (Besok)",
+  REGULAR: "Reguler",
+  INSTANT: "Instan",
+  NEXT_DAY: "Besok",
 };
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
-  const navigate = useNavigate();
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: raw, isLoading, error } = useOrderDetail(orderId);
+  const order = raw?.order ?? raw;
+  const cancelMutation = useCancelOrder();
   const [cancelling, setCancelling] = useState(false);
-  const [cancelError, setCancelError] = useState("");
-  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleCancel = async () => {
-    setShowCancelModal(false);
     setCancelling(true);
-    setCancelError("");
     try {
-      await cancelOrder(orderId);
-      navigate("/dashboard/buyer/orders");
-    } catch (err) {
-      setCancelError(err?.message || "Gagal membatalkan pesanan.");
-    } finally {
-      setCancelling(false);
-    }
+      await cancelMutation.mutateAsync(orderId);
+    } catch (e) { /* handled */ }
+    setCancelling(false);
   };
 
-  useEffect(() => {
-    getOrderById(orderId)
-      .then(setOrder)
-      .catch((err) => setError(err?.message || "Gagal memuat detail pesanan."))
-      .finally(() => setLoading(false));
-  }, [orderId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-bg-primary">
         <Navbar />
@@ -70,18 +54,18 @@ const OrderDetailPage = () => {
     );
   }
 
-  if (error) {
+  if (error || !order) {
     return (
       <div className="min-h-screen flex flex-col bg-bg-primary">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center px-6">
-          <div className="card text-center max-w-md">
-            <p className="text-danger font-semibold mb-4">{error}</p>
+        <main className="flex-1 flex items-center justify-center">
+          <div className="card text-center py-10">
+            <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
             <button
-              onClick={() => navigate("/dashboard/buyer/orders")}
+              onClick={() => window.location.reload()}
               className="btn-primary text-sm !py-2 !px-6"
             >
-              Kembali
+              Coba Lagi
             </button>
           </div>
         </main>
@@ -90,180 +74,138 @@ const OrderDetailPage = () => {
     );
   }
 
-  const canCancel = order.status === "PENDING";
+  const subtotal = order.subtotal ?? 0;
+  const shippingFee = order.shippingFee ?? 0;
+  const discountValue = order.discountValue ?? 0;
+  const taxFee = order.taxFee ?? 0;
+  const totalPrice = order.totalPrice ?? 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
-      <Navbar variant="checkout" />
-
+      <Navbar />
       <main className="flex-1 max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Detail Pesanan</h1>
-          <span
-            className={`text-xs font-semibold px-3 py-1 rounded-full ${
-              STATUS_STYLE[order.status] || "text-gray-600 bg-gray-50"
-            }`}
-          >
+          <span className={`text-xs font-bold ${STATUS_COLOR[order.status] || "text-text-secondary"}`}>
             {STATUS_LABEL[order.status] || order.status}
           </span>
         </div>
 
-        {/* Store */}
-        <div className="card">
-          <p className="text-sm font-semibold text-text-primary">
-            {order.store?.name || "Toko"}
-          </p>
-        </div>
+        {order.store && (
+          <div className="card">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-brand-deep/10 flex items-center justify-center text-brand-deep font-bold text-sm">
+                {order.store.storeName?.charAt(0) || "S"}
+              </div>
+              <p className="text-sm font-semibold text-text-primary">{order.store.storeName}</p>
+            </div>
+          </div>
+        )}
 
-        {/* Items */}
         <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-3">
-            Produk ({order.orderItems?.length || 0})
-          </h2>
+          <h2 className="text-sm font-bold text-text-primary mb-3">Pesanan #{order.id?.slice(0, 8)}</h2>
+          <p className="text-xs text-text-muted mb-4">
+            {new Date(order.createdAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+
           <div className="space-y-3">
-            {order.orderItems?.map((item) => (
-              <div key={item.id} className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-bg-tertiary rounded flex items-center justify-center overflow-hidden shrink-0">
-                  {item.product?.imageUrl ? (
-                    <img
-                      src={item.product.imageUrl}
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xs text-text-muted">Img</span>
-                  )}
+            {order.orderItems?.map((item, i) => (
+              <div key={item.id || i} className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-xl bg-brand-subtle flex-shrink-0 overflow-hidden">
+                  <img
+                    src={item.product?.imageUrl || "/placeholder.png"}
+                    alt={item.product?.name || "Product"}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text-primary truncate">
-                    {item.product?.name}
+                    {item.product?.name || "Produk"}
                   </p>
-                  <p className="text-xs text-text-secondary">
-                    Rp{item.price?.toLocaleString("id-ID")} x {item.quantity}
-                  </p>
+                  <p className="text-xs text-text-muted">{item.quantity}x @ Rp{item.price?.toLocaleString("id-ID")}</p>
                 </div>
-                <p className="text-sm font-semibold text-text-primary shrink-0">
-                  Rp{(item.price * item.quantity).toLocaleString("id-ID")}
+                <p className="text-sm font-semibold text-text-primary">
+                  Rp{(item.price * item.quantity)?.toLocaleString("id-ID")}
                 </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Address */}
-        <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-2">
-            Alamat Pengiriman
-          </h2>
-          <p className="text-sm font-semibold text-text-primary">
-            {order.address?.label}
-          </p>
-          <p className="text-xs text-text-secondary mt-0.5">
-            {order.address?.completeAddress}
-          </p>
-        </div>
+        {order.address && (
+          <div className="card">
+            <h2 className="text-sm font-bold text-text-primary mb-2">Alamat Pengiriman</h2>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {order.address.label && (
+                <span className="font-semibold text-text-primary">{order.address.label}</span>
+              )}
+              {order.address.label && <br />}
+              {order.address.completeAddress}
+            </p>
+          </div>
+        )}
 
-        {/* Shipping */}
         <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-2">
-            Metode Pengiriman
-          </h2>
-          <p className="text-sm text-text-primary">
-            {SHIPPING_LABEL[order.shippingMethod] || order.shippingMethod}
-          </p>
-        </div>
+          <h2 className="text-sm font-bold text-text-primary mb-3">Rincian Pembayaran</h2>
 
-        {/* Price Summary */}
-        <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-3">
-            Ringkasan Pembayaran
-          </h2>
-          <div className="space-y-2 text-sm">
+          {order.shippingMethod && (
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-text-secondary">Metode Pengiriman</span>
+              <span className="font-medium text-text-primary">{SHIPPING_LABEL[order.shippingMethod] || order.shippingMethod}</span>
+            </div>
+          )}
+
+          <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
               <span className="text-text-secondary">Subtotal</span>
-              <span className="font-medium">
-                Rp{order.subtotal?.toLocaleString("id-ID")}
+              <span className="font-medium text-text-primary">Rp{subtotal.toLocaleString("id-ID")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">Ongkos Kirim</span>
+              <span className="font-medium text-text-primary">
+                {shippingFee > 0 ? `Rp${shippingFee.toLocaleString("id-ID")}` : "Gratis"}
               </span>
             </div>
-            {order.discountValue > 0 && (
+            {discountValue > 0 && (
               <div className="flex justify-between text-success">
                 <span>Diskon</span>
-                <span className="font-medium">
-                  -Rp{order.discountValue?.toLocaleString("id-ID")}
-                </span>
+                <span className="font-medium">-Rp{discountValue.toLocaleString("id-ID")}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-text-secondary">Ongkos Kirim</span>
-              <span className="font-medium">
-                Rp{order.shippingFee?.toLocaleString("id-ID")}
-              </span>
+              <span className="text-text-secondary">Pajak</span>
+              <span className="font-medium text-text-primary">Rp{taxFee.toLocaleString("id-ID")}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-text-secondary">Pajak (12%)</span>
-              <span className="font-medium">
-                Rp{order.taxFee?.toLocaleString("id-ID")}
-              </span>
-            </div>
-            <div className="border-t-[2px] border-bg-tertiary pt-2 flex justify-between text-base font-bold">
-              <span>Total</span>
-              <span className="text-brand-deep">
-                Rp{order.totalPrice?.toLocaleString("id-ID")}
+            <div className="flex justify-between pt-2 border-t border-border">
+              <span className="font-bold text-text-primary">Total</span>
+              <span className="font-bold text-brand-deep text-lg">
+                Rp{Math.max(0, totalPrice).toLocaleString("id-ID")}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Order Date */}
-        <p className="text-xs text-text-muted text-center">
-          Dibuat pada{" "}
-          {new Date(order.createdAt).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
-
-        {/* Cancel */}
-        {cancelError && (
-          <p className="text-danger text-sm text-center">{cancelError}</p>
+        {order.status === "PENDING" && (
+          <div className="card">
+            <p className="text-sm text-text-secondary mb-3">
+              Apakah Anda yakin ingin membatalkan pesanan ini?
+            </p>
+            <button
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="btn-primary bg-danger hover:bg-danger/90 text-sm !py-2 !px-6"
+            >
+              {cancelling ? "Membatalkan..." : "Batalkan Pesanan"}
+            </button>
+          </div>
         )}
-        <button
-          onClick={() => setShowCancelModal(true)}
-          disabled={!canCancel || cancelling}
-          className={`w-full text-sm !py-2 ${
-            canCancel ? "btn-danger" : "btn-ghost opacity-50 cursor-not-allowed"
-          }`}
-        >
-          {cancelling
-            ? "Membatalkan..."
-            : canCancel
-              ? "Batalkan Pesanan"
-              : "Pesanan Tidak Dapat Dibatalkan"}
-        </button>
-
-        {/* Back */}
-        <button
-          onClick={() => navigate("/dashboard/buyer/orders")}
-          className="btn-ghost w-full text-sm !py-2"
-        >
-          Kembali ke Pesanan
-        </button>
       </main>
-
-      <AlertModal
-        isOpen={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        icon="⚠️"
-        title="Batalkan Pesanan?"
-        message="Pesanan yang dibatalkan tidak dapat dikembalikan. Apakah Anda yakin?"
-        actionLabel="Ya, Batalkan"
-        onAction={handleCancel}
-      />
-
       <Footer />
     </div>
   );
