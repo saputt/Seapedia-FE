@@ -36,6 +36,7 @@ const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"),
 const StoreManagementPage = lazyLoad(() => import("../pages/stores/StoreManagementPage"), "StoreManagementPage");
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
+const ProductManagementPage = lazyLoad(() => import("../pages/dashboard/seller/ProductManagementPage"), "ProductManagementPage");
 
 const AppRoutes = () => {
   return (
@@ -189,7 +190,7 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="seller">
-              <ComingSoon title="Kelola Produk" />
+              <ProductManagementPage />
             </RoleRoute>
           </PrivateRoute>
         }
