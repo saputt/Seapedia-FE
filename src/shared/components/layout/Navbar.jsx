@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
 import { switchUserRole } from "../../../features/auth/api/auth.api";
+import { getMyStore } from "../../../features/store/api/store.api";
+import SwitchRoleModal from "./../ui/SwitchRoleModal";
 
 const Navbar = ({ variant = "default" }) => {
   const navigate = useNavigate();
@@ -23,26 +25,40 @@ const Navbar = ({ variant = "default" }) => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartHover, setCartHover] = useState(false);
+  const [switchingRole, setSwitchingRole] = useState(null);
   const profileRef = useRef(null);
   const cartRef = useRef(null);
 
-  const handleSellerClick = useCallback(() => {
+  const handleSellerClick = useCallback(async () => {
     setDropdownOpen(false);
-    navigate("/dashboard/seller/create-store");
-  }, [navigate]);
+    try {
+      const store = await getMyStore();
+      if (store) {
+        setSwitchingRole("SELLER");
+        const res = await switchUserRole("SELLER");
+        switchRole("SELLER", res.accessToken);
+        setSwitchingRole(null);
+        navigate("/dashboard/seller", { replace: true });
+      } else {
+        navigate("/dashboard/seller/create-store");
+      }
+    } catch {
+      navigate("/dashboard/seller/create-store");
+    }
+  }, [navigate, switchRole]);
 
   const handleBuyerClick = useCallback(async () => {
     setDropdownOpen(false);
-    if (activeRole !== "BUYER") {
-      try {
-        const res = await switchUserRole("BUYER");
-        switchRole("BUYER", res.accessToken);
-      } catch {
-        return;
-      }
+    setSwitchingRole("BUYER");
+    try {
+      const res = await switchUserRole("BUYER");
+      switchRole("BUYER", res.accessToken);
+      setSwitchingRole(null);
+      navigate("/dashboard/buyer", { replace: true });
+    } catch {
+      setSwitchingRole(null);
     }
-    navigate("/dashboard/buyer");
-  }, [activeRole, navigate, switchRole]);
+  }, [navigate, switchRole]);
 
   useEffect(() => {
     if (isLoggedIn) refreshCart();
@@ -103,6 +119,7 @@ const Navbar = ({ variant = "default" }) => {
   const hasMore = cartItems.length > 5;
 
   return (
+    <>
     <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
       <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
         <div className="flex items-center gap-8">
@@ -297,6 +314,8 @@ const Navbar = ({ variant = "default" }) => {
         </div>
       </div>
     </nav>
+      <SwitchRoleModal role={switchingRole} />
+    </>
   );
 };
 
