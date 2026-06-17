@@ -9,14 +9,12 @@ export const useCreateStore = () => {
   const switchRole = useAuthStore((s) => s.switchRole);
 
   return useMutation({
-    mutationFn: createStore,
-    onSuccess: async () => {
-      try {
-        const res = await switchUserRole("SELLER");
-        switchRole("SELLER", res.accessToken);
-      } catch {
-        /* silent */
-      }
+    mutationFn: async (dto) => {
+      const res = await switchUserRole("SELLER");
+      switchRole("SELLER", res.accessToken);
+      return createStore(dto);
+    },
+    onSuccess: () => {
       navigate("/dashboard/seller", { replace: true });
     },
   });
