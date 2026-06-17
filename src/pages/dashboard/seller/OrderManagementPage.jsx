@@ -10,8 +10,8 @@ const OrderManagementPage = () => {
   const [expandedId, setExpandedId] = useState(null);
 
   const { data: store } = useMyStore();
-  const { data: orders = [], isLoading, error } = useSellerOrders(
-    filter === "ALL" ? { orderBy: "dsc" } : { status: filter, orderBy: "dsc" }
+  const { data: orders = [], isLoading, isFetching, error } = useSellerOrders(
+    filter === "ALL" ? { orderBy: "desc" } : { status: filter, orderBy: "asc" }
   );
   const progressMutation = useUpdateOrderStatus();
 
@@ -20,17 +20,11 @@ const OrderManagementPage = () => {
     progressMutation.mutate({ orderId, storeId: store.id });
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
+        <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
           <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
@@ -62,15 +56,23 @@ const OrderManagementPage = () => {
         ))}
       </div>
 
-      {orders.length === 0 && (
-        <div className="card text-center py-10">
-          <p className="text-sm text-text-secondary">
-            {filter === "ALL" ? "Belum ada pesanan." : `Tidak ada pesanan dengan status "${STATUS_LABEL[filter] || filter}".`}
-          </p>
-        </div>
-      )}
+      <div className="relative min-h-[200px]">
+        {(isLoading || isFetching) && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+            <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
 
-      <div className="space-y-4">
+        {!isLoading && orders.length === 0 && (
+          <div className="card text-center py-10">
+            <p className="text-sm text-text-secondary">
+              {filter === "ALL" ? "Belum ada pesanan." : `Tidak ada pesanan dengan status "${STATUS_LABEL[filter] || filter}".`}
+            </p>
+          </div>
+        )}
+
+        {orders.length > 0 && (
+        <div className="space-y-4">
         {orders.map((order) => (
           <div key={order.id} className="card overflow-hidden">
             <div
@@ -231,6 +233,8 @@ const OrderManagementPage = () => {
             )}
           </div>
         ))}
+      </div>
+        )}
       </div>
     </div>
   );
