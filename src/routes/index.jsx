@@ -32,16 +32,15 @@ const lazyLoad = (importFn, name) => {
 const LoginPage = lazyLoad(() => import("../pages/auth/LoginPage"), "LoginPage");
 const RegisterPage = lazyLoad(() => import("../pages/auth/RegisterPage"), "RegisterPage");
 const RoleSelectPage = lazyLoad(() => import("../pages/auth/RoleSelectPage"), "RoleSelectPage");
-const HomePage = lazyLoad(() => import("../pages/public/HomePage"), "HomePage");
-const ProductListPage = lazyLoad(() => import("../pages/public/ProductListPage"), "ProductListPage");
-const ProductDetailPage = lazyLoad(() => import("../pages/public/ProductDetailPage"), "ProductDetailPage");
-const StoreDetailPage = lazyLoad(() => import("../pages/public/StoreDetailPage"), "StoreDetailPage");
+const ProductListPage = lazyLoad(() => import("../pages/products/ProductListPage"), "ProductListPage");
+const ProductDetailPage = lazyLoad(() => import("../pages/products/ProductDetailPage"), "ProductDetailPage");
+const StoreDetailPage = lazyLoad(() => import("../pages/stores/StoreDetailPage"), "StoreDetailPage");
 const BuyerDashboard = lazyLoad(() => import("../pages/dashboard/buyer/BuyerDashboard"), "BuyerDashboard");
 const CartPage = lazyLoad(() => import("../pages/dashboard/buyer/CartPage"), "CartPage");
-const PublicCartPage = lazyLoad(() => import("../pages/public/CartPage"), "PublicCartPage");
+const CartMainPage = lazyLoad(() => import("../pages/cart/CartPage"), "CartMainPage");
 const CheckoutPage = lazyLoad(() => import("../pages/dashboard/buyer/CheckoutPage"), "CheckoutPage");
-const PublicCheckoutPage = lazyLoad(() => import("../pages/public/CheckoutPage"), "PublicCheckoutPage");
-const CheckoutSuccessPage = lazyLoad(() => import("../pages/public/CheckoutSuccessPage"), "CheckoutSuccessPage");
+const CheckoutMainPage = lazyLoad(() => import("../pages/checkout/CheckoutPage"), "CheckoutMainPage");
+const CheckoutSuccessPage = lazyLoad(() => import("../pages/checkout/CheckoutSuccessPage"), "CheckoutSuccessPage");
 const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHistoryPage"), "OrderHistoryPage");
 const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
@@ -67,7 +66,7 @@ const AppRoutes = () => {
         path="/cart"
         element={
           <PrivateRoute>
-            <PublicCartPage />
+            <CartMainPage />
           </PrivateRoute>
         }
       />
@@ -76,7 +75,7 @@ const AppRoutes = () => {
         path="/checkout"
         element={
           <PrivateRoute>
-            <PublicCheckoutPage />
+            <CheckoutMainPage />
           </PrivateRoute>
         }
       />
