@@ -21,7 +21,7 @@ const SellerLayout = () => {
   const { data: store } = useMyStore();
 
   return (
-    <MainLayout navbarVariant="default">
+    <MainLayout navbarVariant="seller">
       <div className="flex min-h-[calc(100vh-4rem)]">
         <aside className="w-60 shrink-0 border-r-[3px] border-brand-deep/20 bg-bg-secondary hidden lg:flex lg:flex-col">
           <div className="p-5 border-b-[3px] border-brand-deep/20">
