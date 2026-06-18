@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useParams } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
+import AlertModal from "../../../shared/components/ui/AlertModal";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
-import { useState } from "react";
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -13,8 +14,10 @@ const OrderDetailPage = () => {
   const confirmMutation = useBuyerConfirmOrder();
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [modal, setModal] = useState(null);
 
   const handleCancel = async () => {
+    setModal(null);
     setCancelling(true);
     try {
       await cancelMutation.mutateAsync(orderId);
@@ -23,6 +26,7 @@ const OrderDetailPage = () => {
   };
 
   const handleConfirm = async () => {
+    setModal(null);
     setConfirming(true);
     try {
       await confirmMutation.mutateAsync({ orderId, storeId: order.storeId });
@@ -177,7 +181,9 @@ const OrderDetailPage = () => {
         <div className="card">
           <div className="flex items-center gap-3">
             <button
-              onClick={handleCancel}
+              onClick={() => {
+                if (order.status === "PENDING") setModal("cancel");
+              }}
               disabled={order.status !== "PENDING" || cancelling}
               className={`text-sm !py-2 !px-6 font-bold transition-all ${
                 order.status === "PENDING"
@@ -188,7 +194,9 @@ const OrderDetailPage = () => {
               {cancelling ? "Membatalkan..." : "Batalkan"}
             </button>
             <button
-              onClick={handleConfirm}
+              onClick={() => {
+                if (order.status === "ON_DELIVERY") setModal("confirm");
+              }}
               disabled={order.status !== "ON_DELIVERY" || confirming}
               className={`text-sm !py-2 !px-6 font-bold transition-all ${
                 order.status === "ON_DELIVERY"
@@ -201,6 +209,20 @@ const OrderDetailPage = () => {
           </div>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={!!modal}
+        onClose={() => setModal(null)}
+        icon={modal === "cancel" ? "⚠️" : "✅"}
+        title={modal === "cancel" ? "Batalkan Pesanan" : "Konfirmasi Penerimaan"}
+        message={
+          modal === "cancel"
+            ? "Apakah Anda yakin ingin membatalkan pesanan ini? Pesanan yang dibatalkan tidak dapat dikembalikan."
+            : "Apakah Anda yakin ingin mengonfirmasi bahwa pesanan ini sudah diterima?"
+        }
+        actionLabel={modal === "cancel" ? "Ya, Batalkan" : "Ya, Konfirmasi"}
+        onAction={modal === "cancel" ? handleCancel : handleConfirm}
+      />
     </MainLayout>
   );
 };

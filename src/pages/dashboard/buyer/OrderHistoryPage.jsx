@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
+import AlertModal from "../../../shared/components/ui/AlertModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 
@@ -11,6 +12,7 @@ const OrderHistoryPage = () => {
   const [filter, setFilter] = useState("ALL");
   const [cancellingId, setCancellingId] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [modal, setModal] = useState(null);
 
   const statuses = ["ALL", ...new Set(orders.map((o) => o.status))];
 
@@ -20,6 +22,7 @@ const OrderHistoryPage = () => {
       : orders.filter((o) => o.status === filter);
 
   const handleCancel = async (orderId) => {
+    setModal(null);
     setCancellingId(orderId);
     try {
       await cancelMutation.mutateAsync(orderId);
@@ -28,6 +31,7 @@ const OrderHistoryPage = () => {
   };
 
   const handleConfirm = async (orderId, storeId) => {
+    setModal(null);
     setConfirmingId(orderId);
     try {
       await confirmMutation.mutateAsync({ orderId, storeId });
@@ -159,7 +163,9 @@ const OrderHistoryPage = () => {
                   <button
                     onClick={(e) => {
                       e.preventDefault();
-                      handleCancel(order.id);
+                      if (order.status === "PENDING") {
+                        setModal({ type: "cancel", orderId: order.id });
+                      }
                     }}
                     disabled={order.status !== "PENDING" || cancellingId === order.id}
                     className={`text-xs font-bold transition-colors disabled:opacity-40 ${
@@ -174,7 +180,7 @@ const OrderHistoryPage = () => {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        handleConfirm(order.id, order.storeId);
+                        setModal({ type: "confirm", orderId: order.id, storeId: order.storeId });
                       }}
                       disabled={confirmingId === order.id}
                       className="text-xs font-bold text-success hover:text-success/80 transition-colors disabled:opacity-50"
@@ -188,6 +194,24 @@ const OrderHistoryPage = () => {
           ))}
         </div>
       </div>
+
+      <AlertModal
+        isOpen={!!modal}
+        onClose={() => setModal(null)}
+        icon={modal?.type === "cancel" ? "⚠️" : "✅"}
+        title={modal?.type === "cancel" ? "Batalkan Pesanan" : "Konfirmasi Penerimaan"}
+        message={
+          modal?.type === "cancel"
+            ? "Apakah Anda yakin ingin membatalkan pesanan ini? Pesanan yang dibatalkan tidak dapat dikembalikan."
+            : "Apakah Anda yakin ingin mengonfirmasi bahwa pesanan ini sudah diterima?"
+        }
+        actionLabel={modal?.type === "cancel" ? "Ya, Batalkan" : "Ya, Konfirmasi"}
+        onAction={() =>
+          modal?.type === "cancel"
+            ? handleCancel(modal.orderId)
+            : handleConfirm(modal.orderId, modal.storeId)
+        }
+      />
     </MainLayout>
   );
 };
