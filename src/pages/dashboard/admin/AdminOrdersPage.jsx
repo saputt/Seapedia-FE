@@ -7,8 +7,8 @@ const PAGE_SIZE = 10;
 const AdminOrdersPage = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useAdminOrders(page);
-  const orders = data?.data?.data ?? [];
-  const totalPages = data?.data?.totalPages ?? 1;
+  const orders = data?.data ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   if (isLoading) {
     return (

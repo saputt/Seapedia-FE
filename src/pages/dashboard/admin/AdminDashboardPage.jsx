@@ -14,9 +14,9 @@ const StatCard = ({ label, value, color, prefix }) => (
 const AdminDashboardPage = () => {
   const { data, isLoading, error } = useAdminDashboard();
   const navigate = useNavigate();
-  const stats = data?.data?.stats;
-  const ordersByStatus = data?.data?.ordersByStatus ?? {};
-  const recentOrders = data?.data?.recentOrders ?? [];
+  const stats = data?.stats;
+  const ordersByStatus = data?.ordersByStatus ?? {};
+  const recentOrders = data?.recentOrders ?? [];
 
   if (isLoading) {
     return (
