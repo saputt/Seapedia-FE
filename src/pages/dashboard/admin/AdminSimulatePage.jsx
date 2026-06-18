@@ -1,95 +1,137 @@
-import { useState } from "react";
-import { useSimulateOverdue } from "../../../features/admin/hooks/useAdmin";
+import { useState, useEffect } from "react";
+import { useSimulateOverdue, useResetSimulation, useSimulationStatus } from "../../../features/admin/hooks/useAdmin";
 
 const SHIPPING_LABEL = { INSTANT: "Instan", NEXT_DAY: "Besok", REGULAR: "Reguler" };
 const SHIPPING_COLOR = { INSTANT: "text-warning", NEXT_DAY: "text-info", REGULAR: "text-text-primary" };
 
 const AdminSimulatePage = () => {
+  const [days, setDays] = useState("1");
   const [result, setResult] = useState(null);
   const mutation = useSimulateOverdue();
+  const resetMutation = useResetSimulation();
+  const { data: simStatus, refetch: refetchStatus } = useSimulationStatus();
+
+  const totalSkipped = simStatus?.data?.totalDaysSkipped ?? 0;
 
   const handleSimulate = async () => {
+    const daysToSkip = parseInt(days, 10) || 1;
     setResult(null);
     try {
-      const res = await mutation.mutateAsync();
+      const res = await mutation.mutateAsync(daysToSkip);
       setResult({ success: true, data: res });
     } catch (e) {
       setResult({ success: false, message: e?.message || "Simulasi gagal." });
     }
   };
 
+  const handleReset = async () => {
+    setResult(null);
+    try {
+      await resetMutation.mutateAsync();
+      refetchStatus();
+    } catch (e) { /* handled */ }
+  };
+
   return (
     <>
       <h1 className="text-2xl font-bold text-text-primary mb-1">Simulasi Overdue</h1>
-      <p className="text-sm text-text-muted mb-6">Jalankan pembatalan otomatis pesanan yang melewati batas SLA</p>
+      <p className="text-sm text-text-muted mb-6">Majukan waktu simulasi untuk memproses pesanan yang melewati batas SLA</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="card lg:col-span-2">
           <h2 className="text-sm font-bold text-text-primary mb-3">Aturan SLA</h2>
-          <p className="text-sm text-text-secondary mb-4">
-            Sistem akan membatalkan pesanan yang menggantung dan melewati batas waktu berikut:
-          </p>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-6">
             {[
-              { method: "INSTANT", label: "Instan", days: 1, desc: "Pesanan lewat 1 hari otomatis dibatalkan" },
-              { method: "NEXT_DAY", label: "Besok", days: 2, desc: "Pesanan lewat 2 hari otomatis dibatalkan" },
-              { method: "REGULAR", label: "Reguler", days: 3, desc: "Pesanan lewat 3 hari otomatis dibatalkan" },
+              { method: "INSTANT", label: "Instan", days: 1 },
+              { method: "NEXT_DAY", label: "Besok", days: 2 },
+              { method: "REGULAR", label: "Reguler", days: 3 },
             ].map((sla) => (
               <div key={sla.method} className="flex items-center gap-3 px-3 py-2 rounded bg-brand-subtle">
                 <span className={`text-sm font-bold ${SHIPPING_COLOR[sla.method]}`}>{sla.label}</span>
-                <span className="text-sm text-text-secondary">{sla.desc}</span>
+                <span className="text-sm text-text-secondary">
+                  Pesanan dibuat {sla.days} hari yang lalu (waktu simulasi) otomatis dibatalkan
+                </span>
               </div>
             ))}
           </div>
 
-          <button
-            onClick={handleSimulate}
-            disabled={mutation.isPending}
-            className="btn-primary text-sm !py-2.5 !px-8 mt-6"
-          >
-            {mutation.isPending ? "Memproses..." : "Jalankan Simulasi"}
-          </button>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
+            <label className="text-sm font-semibold text-text-primary whitespace-nowrap">Skip hari:</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={days}
+              onChange={(e) => setDays(e.target.value.replace(/[^0-9]/g, ""))}
+              onKeyDown={(e) => e.key === "Enter" && handleSimulate()}
+              className="input-neo !py-2 !text-sm w-24"
+              placeholder="1"
+            />
+            <button
+              onClick={handleSimulate}
+              disabled={mutation.isPending || !days.trim()}
+              className="btn-primary text-sm !py-2 !px-6 whitespace-nowrap"
+            >
+              {mutation.isPending ? "Memproses..." : `Skip ${days || 1} Hari + Proses`}
+            </button>
+            {totalSkipped > 0 && (
+              <button
+                onClick={handleReset}
+                disabled={resetMutation.isPending}
+                className="btn-ghost text-sm !py-2 !px-4"
+              >
+                Reset Waktu
+              </button>
+            )}
+          </div>
 
           {mutation.isPending && (
-            <div className="flex items-center gap-2 mt-4 text-sm text-text-muted">
+            <div className="flex items-center gap-2 text-sm text-text-muted">
               <span className="w-4 h-4 border-[2px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-              Mencari dan memproses pesanan overdue...
+              Majuin waktu {days || 1} hari + proses overdue...
             </div>
           )}
         </div>
 
         <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-3">Informasi</h2>
-          <ul className="space-y-2 text-sm text-text-secondary">
-            <li className="flex items-start gap-2">
-              <span className="text-warning mt-0.5">•</span>
-              <span>Hanya pesanan dengan status <strong>Menunggu Konfirmasi</strong> atau <strong>Siap Dikirim</strong> yang diproses</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-success mt-0.5">•</span>
-              <span>Buyer mendapat refund penuh ke wallet</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-info mt-0.5">•</span>
-              <span>Stok produk dikembalikan ke toko</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-text-muted mt-0.5">•</span>
-              <span>Riwayat status otomatis tercatat</span>
-            </li>
-          </ul>
+          <h2 className="text-sm font-bold text-text-primary mb-3">Waktu Simulasi</h2>
+          {simStatus?.data ? (
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-text-muted">Tanggal Real</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                </p>
+              </div>
+              <div className="border-t border-border pt-3">
+                <p className="text-xs text-text-muted">Tanggal Simulasi</p>
+                <p className="text-sm font-semibold text-brand-deep">
+                  {new Date(simStatus.data.simulatedDate).toLocaleDateString("id-ID", {
+                    day: "numeric", month: "long", year: "numeric"
+                  })}
+                </p>
+              </div>
+              <div className="border-t border-border pt-3">
+                <p className="text-xs text-text-muted">Total Hari Dilewati</p>
+                <p className="text-lg font-bold text-warning">{totalSkipped} hari</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-6">
+              <span className="w-5 h-5 border-[2px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
         </div>
       </div>
 
       {result && !result.success && (
-        <div className="card">
+        <div className="card mb-6">
           <p className="text-danger font-semibold">{result.message}</p>
         </div>
       )}
 
       {result && result.success && result.data && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
             <div className="card text-center">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">Total Diproses</p>
               <p className="text-3xl font-bold text-brand-deep">{result.data.summary?.totalProcessed ?? 0}</p>
@@ -101,17 +143,19 @@ const AdminSimulatePage = () => {
               </p>
             </div>
             <div className="card text-center">
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">SLA Terpakai</p>
-              {Object.entries(result.data.slaApplied ?? {}).map(([method, days]) => (
-                <p key={method} className="text-xs text-text-secondary">
-                  {SHIPPING_LABEL[method] || method}: {days}
-                </p>
-              ))}
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">Hari Diskip</p>
+              <p className="text-3xl font-bold text-warning">{result.data.daysSkipped}</p>
             </div>
             <div className="card text-center">
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">Diproses Pada</p>
-              <p className="text-sm font-medium text-text-primary">
-                {new Date(result.data.processedAt).toLocaleString("id-ID")}
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">Total Skip</p>
+              <p className="text-3xl font-bold text-warning">{result.data.totalDaysSkipped}</p>
+            </div>
+            <div className="card text-center">
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">Tanggal Simulasi</p>
+              <p className="text-xs font-medium text-text-primary">
+                {new Date(result.data.simulatedDate).toLocaleDateString("id-ID", {
+                  day: "numeric", month: "short", year: "numeric"
+                })}
               </p>
             </div>
           </div>
@@ -125,7 +169,7 @@ const AdminSimulatePage = () => {
                 <p className={`text-2xl font-bold ${SHIPPING_COLOR[method]}`}>
                   {result.data.summary?.byMethod?.[method] ?? 0}
                 </p>
-                <p className="text-xs text-text-muted mt-1">pesanan</p>
+                <p className="text-xs text-text-muted mt-1">pesanan overdue</p>
               </div>
             ))}
           </div>
@@ -146,7 +190,7 @@ const AdminSimulatePage = () => {
 
           {result.data.logs && result.data.logs.length === 0 && (
             <div className="card text-center py-6">
-              <p className="text-sm text-text-secondary">Tidak ada pesanan overdue yang perlu diproses.</p>
+              <p className="text-sm text-text-secondary">Tidak ada pesanan overdue — semua pesanan masih dalam batas SLA.</p>
             </div>
           )}
         </>

@@ -8,7 +8,14 @@ export const getAdminUsers = (page = 1, limit = 20) =>
 export const getAdminOrders = (page = 1, limit = 10) =>
   apiFetch(`orders/admin?page=${page}&limit=${limit}`);
 
-export const simulateOverdue = () =>
+export const simulateOverdue = (daysToSkip = 1) =>
   apiFetch("admin/simulation/overdue", {
     method: "POST",
+    body: JSON.stringify({ daysToSkip }),
   });
+
+export const resetSimulation = () =>
+  apiFetch("admin/simulation/reset", { method: "POST" });
+
+export const getSimulationStatus = () =>
+  apiFetch("admin/simulation/status");

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAdminDashboard, getAdminUsers, getAdminOrders, simulateOverdue } from "../api/admin.api";
+import { getAdminDashboard, getAdminUsers, getAdminOrders, simulateOverdue, resetSimulation, getSimulationStatus } from "../api/admin.api";
 
 export const useAdminDashboard = () =>
   useQuery({
@@ -19,13 +19,31 @@ export const useAdminOrders = (page = 1) =>
     queryFn: () => getAdminOrders(page),
   });
 
+export const useSimulationStatus = () =>
+  useQuery({
+    queryKey: ["admin", "simulation-status"],
+    queryFn: getSimulationStatus,
+    refetchInterval: false,
+  });
+
 export const useSimulateOverdue = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => simulateOverdue(),
+    mutationFn: (daysToSkip = 1) => simulateOverdue(daysToSkip),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "simulation-status"] });
+    },
+  });
+};
+
+export const useResetSimulation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => resetSimulation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "simulation-status"] });
     },
   });
 };
