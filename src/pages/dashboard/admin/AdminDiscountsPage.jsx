@@ -28,7 +28,7 @@ const AdminDiscountsPage = () => {
     setError(null);
     try {
       const res = await apiFetch("discounts/all");
-      setDiscounts(res?.data ?? []);
+      setDiscounts(res ?? []);
     } catch (e) {
       setError(e?.message || "Gagal memuat data");
     }
