@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { apiFetch } from "../../../api/client";
 
-const DISCOUNT_TYPE_LABEL = {
-  VOUCHER: { label: "Voucher", color: "text-info" },
-  PROMO: { label: "Promo", color: "text-warning" },
-};
+const TABS = [
+  { key: "all", label: "Semua" },
+  { key: "PROMO", label: "Promo" },
+  { key: "VOUCHER", label: "Voucher" },
+];
 
-const AdminDiscountsPage = ({ type = "PROMO" }) => {
+const AdminDiscountsPage = () => {
+  const [tab, setTab] = useState("all");
   const [discounts, setDiscounts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({
     code: "",
+    type: "PROMO",
     value: "",
     isPercent: false,
     maxUses: "",
@@ -25,15 +28,16 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
     setError(null);
     try {
       const res = await apiFetch("discounts/all");
-      const all = res?.data ?? [];
-      setDiscounts(all.filter((d) => d.type === type));
+      setDiscounts(res?.data ?? []);
     } catch (e) {
       setError(e?.message || "Gagal memuat data");
     }
     setLoading(false);
   };
 
-  useState(() => { fetchDiscounts(); }, [type]);
+  useState(() => { fetchDiscounts(); }, []);
+
+  const filtered = tab === "all" ? (discounts ?? []) : (discounts ?? []).filter((d) => d.type === tab);
 
   const handleCreate = async () => {
     if (!form.code || !form.value || !form.expiredAt) return;
@@ -43,7 +47,7 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
         method: "POST",
         body: JSON.stringify({
           code: form.code,
-          type,
+          type: form.type,
           value: parseInt(form.value, 10),
           isPercent: form.isPercent,
           maxUses: form.maxUses ? parseInt(form.maxUses, 10) : null,
@@ -51,7 +55,7 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
         }),
       });
       setShowCreate(false);
-      setForm({ code: "", value: "", isPercent: false, maxUses: "", expiredAt: "" });
+      setForm({ code: "", type: "PROMO", value: "", isPercent: false, maxUses: "", expiredAt: "" });
       fetchDiscounts();
     } catch (e) {
       setError(e?.message || "Gagal membuat diskon");
@@ -69,8 +73,6 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
     }
   };
 
-  const label = DISCOUNT_TYPE_LABEL[type] || { label: type, color: "text-text-primary" };
-
   if (loading && !discounts) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -82,12 +84,12 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
   return (
     <>
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-text-primary">Kelola {label.label}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Kelola Diskon</h1>
         <button onClick={() => setShowCreate(true)} className="btn-primary text-sm !py-2 !px-5">
-          + Buat {label.label}
+          + Buat Diskon
         </button>
       </div>
-      <p className="text-sm text-text-muted mb-6">Atur kode {label.label.toLowerCase()} untuk pengguna</p>
+      <p className="text-sm text-text-muted mb-6">Atur kode promo dan voucher untuk pengguna</p>
 
       {error && (
         <div className="card mb-4">
@@ -100,19 +102,27 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
 
       {showCreate && (
         <div className="card mb-6">
-          <h3 className="text-sm font-bold text-text-primary mb-3">Buat {label.label} Baru</h3>
+          <h3 className="text-sm font-bold text-text-primary mb-3">Buat Diskon Baru</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               type="text"
-              placeholder="Kode (contoh: PROMO50)"
+              placeholder="Kode diskon"
               value={form.code}
               onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
               className="input-neo w-full !text-sm !py-2"
             />
+            <select
+              value={form.type}
+              onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+              className="input-neo w-full !text-sm !py-2"
+            >
+              <option value="PROMO">Promo</option>
+              <option value="VOUCHER">Voucher</option>
+            </select>
             <input
               type="text"
               inputMode="numeric"
-              placeholder="Nilai"
+              placeholder="Nilai diskon"
               value={form.value}
               onChange={(e) => setForm((f) => ({ ...f, value: e.target.value.replace(/[^0-9]/g, "") }))}
               className="input-neo w-full !text-sm !py-2"
@@ -153,25 +163,45 @@ const AdminDiscountsPage = ({ type = "PROMO" }) => {
       )}
 
       <div className="card">
-        {!discounts || discounts.length === 0 ? (
-          <p className="text-sm text-text-secondary text-center py-6">Belum ada {label.label.toLowerCase()}.</p>
+        <div className="flex items-center gap-1 mb-4 border-b-2 border-border pb-2">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`text-sm font-semibold !py-1.5 !px-4 rounded transition-colors ${
+                tab === t.key ? "bg-brand-deep text-white" : "text-text-secondary hover:text-brand-deep"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {filtered.length === 0 ? (
+          <p className="text-sm text-text-secondary text-center py-6">Belum ada diskon.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b-2 border-border text-left text-text-muted">
                   <th className="pb-2 pr-4 font-semibold">Kode</th>
+                  <th className="pb-2 pr-4 font-semibold">Tipe</th>
                   <th className="pb-2 pr-4 font-semibold">Nilai</th>
-                  <th className="pb-2 pr-4 font-semibold">Pakai</th>
+                  <th className="pb-2 pr-4 font-semibold">Dipakai</th>
                   <th className="pb-2 pr-4 font-semibold">Maks</th>
                   <th className="pb-2 pr-4 font-semibold">Berakhir</th>
                   <th className="pb-2 font-semibold">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {discounts.map((d) => (
+                {filtered.map((d) => (
                   <tr key={d.id} className="border-b border-border hover:bg-brand-subtle transition-colors">
                     <td className="py-2.5 pr-4 font-mono font-medium text-text-primary">{d.code}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className={`text-xs font-bold ${d.type === "PROMO" ? "text-warning" : "text-info"}`}>
+                        {d.type}
+                      </span>
+                    </td>
                     <td className="py-2.5 pr-4 text-text-secondary">
                       {d.isPercent ? `${d.value}%` : `Rp${d.value?.toLocaleString("id-ID")}`}
                     </td>

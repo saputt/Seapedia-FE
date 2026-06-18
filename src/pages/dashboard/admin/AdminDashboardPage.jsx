@@ -17,7 +17,6 @@ const AdminDashboardPage = () => {
   const stats = data?.data?.stats;
   const ordersByStatus = data?.data?.ordersByStatus ?? {};
   const recentOrders = data?.data?.recentOrders ?? [];
-  const topSellers = data?.data?.topSellers ?? [];
 
   if (isLoading) {
     return (
@@ -43,50 +42,25 @@ const AdminDashboardPage = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard Admin</h1>
       <p className="text-sm text-text-muted mb-6">Ringkasan sistem Seapedia</p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <StatCard label="Pengguna" value={stats?.totalUsers} color="text-brand-deep" />
         <StatCard label="Toko" value={stats?.totalStores} color="text-info" />
         <StatCard label="Produk" value={stats?.totalProducts} color="text-warning" />
         <StatCard label="Pesanan" value={stats?.totalOrders} color="text-text-primary" />
-        <StatCard label="Pendapatan" value={stats?.totalRevenue} color="text-success" prefix="Rp" />
-        <StatCard label="Total Saldo" value={stats?.totalWalletBalance} color="text-brand-deep" prefix="Rp" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-3">Pesanan per Status</h2>
-          <div className="space-y-2">
-            {Object.entries(ordersByStatus).map(([status, count]) => (
-              <div key={status} className="flex items-center justify-between">
-                <span className="text-sm text-text-secondary">{STATUS_LABEL[status] || status}</span>
-                <span className="text-sm font-bold text-text-primary">{count}</span>
-              </div>
-            ))}
-            {Object.keys(ordersByStatus).length === 0 && (
-              <p className="text-sm text-text-muted text-center py-4">Belum ada pesanan.</p>
-            )}
-          </div>
-        </div>
-
-        <div className="card">
-          <h2 className="text-sm font-bold text-text-primary mb-3">Top Seller</h2>
-          <div className="space-y-2">
-            {topSellers.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Belum ada data penjualan.</p>
-            ) : (
-              topSellers.map((seller, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">{seller.storeName || seller.username}</p>
-                    <p className="text-xs text-text-muted">{seller.username}</p>
-                  </div>
-                  <span className="text-sm font-bold text-success">
-                    Rp{seller.totalEarnings?.toLocaleString("id-ID")}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
+      <div className="card mb-8">
+        <h2 className="text-sm font-bold text-text-primary mb-3">Pesanan per Status</h2>
+        <div className="space-y-2">
+          {Object.entries(ordersByStatus).map(([status, count]) => (
+            <div key={status} className="flex items-center justify-between">
+              <span className="text-sm text-text-secondary">{STATUS_LABEL[status] || status}</span>
+              <span className="text-sm font-bold text-text-primary">{count}</span>
+            </div>
+          ))}
+          {Object.keys(ordersByStatus).length === 0 && (
+            <p className="text-sm text-text-muted text-center py-4">Belum ada pesanan.</p>
+          )}
         </div>
       </div>
 

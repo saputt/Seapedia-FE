@@ -241,8 +241,7 @@ const AppRoutes = () => {
       >
         <Route index element={<AdminDashboardPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
-        <Route path="promo" element={<AdminDiscountsPage type="PROMO" />} />
-        <Route path="voucher" element={<AdminDiscountsPage type="VOUCHER" />} />
+        <Route path="discounts" element={<AdminDiscountsPage />} />
       </Route>
     </Routes>
   );

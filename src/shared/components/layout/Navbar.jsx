@@ -60,19 +60,6 @@ const Navbar = ({ variant = "default" }) => {
     }
   }, [navigate, switchRole]);
 
-  const handleAdminClick = useCallback(async () => {
-    setDropdownOpen(false);
-    setSwitchingRole("ADMIN");
-    try {
-      const res = await switchUserRole("ADMIN");
-      switchRole("ADMIN", res.accessToken);
-      setSwitchingRole(null);
-      navigate("/dashboard/admin", { replace: true });
-    } catch {
-      setSwitchingRole(null);
-    }
-  }, [navigate, switchRole]);
-
   const handleDriverClick = useCallback(async () => {
     setDropdownOpen(false);
     setSwitchingRole("DRIVER");
@@ -192,15 +179,6 @@ const Navbar = ({ variant = "default" }) => {
                         Driver
                       </button>
                     )}
-                    {activeRole !== "ADMIN" && (
-                      <button
-                        onClick={handleAdminClick}
-                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-                      >
-                        Admin
-                      </button>
-                    )}
-
                     <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
                       <button
                         onClick={() => { logout(); setDropdownOpen(false); }}
@@ -428,14 +406,6 @@ const Navbar = ({ variant = "default" }) => {
                       className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                     >
                       Driver
-                    </button>
-                  )}
-                  {activeRole !== "ADMIN" && (
-                    <button
-                      onClick={handleAdminClick}
-                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-                    >
-                      Admin
                     </button>
                   )}
 
