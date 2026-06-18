@@ -54,7 +54,20 @@ const Navbar = ({ variant = "default" }) => {
       const res = await switchUserRole("BUYER");
       switchRole("BUYER", res.accessToken);
       setSwitchingRole(null);
-      navigate("/dashboard/buyer", { replace: true });
+      navigate("/products", { replace: true });
+    } catch {
+      setSwitchingRole(null);
+    }
+  }, [navigate, switchRole]);
+
+  const handleDriverClick = useCallback(async () => {
+    setDropdownOpen(false);
+    setSwitchingRole("DRIVER");
+    try {
+      const res = await switchUserRole("DRIVER");
+      switchRole("DRIVER", res.accessToken);
+      setSwitchingRole(null);
+      navigate("/dashboard/driver", { replace: true });
     } catch {
       setSwitchingRole(null);
     }
@@ -113,7 +126,7 @@ const Navbar = ({ variant = "default" }) => {
       <>
       <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
-          <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
+          <Link className="text-brand-deep font-extrabold text-2xl tracking-tight">
             SEAPEDIA
           </Link>
           <div className="flex items-center gap-3">
@@ -142,19 +155,28 @@ const Navbar = ({ variant = "default" }) => {
                       </p>
                     </div>
 
-                    {activeRole === "SELLER" ? (
+                    {activeRole !== "BUYER" && (
                       <button
                         onClick={handleBuyerClick}
                         className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                       >
                         Buyer
                       </button>
-                    ) : (
+                    )}
+                    {activeRole !== "SELLER" && (
                       <button
                         onClick={handleSellerClick}
                         className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                       >
                         Seller
+                      </button>
+                    )}
+                    {activeRole !== "DRIVER" && (
+                      <button
+                        onClick={handleDriverClick}
+                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                      >
+                        Driver
                       </button>
                     )}
 
@@ -344,19 +366,47 @@ const Navbar = ({ variant = "default" }) => {
                     </>
                   )}
 
-                  {activeRole === "SELLER" ? (
+                  {activeRole === "DRIVER" && (
+                    <>
+                      <Link
+                        to="/dashboard/driver/jobs"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                      >
+                        Pekerjaan Tersedia
+                      </Link>
+                      <Link
+                        to="/dashboard/driver/history"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                      >
+                        Riwayat
+                      </Link>
+                    </>
+                  )}
+
+                  {activeRole !== "BUYER" && (
                     <button
                       onClick={handleBuyerClick}
                       className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                     >
                       Buyer
                     </button>
-                  ) : (
+                  )}
+                  {activeRole !== "SELLER" && (
                     <button
                       onClick={handleSellerClick}
                       className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                     >
                       Seller
+                    </button>
+                  )}
+                  {activeRole !== "DRIVER" && (
+                    <button
+                      onClick={handleDriverClick}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                    >
+                      Driver
                     </button>
                   )}
 

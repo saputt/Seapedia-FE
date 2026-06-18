@@ -3,11 +3,14 @@ import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
+import BuyerRoute from "./BuyerRoute";
 import LandingPage from "../pages/LandingPage";
 import ComingSoon from "../shared/components/ui/ComingSoon";
 import SellerLayout from "../shared/components/layout/SellerLayout";
+import DriverLayout from "../shared/components/layout/DriverLayout";
+import SellerRoute from "./SellerRoute";
 
-const lazyLoad = (importFn, name) => {
+const lazyLoad = (importFn) => {
   const Component = lazy(importFn);
   return (props) => (
     <Suspense
@@ -39,20 +42,37 @@ const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage")
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
 const ProductManagementPage = lazyLoad(() => import("../pages/dashboard/seller/ProductManagementPage"), "ProductManagementPage");
 const OrderManagementPage = lazyLoad(() => import("../pages/dashboard/seller/OrderManagementPage"), "OrderManagementPage");
+const DriverDashboardPage = lazyLoad(() => import("../pages/dashboard/driver/DriverDashboardPage"), "DriverDashboardPage");
+const DriverJobsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverJobsPage"), "DriverJobsPage");
+const DriverHistoryPage = lazyLoad(() => import("../pages/dashboard/driver/DriverHistoryPage"), "DriverHistoryPage");
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/products" element={<ProductListPage />} />
-      <Route path="/products/:productId" element={<ProductDetailPage />} />
+      <Route
+        path="/products"
+        element={
+          <BuyerRoute>
+            <ProductListPage />
+          </BuyerRoute>
+        }
+      />
+      <Route
+        path="/products/:productId"
+        element={
+          <BuyerRoute>
+            <ProductDetailPage />
+          </BuyerRoute>
+        }
+      />
       <Route path="/stores/:storeId" element={<StoreDetailPage />} />
       <Route
         path="/cart"
         element={
-          <PrivateRoute>
+          <BuyerRoute>
             <CartMainPage />
-          </PrivateRoute>
+          </BuyerRoute>
         }
       />
 
@@ -60,7 +80,9 @@ const AppRoutes = () => {
         path="/checkout"
         element={
           <PrivateRoute>
-            <CheckoutMainPage />
+            <BuyerRoute>
+              <CheckoutMainPage />
+            </BuyerRoute>
           </PrivateRoute>
         }
       />
@@ -68,7 +90,9 @@ const AppRoutes = () => {
         path="/checkout/success"
         element={
           <PrivateRoute>
-            <CheckoutSuccessPage />
+            <BuyerRoute>
+              <CheckoutSuccessPage />
+            </BuyerRoute>
           </PrivateRoute>
         }
       />
@@ -102,9 +126,9 @@ const AppRoutes = () => {
         path="/dashboard/buyer"
         element={
           <PrivateRoute>
-            <RoleRoute role="buyer">
+            <BuyerRoute>
               <ComingSoon title="Dashboard Pembeli" />
-            </RoleRoute>
+            </BuyerRoute>
           </PrivateRoute>
         }
       />
@@ -112,9 +136,9 @@ const AppRoutes = () => {
         path="/dashboard/buyer/cart"
         element={
           <PrivateRoute>
-            <RoleRoute role="buyer">
+            <BuyerRoute>
               <ComingSoon title="Keranjang" />
-            </RoleRoute>
+            </BuyerRoute>
           </PrivateRoute>
         }
       />
@@ -162,11 +186,9 @@ const AppRoutes = () => {
       <Route
         path="/dashboard/seller"
         element={
-          <PrivateRoute>
-            <RoleRoute role="seller">
-              <SellerLayout />
-            </RoleRoute>
-          </PrivateRoute>
+          <SellerRoute>
+            <SellerLayout />
+          </SellerRoute>
         }
       >
         <Route index element={<SellerDashboardPage />} />
@@ -189,31 +211,15 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="driver">
-              <ComingSoon title="Dashboard Kurir" />
+              <DriverLayout />
             </RoleRoute>
           </PrivateRoute>
         }
-      />
-      <Route
-        path="/dashboard/driver/jobs"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="driver">
-              <ComingSoon title="Pekerjaan Tersedia" />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/driver/history"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="driver">
-              <ComingSoon title="Riwayat Pekerjaan" />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
+      >
+        <Route index element={<DriverDashboardPage />} />
+        <Route path="jobs" element={<DriverJobsPage />} />
+        <Route path="history" element={<DriverHistoryPage />} />
+      </Route>
 
       <Route
         path="/dashboard/admin"
