@@ -22,7 +22,7 @@ export const useAdminOrders = (page = 1) =>
 export const useSimulateOverdue = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (dayToSkip) => simulateOverdue(dayToSkip),
+    mutationFn: () => simulateOverdue(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
