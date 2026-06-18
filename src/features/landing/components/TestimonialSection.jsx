@@ -85,6 +85,45 @@ const TestimonialSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Review List */}
+          <div className="lg:col-span-3">
+            {isLoading && (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="card animate-pulse">
+                    <div className="h-5 bg-bg-tertiary rounded w-1/3 mb-3" />
+                    <div className="h-4 bg-bg-tertiary rounded w-full mb-2" />
+                    <div className="h-4 bg-bg-tertiary rounded w-2/3" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {isError && (
+              <div className="text-center py-12">
+                <p className="text-danger font-semibold">
+                  Gagal memuat review.
+                </p>
+              </div>
+            )}
+
+            {!isLoading && !isError && reviews.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-text-secondary">
+                  Belum ada review. Jadilah yang pertama!
+                </p>
+              </div>
+            )}
+
+            {!isLoading && !isError && reviews.length > 0 && (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Review Form */}
           <div className="lg:col-span-2">
             <div className="card">
@@ -145,45 +184,6 @@ const TestimonialSection = () => {
                 )}
               </form>
             </div>
-          </div>
-
-          {/* Review List */}
-          <div className="lg:col-span-3">
-            {isLoading && (
-              <div className="space-y-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="card animate-pulse">
-                    <div className="h-5 bg-bg-tertiary rounded w-1/3 mb-3" />
-                    <div className="h-4 bg-bg-tertiary rounded w-full mb-2" />
-                    <div className="h-4 bg-bg-tertiary rounded w-2/3" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {isError && (
-              <div className="text-center py-12">
-                <p className="text-danger font-semibold">
-                  Gagal memuat review.
-                </p>
-              </div>
-            )}
-
-            {!isLoading && !isError && reviews.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-text-secondary">
-                  Belum ada review. Jadilah yang pertama!
-                </p>
-              </div>
-            )}
-
-            {!isLoading && !isError && reviews.length > 0 && (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {reviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
