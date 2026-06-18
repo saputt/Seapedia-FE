@@ -1,9 +1,7 @@
 import { useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getMyStore } from "../../../features/store/api/store.api";
-import { getSellerOrders } from "../../../features/order/api/order.api";
-import { getAllProducts } from "../../../features/catalog/api/catalog.api";
+import { Link } from "react-router-dom";
+import { useMyStore } from "../../../features/store/hooks/useMyStore";
+import { useSellerOrders } from "../../../features/order/hooks/useOrders";
 
 const StatCard = ({ label, value, color }) => (
   <div className="card !p-5 flex items-center gap-4">
@@ -18,38 +16,13 @@ const StatCard = ({ label, value, color }) => (
 );
 
 const SellerDashboardPage = () => {
-  const location = useLocation();
+  const { data: store, isLoading: storeLoading } = useMyStore();
 
-  const { data: store, isLoading: storeLoading } = useQuery({
-    queryKey: ["myStore"],
-    queryFn: getMyStore,
-  });
-
-  const { data: orders = [], isLoading: ordersLoading } = useQuery({
-    queryKey: ["sellerOrders"],
-    queryFn: () => getSellerOrders({ orderBy: "dsc" }),
-    enabled: !!store,
-  });
-
-  const { data: productsData, isLoading: productsLoading } = useQuery({
-    queryKey: ["storeProducts", store?.id],
-    queryFn: () => getAllProducts({ storeId: store.id, limit: 1 }),
-    enabled: !!store?.id,
-  });
+  const { data: orders = [], isLoading: ordersLoading, error } = useSellerOrders(
+    { orderBy: "desc" }
+  );
 
   const stats = useMemo(() => {
-    if (!orders.length) {
-      return {
-        totalOrders: 0,
-        pending: 0,
-        ready: 0,
-        delivered: 0,
-        cancelled: 0,
-        totalRevenue: 0,
-        totalProducts: productsData?.total || 0,
-      };
-    }
-
     const pending = orders.filter((o) => o.status === "PENDING").length;
     const ready = orders.filter((o) => o.status === "READY_FOR_DELIVERY").length;
     const onDelivery = orders.filter((o) => o.status === "ON_DELIVERY").length;
@@ -67,16 +40,30 @@ const SellerDashboardPage = () => {
       delivered,
       cancelled,
       totalRevenue,
-      totalProducts: productsData?.total || 0,
     };
-  }, [orders, productsData]);
+  }, [orders]);
 
-  const isLoading = storeLoading || ordersLoading || productsLoading;
+  const isLoading = storeLoading || ordersLoading;
 
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard</h1>
+        <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
+        <div className="card text-center py-10">
+          <p className="text-danger font-semibold mb-4">Gagal memuat data dashboard.</p>
+          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+            Coba Lagi
+          </button>
+        </div>
       </div>
     );
   }
@@ -87,7 +74,7 @@ const SellerDashboardPage = () => {
       <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Produk" value={stats.totalProducts} color="bg-blue-500" />
+        <StatCard label="Total Produk" value={store ? "—" : 0} color="bg-blue-500" />
         <StatCard label="Total Pesanan" value={stats.totalOrders} color="bg-brand-deep" />
         <StatCard label="Pendapatan" value={`Rp${stats.totalRevenue.toLocaleString("id-ID")}`} color="bg-success" />
         <StatCard label="Perlu Diproses" value={stats.pending} color="bg-warning" />
