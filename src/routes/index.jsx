@@ -8,6 +8,7 @@ import LandingPage from "../pages/LandingPage";
 import ComingSoon from "../shared/components/ui/ComingSoon";
 import SellerLayout from "../shared/components/layout/SellerLayout";
 import DriverLayout from "../shared/components/layout/DriverLayout";
+import AdminLayout from "../shared/components/layout/AdminLayout";
 import SellerRoute from "./SellerRoute";
 
 const lazyLoad = (importFn) => {
@@ -47,6 +48,9 @@ const DriverDashboardPage = lazyLoad(() => import("../pages/dashboard/driver/Dri
 const DriverJobsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverJobsPage"), "DriverJobsPage");
 const DriverHistoryPage = lazyLoad(() => import("../pages/dashboard/driver/DriverHistoryPage"), "DriverHistoryPage");
 const DriverIncomePage = lazyLoad(() => import("../pages/dashboard/driver/DriverIncomePage"), "DriverIncomePage");
+const AdminDashboardPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDashboardPage"), "AdminDashboardPage");
+const AdminOrdersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminOrdersPage"), "AdminOrdersPage");
+const AdminDiscountsPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDiscountsPage"), "AdminDiscountsPage");
 
 const AppRoutes = () => {
   return (
@@ -230,31 +234,16 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <RoleRoute role="admin">
-              <ComingSoon title="Dashboard Admin" />
+              <AdminLayout />
             </RoleRoute>
           </PrivateRoute>
         }
-      />
-      <Route
-        path="/dashboard/admin/promo"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="admin">
-              <ComingSoon title="Kelola Promo" />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/admin/voucher"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="admin">
-              <ComingSoon title="Kelola Voucher" />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
+      >
+        <Route index element={<AdminDashboardPage />} />
+        <Route path="orders" element={<AdminOrdersPage />} />
+        <Route path="promo" element={<AdminDiscountsPage type="PROMO" />} />
+        <Route path="voucher" element={<AdminDiscountsPage type="VOUCHER" />} />
+      </Route>
     </Routes>
   );
 };
