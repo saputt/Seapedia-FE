@@ -17,12 +17,6 @@ const StoreManagementPage = () => {
     retry: false,
   });
 
-  useEffect(() => {
-    if (!isLoading && !isFetching && !store) {
-      navigate("/dashboard/seller/create-store", { replace: true });
-    }
-  }, [store, isLoading, isFetching, navigate]);
-
   const updateMutation = useMutation({
     mutationFn: () => updateStore(store.id, { storeName: storeName.trim(), description: description.trim() }),
     onSuccess: () => {
