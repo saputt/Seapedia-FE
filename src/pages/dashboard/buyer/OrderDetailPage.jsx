@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
-import { useCancelOrder } from "../../../features/order/hooks/useOrders";
+import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
 import { useState } from "react";
 
@@ -10,7 +10,9 @@ const OrderDetailPage = () => {
   const { data: raw, isLoading, error } = useOrderDetail(orderId);
   const order = raw?.order ?? raw;
   const cancelMutation = useCancelOrder();
+  const confirmMutation = useBuyerConfirmOrder();
   const [cancelling, setCancelling] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   const handleCancel = async () => {
     setCancelling(true);
@@ -18,6 +20,14 @@ const OrderDetailPage = () => {
       await cancelMutation.mutateAsync(orderId);
     } catch (e) { /* handled */ }
     setCancelling(false);
+  };
+
+  const handleConfirm = async () => {
+    setConfirming(true);
+    try {
+      await confirmMutation.mutateAsync({ orderId, storeId: order.storeId });
+    } catch (e) { /* handled */ }
+    setConfirming(false);
   };
 
   if (isLoading) {
@@ -164,20 +174,32 @@ const OrderDetailPage = () => {
           </div>
         </div>
 
-        {order.status === "PENDING" && (
-          <div className="card">
-            <p className="text-sm text-text-secondary mb-3">
-              Apakah Anda yakin ingin membatalkan pesanan ini?
-            </p>
+        <div className="card">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleCancel}
-              disabled={cancelling}
-              className="btn-primary bg-danger hover:bg-danger/90 text-sm !py-2 !px-6"
+              disabled={order.status !== "PENDING" || cancelling}
+              className={`text-sm !py-2 !px-6 font-bold transition-all ${
+                order.status === "PENDING"
+                  ? "btn-primary bg-danger hover:bg-danger/90"
+                  : "opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted"
+              }`}
             >
-              {cancelling ? "Membatalkan..." : "Batalkan Pesanan"}
+              {cancelling ? "Membatalkan..." : "Batalkan"}
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={order.status !== "ON_DELIVERY" || confirming}
+              className={`text-sm !py-2 !px-6 font-bold transition-all ${
+                order.status === "ON_DELIVERY"
+                  ? "btn-primary"
+                  : "opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted"
+              }`}
+            >
+              {confirming ? "Mengonfirmasi..." : "Konfirmasi"}
             </button>
           </div>
-        )}
+        </div>
       </div>
     </MainLayout>
   );

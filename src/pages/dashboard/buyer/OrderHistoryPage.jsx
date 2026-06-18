@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
-import { useBuyerOrders, useCancelOrder } from "../../../features/order/hooks/useOrders";
+import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 
 const OrderHistoryPage = () => {
   const { data: orders = [], isLoading, error } = useBuyerOrders();
   const cancelMutation = useCancelOrder();
+  const confirmMutation = useBuyerConfirmOrder();
   const [filter, setFilter] = useState("ALL");
   const [cancellingId, setCancellingId] = useState(null);
+  const [confirmingId, setConfirmingId] = useState(null);
 
   const statuses = ["ALL", ...new Set(orders.map((o) => o.status))];
 
@@ -23,6 +25,14 @@ const OrderHistoryPage = () => {
       await cancelMutation.mutateAsync(orderId);
     } catch (e) { /* handled */ }
     setCancellingId(null);
+  };
+
+  const handleConfirm = async (orderId, storeId) => {
+    setConfirmingId(orderId);
+    try {
+      await confirmMutation.mutateAsync({ orderId, storeId });
+    } catch (e) { /* handled */ }
+    setConfirmingId(null);
   };
 
   if (isLoading) {
@@ -145,18 +155,34 @@ const OrderHistoryPage = () => {
                 <p className="text-sm font-bold text-text-primary">
                   Total Rp{order.totalPrice?.toLocaleString("id-ID")}
                 </p>
-                {order.status === "PENDING" && (
+                <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       handleCancel(order.id);
                     }}
-                    disabled={cancellingId === order.id}
-                    className="text-xs font-bold text-danger hover:text-danger/80 transition-colors disabled:opacity-50"
+                    disabled={order.status !== "PENDING" || cancellingId === order.id}
+                    className={`text-xs font-bold transition-colors disabled:opacity-40 ${
+                      order.status === "PENDING"
+                        ? "text-danger hover:text-danger/80"
+                        : "text-text-muted cursor-not-allowed"
+                    }`}
                   >
                     {cancellingId === order.id ? "Membatalkan..." : "Batalkan"}
                   </button>
-                )}
+                  {order.status === "ON_DELIVERY" && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleConfirm(order.id, order.storeId);
+                      }}
+                      disabled={confirmingId === order.id}
+                      className="text-xs font-bold text-success hover:text-success/80 transition-colors disabled:opacity-50"
+                    >
+                      {confirmingId === order.id ? "Mengonfirmasi..." : "Konfirmasi"}
+                    </button>
+                  )}
+                </div>
               </div>
             </Link>
           ))}

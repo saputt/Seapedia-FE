@@ -33,3 +33,14 @@ export const useUpdateOrderStatus = () => {
     },
   });
 };
+
+export const useBuyerConfirmOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, storeId }) => updateOrderStatus(orderId, storeId),
+    onSuccess: (_data, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+    },
+  });
+};
