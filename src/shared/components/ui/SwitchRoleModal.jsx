@@ -1,11 +1,15 @@
 const roleLabel = {
   SELLER: "Penjual",
   BUYER: "Pembeli",
+  DRIVER: "Driver",
+  ADMIN: "Admin",
 };
 
 const roleIcon = {
   SELLER: "🏪",
   BUYER: "🛍️",
+  DRIVER: "🚚",
+  ADMIN: "⚙️",
 };
 
 const SwitchRoleModal = ({ role }) => {
