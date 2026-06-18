@@ -178,6 +178,23 @@ const OrderDetailPage = () => {
           </div>
         </div>
 
+        {order.statusLogs && order.statusLogs.length > 0 && (
+          <div className="card">
+            <h2 className="text-sm font-bold text-text-primary mb-3">Riwayat Status</h2>
+            <div className="space-y-2">
+              {[...order.statusLogs].reverse().map((log) => (
+                <div key={log.id} className="flex items-center gap-2.5 text-sm">
+                  <span className={`w-2 h-2 rounded-full ${STATUS_COLOR[log.status] || "bg-text-muted"}`} />
+                  <span className="font-medium text-text-primary">{STATUS_LABEL[log.status] || log.status}</span>
+                  <span className="text-text-muted ml-auto">
+                    {new Date(log.changedAt).toLocaleString("id-ID")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="card">
           <div className="flex items-center gap-3">
             <button
