@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
+import useProductSearchStore from "../../../features/catalog/store/productSearchStore";
 import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./../ui/SwitchRoleModal";
@@ -209,11 +210,14 @@ const Navbar = ({ variant = "default" }) => {
   const topItems = cartItems.slice(0, 5);
   const hasMore = cartItems.length > 5;
 
+  const searchQuery = useProductSearchStore((s) => s.query);
+  const setSearchQuery = useProductSearchStore((s) => s.setQuery);
+
   return (
     <>
     <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
-      <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
-        <div className="flex items-center gap-8">
+      <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between gap-4">
+        <div className="flex items-center gap-8 shrink-0">
           <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
             SEAPEDIA
           </Link>
@@ -226,6 +230,19 @@ const Navbar = ({ variant = "default" }) => {
             </Link>
           </div>
         </div>
+
+        {variant === "products" && (
+          <div className="flex-1 max-w-md mx-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-neo w-full !py-1.5 !text-sm"
+              placeholder="Cari produk..."
+            />
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           {isLoggedIn && (
             <div

@@ -4,18 +4,19 @@ import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
+import useProductSearchStore from "../../features/catalog/store/productSearchStore";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
   const { data: wallet } = useWallet();
-  const [search, setSearch] = useState("");
+  const searchQuery = useProductSearchStore((s) => s.query);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const loadMoreRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 400);
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [searchQuery]);
 
   const {
     data,
@@ -50,18 +51,8 @@ const ProductListPage = () => {
   }, [handleObserver]);
 
   return (
-    <MainLayout>
+    <MainLayout navbarVariant="products">
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
-        {/* Search */}
-        <div className="mb-8">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-neo w-full max-w-xl"
-            placeholder="Cari produk..."
-          />
-        </div>
 
         {/* Wallet Info */}
         <button
