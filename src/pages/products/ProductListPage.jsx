@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
+import { useWallet } from "../../features/wallet/hooks/useWallet";
 
 const ProductListPage = () => {
+  const navigate = useNavigate();
+  const { data: wallet } = useWallet();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const loadMoreRef = useRef(null);
@@ -58,6 +62,23 @@ const ProductListPage = () => {
             placeholder="Cari produk..."
           />
         </div>
+
+        {/* Wallet Info */}
+        <button
+          onClick={() => navigate("/dashboard/buyer/wallet")}
+          className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
+        >
+          <div className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            <span className="text-sm font-medium text-text-primary">Saldo Dompet</span>
+          </div>
+          <span className="text-sm font-bold text-brand-deep">
+            Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
+          </span>
+        </button>
 
         {/* Loading State */}
         {isLoading && (
