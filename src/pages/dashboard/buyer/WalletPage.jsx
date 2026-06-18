@@ -157,14 +157,12 @@ const WalletPage = () => {
                       </div>
                       <p
                         className={`text-sm font-semibold ${
-                          tx.type === "TOP_UP" || tx.type === "REFUND"
+                          tx.type === "TOP_UP" || tx.type === "REFUND" || tx.type === "SELLER_EARNING" || tx.type === "DRIVER_EARNING"
                             ? "text-success"
-                            : tx.type === "PAYMENT"
-                              ? "text-danger"
-                              : "text-text-primary"
+                            : "text-danger"
                         }`}
                       >
-                        {tx.type === "TOP_UP" || tx.type === "REFUND"
+                        {tx.type === "TOP_UP" || tx.type === "REFUND" || tx.type === "SELLER_EARNING" || tx.type === "DRIVER_EARNING"
                           ? `+Rp${tx.amount.toLocaleString("id-ID")}`
                           : `-Rp${tx.amount.toLocaleString("id-ID")}`}
                       </p>
