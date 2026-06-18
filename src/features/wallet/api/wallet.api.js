@@ -8,4 +8,5 @@ export const topUp = (amount) =>
     body: JSON.stringify({ amount }),
   });
 
-export const getTransactions = () => apiFetch("wallet/transactions");
+export const getTransactions = (page = 1, limit = 5) =>
+  apiFetch(`wallet/transactions?page=${page}&limit=${limit}`);

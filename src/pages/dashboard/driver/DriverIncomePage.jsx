@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useRef, useEffect } from "react";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
 
 const DriverIncomePage = () => {
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
-  const { data: transactions = [], isLoading: txLoading, error: txError } = useTransactions();
-  const [showAll, setShowAll] = useState(false);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError } = useTransactions();
+  const sentinelRef = useRef(null);
 
   const loading = walletLoading || txLoading;
   const error = walletError || txError;
-
+  const transactions = data?.pages.flatMap((p) => p.data) ?? [];
   const totalIncome = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) fetchNextPage();
+      },
+      { rootMargin: "100px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (loading) {
     return (
@@ -64,7 +78,7 @@ const DriverIncomePage = () => {
           <p className="text-sm text-text-secondary text-center py-6">Belum ada transaksi.</p>
         ) : (
           <div className="space-y-2">
-            {(showAll ? transactions : transactions.slice(0, 10)).map((tx) => (
+            {transactions.map((tx) => (
               <div
                 key={tx.id}
                 className="flex items-center justify-between px-3 py-2 rounded hover:bg-brand-subtle transition-colors"
@@ -84,13 +98,13 @@ const DriverIncomePage = () => {
                 </p>
               </div>
             ))}
-            {!showAll && transactions.length > 10 && (
-              <button
-                onClick={() => setShowAll(true)}
-                className="w-full text-center text-sm font-semibold text-brand-deep hover:bg-brand-subtle rounded px-3 py-2 transition-colors"
-              >
-                Lihat Semua ({transactions.length})
-              </button>
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-3">
+                <span className="w-6 h-6 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            {hasNextPage && !isFetchingNextPage && (
+              <div ref={sentinelRef} className="h-4" />
             )}
           </div>
         )}

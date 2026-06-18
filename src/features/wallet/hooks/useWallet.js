@@ -1,5 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { getWallet, getTransactions, topUp } from "../api/wallet.api";
+
+const LIMIT = 5;
 
 export const useWallet = () =>
   useQuery({
@@ -8,9 +10,12 @@ export const useWallet = () =>
   });
 
 export const useTransactions = () =>
-  useQuery({
+  useInfiniteQuery({
     queryKey: ["transactions"],
-    queryFn: getTransactions,
+    queryFn: ({ pageParam = 1 }) => getTransactions(pageParam, LIMIT),
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    initialPageParam: 1,
   });
 
 export const useTopUp = () => {
