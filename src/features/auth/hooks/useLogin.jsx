@@ -23,7 +23,9 @@ export const useLogin = () => {
       if (data.userRoles.length > 1) {
         navigate("/auth/role-select", { replace: true });
       } else {
-        navigate(`/dashboard/${data.activeRole.toLowerCase()}`, { replace: true });
+        const redirectPath =
+          data.activeRole === "BUYER" ? "/products" : `/dashboard/${data.activeRole.toLowerCase()}`;
+        navigate(redirectPath, { replace: true });
       }
     },
   });

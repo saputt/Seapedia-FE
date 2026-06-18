@@ -22,7 +22,9 @@ const RoleSelectPage = () => {
     mutationFn: switchUserRole,
     onSuccess: (data) => {
       switchRole(data.activeRole, data.accessToken);
-      navigate(`/dashboard/${data.activeRole.toLowerCase()}`, { replace: true });
+      const redirectPath =
+        data.activeRole === "BUYER" ? "/products" : `/dashboard/${data.activeRole.toLowerCase()}`;
+      navigate(redirectPath, { replace: true });
     },
   });
 
