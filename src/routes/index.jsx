@@ -46,6 +46,7 @@ const IncomeHistoryPage = lazyLoad(() => import("../pages/dashboard/seller/Incom
 const DriverDashboardPage = lazyLoad(() => import("../pages/dashboard/driver/DriverDashboardPage"), "DriverDashboardPage");
 const DriverJobsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverJobsPage"), "DriverJobsPage");
 const DriverHistoryPage = lazyLoad(() => import("../pages/dashboard/driver/DriverHistoryPage"), "DriverHistoryPage");
+const DriverIncomePage = lazyLoad(() => import("../pages/dashboard/driver/DriverIncomePage"), "DriverIncomePage");
 
 const AppRoutes = () => {
   return (
@@ -221,6 +222,7 @@ const AppRoutes = () => {
         <Route index element={<DriverDashboardPage />} />
         <Route path="jobs" element={<DriverJobsPage />} />
         <Route path="history" element={<DriverHistoryPage />} />
+        <Route path="income" element={<DriverIncomePage />} />
       </Route>
 
       <Route
