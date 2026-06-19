@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import AlertModal from "../../../shared/components/ui/AlertModal";
+import Button from "../../../shared/components/ui/Button";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const OrderHistoryPage = () => {
   const { data: orders = [], isLoading, error } = useBuyerOrders();
@@ -26,7 +28,7 @@ const OrderHistoryPage = () => {
     setCancellingId(orderId);
     try {
       await cancelMutation.mutateAsync(orderId);
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
     setCancellingId(null);
   };
 
@@ -35,7 +37,7 @@ const OrderHistoryPage = () => {
     setConfirmingId(orderId);
     try {
       await confirmMutation.mutateAsync({ orderId, storeId });
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
     setConfirmingId(null);
   };
 
@@ -43,7 +45,7 @@ const OrderHistoryPage = () => {
     return (
       <MainLayout>
         <div className="flex items-center justify-center py-20">
-          <span className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       </MainLayout>
     );
@@ -55,12 +57,9 @@ const OrderHistoryPage = () => {
         <div className="flex items-center justify-center py-20">
           <div className="card text-center py-10">
             <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary text-sm !py-2 !px-6"
-            >
+            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
               Coba Lagi
-            </button>
+            </Button>
           </div>
         </div>
       </MainLayout>

@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import AlertModal from "../../../shared/components/ui/AlertModal";
+import Button from "../../../shared/components/ui/Button";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -21,7 +23,7 @@ const OrderDetailPage = () => {
     setCancelling(true);
     try {
       await cancelMutation.mutateAsync(orderId);
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
     setCancelling(false);
   };
 
@@ -30,7 +32,7 @@ const OrderDetailPage = () => {
     setConfirming(true);
     try {
       await confirmMutation.mutateAsync({ orderId, storeId: order.storeId });
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
     setConfirming(false);
   };
 
@@ -38,7 +40,7 @@ const OrderDetailPage = () => {
     return (
       <MainLayout>
         <div className="flex items-center justify-center py-20">
-          <span className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       </MainLayout>
     );
@@ -50,12 +52,9 @@ const OrderDetailPage = () => {
         <div className="flex items-center justify-center py-20">
           <div className="card text-center py-10">
             <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary text-sm !py-2 !px-6"
-            >
+            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
               Coba Lagi
-            </button>
+            </Button>
           </div>
         </div>
       </MainLayout>
@@ -197,32 +196,34 @@ const OrderDetailPage = () => {
 
         <div className="card">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                if (order.status === "PENDING") setModal("cancel");
-              }}
-              disabled={order.status !== "PENDING" || cancelling}
-              className={`text-sm !py-2 !px-6 font-bold transition-all ${
-                order.status === "PENDING"
-                  ? "btn-primary bg-danger hover:bg-danger/90"
-                  : "opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted"
-              }`}
-            >
-              {cancelling ? "Membatalkan..." : "Batalkan"}
-            </button>
-            <button
-              onClick={() => {
-                if (order.status === "ON_DELIVERY") setModal("confirm");
-              }}
-              disabled={order.status !== "ON_DELIVERY" || confirming}
-              className={`text-sm !py-2 !px-6 font-bold transition-all ${
-                order.status === "ON_DELIVERY"
-                  ? "btn-primary"
-                  : "opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted"
-              }`}
-            >
-              {confirming ? "Mengonfirmasi..." : "Konfirmasi"}
-            </button>
+            {order.status === "PENDING" && (
+              <Button
+                onClick={() => setModal("cancel")}
+                variant="primary"
+                loading={cancelling}
+              >
+                {cancelling ? "Membatalkan..." : "Batalkan"}
+              </Button>
+            )}
+            {order.status !== "PENDING" && (
+              <span className="text-sm !py-2 !px-6 font-bold opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted inline-flex items-center">
+                Batalkan
+              </span>
+            )}
+            {order.status === "ON_DELIVERY" && (
+              <Button
+                onClick={() => setModal("confirm")}
+                variant="primary"
+                loading={confirming}
+              >
+                {confirming ? "Mengonfirmasi..." : "Konfirmasi"}
+              </Button>
+            )}
+            {order.status !== "ON_DELIVERY" && (
+              <span className="text-sm !py-2 !px-6 font-bold opacity-40 cursor-not-allowed border-[3px] border-brand-deep bg-bg-tertiary text-text-muted inline-flex items-center">
+                Konfirmasi
+              </span>
+            )}
           </div>
         </div>
       </div>
