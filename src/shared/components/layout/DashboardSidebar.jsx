@@ -17,7 +17,10 @@ const DashboardSidebar = ({ title, subtitle, links }) => {
       </div>
       <nav className="p-3 space-y-1 flex-1">
         {links.map((link) => {
-          const isActive = link.to === location.pathname;
+          const segments = link.to.split("/").filter(Boolean);
+          const isActive = segments.length <= 2
+            ? link.to === location.pathname
+            : (link.to === location.pathname || location.pathname.startsWith(link.to + "/"));
           return (
             <Link
               key={link.to}
