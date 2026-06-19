@@ -24,7 +24,12 @@ const Navbar = ({ variant = "default" }) => {
 
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
-      setSearchParams({ q: searchInput }, { replace: true });
+      const currentPath = window.location.pathname;
+      if (currentPath !== "/") {
+        navigate(`/?q=${encodeURIComponent(searchInput)}`);
+      } else {
+        setSearchParams({ q: searchInput }, { replace: true });
+      }
     }
   };
 
