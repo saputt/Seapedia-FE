@@ -7,16 +7,14 @@ const MONTHS = [
 ];
 const DAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-const DayBtn = ({ day, selected, inRange, onClick, disabled }) => {
+const DayBtn = ({ day, selected, inRange, onClick }) => {
   const isToday = day.toDateString() === new Date().toDateString();
   return (
     <button
       type="button"
-      disabled={disabled}
       onClick={() => onClick(day)}
       className={[
-        "w-9 h-9 text-sm font-medium rounded transition-all",
-        "disabled:opacity-20 disabled:cursor-not-allowed",
+        "w-9 h-9 text-sm font-medium rounded transition-all cursor-pointer",
         selected
           ? "bg-brand-deep text-white shadow-[2px_2px_0px_0px_var(--color-brand-deep)]"
           : inRange
@@ -31,14 +29,8 @@ const DayBtn = ({ day, selected, inRange, onClick, disabled }) => {
 };
 
 const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }) => {
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
-
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [selecting, setSelecting] = useState("start");
 
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -176,7 +168,6 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
               selected={!!(startDate && day.toDateString() === startDate.toDateString()) || !!(endDate && day.toDateString() === endDate.toDateString())}
               inRange={isInRange(day)}
               onClick={handleDayClick}
-              disabled={day < today}
             />
           ) : (
             <div key={i} />
