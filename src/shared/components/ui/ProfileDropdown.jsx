@@ -97,14 +97,18 @@ const ProfileDropdown = () => {
 
         {dropdownOpen && (
           <div className="absolute right-0 top-full mt-2 card !p-2 min-w-[200px] z-50">
-            <div className="px-3 py-2 border-b-[2px] border-bg-tertiary">
+            <Link
+              to="/dashboard/buyer/profile"
+              onClick={() => setDropdownOpen(false)}
+              className="block px-3 py-2 border-b-[2px] border-bg-tertiary hover:bg-brand-subtle rounded transition-colors"
+            >
               <p className="text-sm font-semibold text-text-primary truncate">
                 {displayName}
               </p>
               <p className="text-xs text-text-muted truncate">
                 {user?.email}
               </p>
-            </div>
+            </Link>
 
             <Link
               to={dashboardRoute}
@@ -129,6 +133,13 @@ const ProfileDropdown = () => {
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
                   Pesanan
+                </Link>
+                <Link
+                  to="/dashboard/buyer/profile"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
+                >
+                  Profil
                 </Link>
               </>
             )}

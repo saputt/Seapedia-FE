@@ -6,6 +6,7 @@ import RoleRoute from "./RoleRoute";
 import BuyerRoute from "./BuyerRoute";
 import LandingPage from "../pages/LandingPage";
 import ComingSoon from "../shared/components/ui/ComingSoon";
+import BuyerLayout from "../shared/components/layout/BuyerLayout";
 import SellerLayout from "../shared/components/layout/SellerLayout";
 import DriverLayout from "../shared/components/layout/DriverLayout";
 import AdminLayout from "../shared/components/layout/AdminLayout";
@@ -40,6 +41,7 @@ const OrderHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderHi
 const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDetailPage"), "OrderDetailPage");
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
 const TransactionHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/TransactionHistoryPage"), "TransactionHistoryPage");
+const ProfilePage = lazyLoad(() => import("../pages/dashboard/buyer/ProfilePage"), "ProfilePage");
 const StoreManagement = lazyLoad(() => import("../pages/dashboard/seller/StoreManagement"), "StoreManagement");
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
@@ -135,72 +137,21 @@ const AppRoutes = () => {
         path="/dashboard/buyer"
         element={
           <PrivateRoute>
-            <BuyerRoute>
-              <ComingSoon title="Dashboard Pembeli" />
-            </BuyerRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/buyer/cart"
-        element={
-          <PrivateRoute>
-            <BuyerRoute>
-              <ComingSoon title="Keranjang" />
-            </BuyerRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/buyer/checkout"
-        element={
-          <PrivateRoute>
             <RoleRoute role="buyer">
-              <CheckoutMainPage />
+              <BuyerLayout />
             </RoleRoute>
           </PrivateRoute>
         }
-      />
-      <Route
-        path="/dashboard/buyer/orders"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="buyer">
-              <OrderHistoryPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/buyer/orders/:orderId"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="buyer">
-              <OrderDetailPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/buyer/wallet"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="buyer">
-              <WalletPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/dashboard/buyer/wallet/history"
-        element={
-          <PrivateRoute>
-            <RoleRoute role="buyer">
-              <TransactionHistoryPage />
-            </RoleRoute>
-          </PrivateRoute>
-        }
-      />
+      >
+        <Route index element={<ComingSoon title="Dashboard Pembeli" />} />
+        <Route path="cart" element={<ComingSoon title="Keranjang" />} />
+        <Route path="checkout" element={<CheckoutMainPage />} />
+        <Route path="orders" element={<OrderHistoryPage />} />
+        <Route path="orders/:orderId" element={<OrderDetailPage />} />
+        <Route path="wallet" element={<WalletPage />} />
+        <Route path="wallet/history" element={<TransactionHistoryPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
 
       <Route
         path="/dashboard/seller"
