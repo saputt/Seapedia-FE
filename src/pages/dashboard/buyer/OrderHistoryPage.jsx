@@ -154,33 +154,31 @@ const OrderHistoryPage = () => {
                   Total Rp{order.totalPrice?.toLocaleString("id-ID")}
                 </p>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (order.status === "PENDING") {
-                        setModal({ type: "cancel", orderId: order.id });
-                      }
-                    }}
-                    disabled={order.status !== "PENDING" || cancellingId === order.id}
-                    className={`text-xs font-bold transition-colors disabled:opacity-40 ${
-                      order.status === "PENDING"
-                        ? "text-danger hover:text-danger/80"
-                        : "text-text-muted cursor-not-allowed"
-                    }`}
-                  >
-                    {cancellingId === order.id ? "Membatalkan..." : "Batalkan"}
-                  </button>
                   {order.status === "ON_DELIVERY" && (
-                    <button
+                    <Button
+                      size="sm"
+                      variant="primary"
                       onClick={(e) => {
                         e.preventDefault();
                         setModal({ type: "confirm", orderId: order.id, storeId: order.storeId });
                       }}
-                      disabled={confirmingId === order.id}
-                      className="text-xs font-bold text-success hover:text-success/80 transition-colors disabled:opacity-50"
+                      loading={confirmingId === order.id}
                     >
                       {confirmingId === order.id ? "Mengonfirmasi..." : "Konfirmasi"}
-                    </button>
+                    </Button>
+                  )}
+                  {order.status === "PENDING" && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setModal({ type: "cancel", orderId: order.id });
+                      }}
+                      loading={cancellingId === order.id}
+                    >
+                      {cancellingId === order.id ? "Membatalkan..." : "Batalkan"}
+                    </Button>
                   )}
                 </div>
               </div>
