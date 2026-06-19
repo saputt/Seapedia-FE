@@ -69,7 +69,7 @@ const Navbar = ({ variant = "default" }) => {
           </div>
         </div>
 
-        {variant === "products" && (
+        {variant !== "checkout" && variant !== "seller" && (
           <div className="flex-1 max-w-md mx-auto">
             <input
               type="text"

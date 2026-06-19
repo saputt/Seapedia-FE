@@ -30,7 +30,7 @@ const ProductListPage = () => {
   });
 
   return (
-    <MainLayout navbarVariant="products">
+    <MainLayout>
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
 
         {/* Wallet Info */}
