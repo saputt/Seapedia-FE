@@ -1,110 +1,16 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
+import { getAllProducts, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import Button from "../../../shared/components/ui/Button";
 import AlertModal from "../../../shared/components/ui/AlertModal";
-import CategoryPicker from "../../../shared/components/ui/CategoryPicker";
-import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { CATEGORY_LABEL } from "../../../shared/constants/product";
-
-const ProductFormModal = ({ storeId, product, onClose, onSuccess }) => {
-  const queryClient = useQueryClient();
-  const isEdit = !!product;
-
-  const [name, setName] = useState(product?.name || "");
-  const [description, setDescription] = useState(product?.description || "");
-  const [price, setPrice] = useState(product?.price?.toString() || "");
-  const [stock, setStock] = useState(product?.stock?.toString() || "");
-  const [imageUrl, setImageUrl] = useState(product?.imageUrl || "");
-  const [category, setCategory] = useState(product?.category || "HOBBY");
-
-  const mutation = useMutation({
-    mutationFn: async (dto) => {
-      if (isEdit) {
-        return updateProduct(product.id, dto);
-      }
-      return createProduct(storeId, dto);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
-      onSuccess();
-    },
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    mutation.mutate({
-      name: name.trim(),
-      description: description.trim(),
-      price: parseInt(price, 10),
-      stock: parseInt(stock, 10),
-      category,
-      ...(imageUrl.trim() ? { imageUrl: imageUrl.trim() } : {}),
-    });
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="card !p-6 mx-4 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-text-primary">{isEdit ? "Edit Produk" : "Tambah Produk"}</h2>
-          <button onClick={onClose} className="text-text-muted hover:text-text-primary text-xl leading-none">&times;</button>
-        </div>
-
-        {mutation.isError && (
-          <div className="mb-4 p-3 border-[3px] border-danger bg-danger/5">
-            <p className="text-danger text-sm font-medium">{getReadableError(mutation.error)}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">Nama Produk</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="input-neo w-full" placeholder="Nama produk" required />
-          </div>
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">Deskripsi</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-neo w-full resize-none h-20" placeholder="Deskripsi produk" required />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-text-secondary font-medium text-sm mb-1">Harga (Rp)</label>
-              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="input-neo w-full" placeholder="50000" min="0" required />
-            </div>
-            <div>
-              <label className="block text-text-secondary font-medium text-sm mb-1">Stok</label>
-              <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="input-neo w-full" placeholder="10" min="0" required />
-            </div>
-          </div>
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">URL Gambar</label>
-            <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="input-neo w-full" placeholder="https://..." />
-          </div>
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">Kategori</label>
-            <CategoryPicker value={category} onChange={setCategory} />
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <Button type="button" onClick={onClose} variant="ghost" fullWidth>Batal</Button>
-            <Button type="submit" variant="primary" fullWidth loading={mutation.isPending}>
-              {mutation.isPending ? (isEdit ? "Menyimpan..." : "Menambah...") : (isEdit ? "Simpan" : "Tambah")}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
 
 const ProductManagementPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [successModal, setSuccessModal] = useState({ open: false, message: "" });
@@ -136,7 +42,7 @@ const ProductManagementPage = () => {
     <>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Produk</h1>
-        <Button onClick={() => { setEditingProduct(null); setShowForm(true); }} variant="primary">
+        <Button onClick={() => navigate("/dashboard/seller/products/create")} variant="primary">
           + Tambah Produk
         </Button>
       </div>
@@ -228,19 +134,6 @@ const ProductManagementPage = () => {
             </tbody>
           </table>
         </div>
-      )}
-
-      {showForm && (
-        <ProductFormModal
-          storeId={store?.id}
-          product={editingProduct}
-          onClose={() => { setShowForm(false); setEditingProduct(null); }}
-          onSuccess={() => {
-            setShowForm(false);
-            setEditingProduct(null);
-            setSuccessModal({ open: true, message: "Produk berhasil ditambahkan!" });
-          }}
-        />
       )}
 
       <AlertModal
