@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
+import Button from "../../shared/components/ui/Button";
 import { useCreateStore } from "../../features/store/hooks/useCreateStore";
 import { getMyStore } from "../../features/store/api/store.api";
 import { getReadableError } from "../../shared/utils/errorMapper";
+import Spinner from "../../shared/components/ui/Spinner";
 
 const CreateStorePage = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ const CreateStorePage = () => {
     return (
       <MainLayout navbarVariant="default">
         <div className="min-h-screen flex items-center justify-center">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       </MainLayout>
     );
@@ -94,27 +96,24 @@ const CreateStorePage = () => {
             </div>
 
             <div className="flex gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="btn-ghost flex-1 !py-3"
+                variant="ghost"
+                size="lg"
+                fullWidth
               >
                 Batal
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="btn-primary flex-1 !py-3 flex items-center justify-center gap-2"
-                disabled={createStoreMutation.isPending}
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={createStoreMutation.isPending}
               >
-                {createStoreMutation.isPending ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Membuat...
-                  </>
-                ) : (
-                  "Buat Toko"
-                )}
-              </button>
+                {createStoreMutation.isPending ? "Membuat..." : "Buat Toko"}
+              </Button>
             </div>
           </form>
         </div>

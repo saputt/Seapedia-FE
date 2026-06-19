@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Button from "../../shared/components/ui/Button";
 import { getMyStore, updateStore } from "../../features/store/api/store.api";
 import { getReadableError } from "../../shared/utils/errorMapper";
+import Spinner from "../../shared/components/ui/Spinner";
 
 const StoreManagementPage = () => {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [description, setDescription] = useState("");
 
-  const { data: store, isLoading, isFetching } = useQuery({
+  const { data: store, isLoading } = useQuery({
     queryKey: ["myStore"],
     queryFn: getMyStore,
     retry: false,
@@ -34,7 +34,7 @@ const StoreManagementPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -49,9 +49,9 @@ const StoreManagementPage = () => {
           <p className="text-sm text-text-muted">Kelola informasi toko Anda</p>
         </div>
         {!isEditing && (
-          <button onClick={startEditing} className="btn-primary text-sm !py-2 !px-4">
+          <Button onClick={startEditing} variant="primary">
             Edit Toko
-          </button>
+          </Button>
         )}
       </div>
 
@@ -97,20 +97,18 @@ const StoreManagementPage = () => {
               />
             </div>
             <div className="flex gap-3">
-              <button type="button" onClick={() => setIsEditing(false)} className="btn-ghost flex-1 !py-3">
+              <Button type="button" onClick={() => setIsEditing(false)} variant="ghost" size="lg" fullWidth>
                 Batal
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="btn-primary flex-1 !py-3 flex items-center justify-center gap-2"
-                disabled={updateMutation.isPending}
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={updateMutation.isPending}
               >
-                {updateMutation.isPending ? (
-                  <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Menyimpan...</>
-                ) : (
-                  "Simpan"
-                )}
-              </button>
+                {updateMutation.isPending ? "Menyimpan..." : "Simpan"}
+              </Button>
             </div>
           </form>
         </div>
