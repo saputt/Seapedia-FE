@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAddresses, createAddress, updateAddress, deleteAddress } from "../../../features/order/api/order.api";
+import { fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from "../../../features/order/api/order.api";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import AlertModal from "../../../shared/components/ui/AlertModal";
@@ -70,6 +70,13 @@ const AddressPage = () => {
     queryFn: fetchAddresses,
   });
 
+  const defaultMutation = useMutation({
+    mutationFn: setDefaultAddress,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: deleteAddress,
     onSuccess: () => {
@@ -107,10 +114,11 @@ const AddressPage = () => {
             return (
               <div
                 key={addr.id}
-                className={`card flex items-start gap-4 transition-all ${
+                onClick={() => { if (!isDefault) defaultMutation.mutate(addr.id); }}
+                className={`card flex items-start gap-4 cursor-pointer transition-all ${
                   isDefault
                     ? "border-brand-deep bg-brand-subtle/20 shadow-[6px_6px_0px_0px_var(--color-brand-deep)]"
-                    : ""
+                    : "hover:border-brand-deep/40 hover:shadow-[4px_4px_0px_0px_var(--color-brand-deep)]"
                 }`}
               >
                 {/* Radio indicator */}
