@@ -53,9 +53,15 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
   };
 
   const handleDayClick = (day) => {
-    onStartChange(day);
-    onEndChange(day);
-    onClose();
+    if (!startDate || endDate) {
+      onStartChange(day);
+      onEndChange(null);
+    } else if (day >= startDate) {
+      onEndChange(day);
+    } else {
+      onStartChange(day);
+      onEndChange(null);
+    }
   };
 
   const isInRange = (day) => {
@@ -86,7 +92,9 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
   return (
     <div className="card !p-5 w-full max-w-sm">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-text-primary">Pilih Tanggal</h3>
+        <h3 className="text-sm font-bold text-text-primary">
+          {startDate && !endDate ? "Pilih Tanggal Akhir" : "Pilih Tanggal"}
+        </h3>
         <button
           type="button"
           onClick={onClose}
@@ -161,11 +169,11 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
       </div>
 
       <p className="text-xs text-text-muted mt-3 text-center min-h-[18px]">
-        {startDate && endDate && startDate.toDateString() === endDate.toDateString()
-          ? `Menampilkan transaksi ${startDate.toLocaleDateString("id-ID")}`
+        {startDate && !endDate
+          ? `Dari ${startDate.toLocaleDateString("id-ID")} — klik lagi untuk batas akhir`
           : startDate && endDate
             ? `${startDate.toLocaleDateString("id-ID")} — ${endDate.toLocaleDateString("id-ID")}`
-            : "Klik tanggal untuk filter"}
+            : "Klik tanggal untuk mulai filter"}
       </p>
     </div>
   );
