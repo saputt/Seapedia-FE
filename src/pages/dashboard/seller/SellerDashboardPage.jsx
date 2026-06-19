@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useSellerOrders } from "../../../features/order/hooks/useOrders";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const StatCard = ({ label, value, color }) => (
   <div className="card !p-5 flex items-center gap-4">
@@ -48,7 +50,7 @@ const SellerDashboardPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -60,9 +62,9 @@ const SellerDashboardPage = () => {
         <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat data dashboard.</p>
-          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -106,7 +108,7 @@ const SellerDashboardPage = () => {
             </div>
             <Link
               to="/dashboard/seller/orders"
-              className="btn-primary text-sm !py-2 !px-4"
+              className="btn-primary text-sm !py-2 !px-4 inline-block"
             >
               Proses Sekarang
             </Link>

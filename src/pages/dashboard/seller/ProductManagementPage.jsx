@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
+import Button from "../../../shared/components/ui/Button";
 import { getReadableError } from "../../../shared/utils/errorMapper";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const ProductFormModal = ({ storeId, product, onClose }) => {
   const queryClient = useQueryClient();
@@ -77,14 +79,10 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-ghost flex-1 !py-2.5">Batal</button>
-            <button type="submit" className="btn-primary flex-1 !py-2.5 flex items-center justify-center gap-2" disabled={mutation.isPending}>
-              {mutation.isPending ? (
-                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{isEdit ? "Menyimpan..." : "Menambah..."}</>
-              ) : (
-                isEdit ? "Simpan" : "Tambah"
-              )}
-            </button>
+            <Button type="button" onClick={onClose} variant="ghost" fullWidth>Batal</Button>
+            <Button type="submit" variant="primary" fullWidth loading={mutation.isPending}>
+              {mutation.isPending ? (isEdit ? "Menyimpan..." : "Menambah...") : (isEdit ? "Simpan" : "Tambah")}
+            </Button>
           </div>
         </form>
       </div>
@@ -123,9 +121,9 @@ const ProductManagementPage = () => {
     <>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Produk</h1>
-        <button onClick={() => { setEditingProduct(null); setShowForm(true); }} className="btn-primary text-sm !py-2 !px-4">
+        <Button onClick={() => { setEditingProduct(null); setShowForm(true); }} variant="primary">
           + Tambah Produk
-        </button>
+        </Button>
       </div>
       <p className="text-sm text-text-muted mb-6">Kelola produk toko Anda ({total} produk)</p>
 
@@ -139,7 +137,7 @@ const ProductManagementPage = () => {
 
       {isLoading && (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       )}
 
@@ -188,22 +186,24 @@ const ProductManagementPage = () => {
                   </td>
                   <td className="py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button
+                      <Button
                         onClick={() => { setEditingProduct(product); setShowForm(true); }}
-                        className="btn-ghost text-xs !py-1.5 !px-3"
+                        variant="ghost"
+                        size="sm"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           if (confirm("Hapus produk ini?")) {
                             deleteMutation.mutate(product.id);
                           }
                         }}
-                        className="btn-danger text-xs !py-1.5 !px-3"
+                        variant="danger"
+                        size="sm"
                       >
                         Hapus
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

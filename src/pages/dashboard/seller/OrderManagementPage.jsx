@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useSellerOrders, useUpdateOrderStatus } from "../../../features/order/hooks/useOrders";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const statusFilters = ["ALL", "PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"];
 
@@ -27,9 +29,9 @@ const OrderManagementPage = () => {
         <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -59,7 +61,7 @@ const OrderManagementPage = () => {
       <div className="relative min-h-[200px]">
         {(isLoading || isFetching) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-            <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+            <Spinner size="lg" />
           </div>
         )}
 
@@ -163,16 +165,17 @@ const OrderManagementPage = () => {
                   Total Rp{order.totalPrice?.toLocaleString("id-ID")}
                 </p>
                 {order.status === "PENDING" && (
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleProgress(order.id);
                     }}
-                    disabled={progressMutation.isPending}
-                    className="btn-primary text-xs !py-1.5 !px-4"
+                    variant="primary"
+                    size="sm"
+                    loading={progressMutation.isPending}
                   >
                     {progressMutation.isPending ? "Memproses..." : "Konfirmasi"}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
