@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
@@ -60,14 +60,21 @@ const AdminSimulatePage = lazyLoad(() => import("../pages/dashboard/admin/AdminS
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
       <Route
-        path="/products"
+        path="/"
         element={
           <BuyerRoute>
             <ProductListPage />
           </BuyerRoute>
         }
+      />
+      <Route
+        path="/about"
+        element={<LandingPage />}
+      />
+      <Route
+        path="/products"
+        element={<Navigate to="/" replace />}
       />
       <Route
         path="/products/:productId"
@@ -156,9 +163,11 @@ const AppRoutes = () => {
       <Route
         path="/dashboard/seller"
         element={
-          <SellerRoute>
-            <SellerLayout />
-          </SellerRoute>
+          <PrivateRoute>
+            <SellerRoute>
+              <SellerLayout />
+            </SellerRoute>
+          </PrivateRoute>
         }
       >
         <Route index element={<SellerDashboardPage />} />

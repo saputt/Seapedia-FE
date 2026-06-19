@@ -7,7 +7,7 @@ const DriverRoute = ({ children }) => {
   if (activeRole === "SELLER") {
     return <Navigate to="/dashboard/seller" replace />;
   } else if (activeRole === "BUYER") {
-    return <Navigate to="/products" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

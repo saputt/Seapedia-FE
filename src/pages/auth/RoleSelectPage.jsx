@@ -24,7 +24,7 @@ const RoleSelectPage = () => {
     onSuccess: (data) => {
       switchRole(data.activeRole, data.accessToken);
       const redirectPath =
-        data.activeRole === "BUYER" ? "/products" : `/dashboard/${data.activeRole.toLowerCase()}`;
+        data.activeRole === "BUYER" ? "/" : `/dashboard/${data.activeRole.toLowerCase()}`;
       navigate(redirectPath, { replace: true });
     },
   });

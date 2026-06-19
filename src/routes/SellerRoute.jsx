@@ -5,7 +5,7 @@ const SellerRoute = ({ children }) => {
   const activeRole = useAuthStore((s) => s.activeRole);
 
   if (activeRole === "BUYER") {
-    return <Navigate to="/products" replace />;
+    return <Navigate to="/" replace />;
   } else if (activeRole === "DRIVER") {
     return <Navigate to="/dashboard/driver" replace />;
   }

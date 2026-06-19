@@ -25,7 +25,7 @@ const CheckoutSuccessPage = () => {
               Lihat Pesanan
             </Button>
             <Button
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/")}
               variant="ghost"
               size="sm"
             >

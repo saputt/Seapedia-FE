@@ -76,7 +76,7 @@ const CartPage = () => {
               Keranjang belanja Anda masih kosong.
             </p>
             <Link
-              to="/products"
+              to="/"
               className="btn-primary text-sm !py-2 !px-6 inline-block"
             >
               Mulai Belanja

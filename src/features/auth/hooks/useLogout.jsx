@@ -8,6 +8,6 @@ export const useLogout = () => {
 
   return useCallback(() => {
     logout();
-    navigate("/", { replace: true });
+    navigate("/about", { replace: true });
   }, [logout, navigate]);
 };

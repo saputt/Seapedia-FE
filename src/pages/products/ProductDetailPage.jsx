@@ -61,7 +61,7 @@ const ProductDetailPage = () => {
     <MainLayout>
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
         <Link
-          to="/products"
+          to="/"
           className="inline-flex items-center gap-1 text-text-secondary hover:text-brand-deep transition-colors mb-6 font-medium"
         >
           &larr; Kembali ke produk
@@ -85,7 +85,7 @@ const ProductDetailPage = () => {
               Produk tidak ditemukan.
             </p>
             <Link
-              to="/products"
+              to="/"
               className="text-brand-deep font-medium hover:underline mt-2 inline-block"
             >
               Lihat produk lainnya

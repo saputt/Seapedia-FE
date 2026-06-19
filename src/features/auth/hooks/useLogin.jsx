@@ -24,7 +24,7 @@ export const useLogin = () => {
         navigate("/auth/role-select", { replace: true });
       } else {
         const redirectPath =
-          data.activeRole === "BUYER" ? "/products" : `/dashboard/${data.activeRole.toLowerCase()}`;
+          data.activeRole === "BUYER" ? "/" : `/dashboard/${data.activeRole.toLowerCase()}`;
         navigate(redirectPath, { replace: true });
       }
     },

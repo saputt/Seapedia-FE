@@ -68,14 +68,6 @@ const Navbar = ({ variant = "default" }) => {
           <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
             SEAPEDIA
           </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <Link to="/products" className="text-text-secondary font-medium hover:text-brand-deep transition-colors">
-              Produk
-            </Link>
-            <Link to="/stores" className="text-text-secondary font-medium hover:text-brand-deep transition-colors">
-              Toko
-            </Link>
-          </div>
         </div>
 
         {variant !== "checkout" && variant !== "seller" && (
