@@ -10,6 +10,7 @@ import SellerLayout from "../shared/components/layout/SellerLayout";
 import DriverLayout from "../shared/components/layout/DriverLayout";
 import AdminLayout from "../shared/components/layout/AdminLayout";
 import SellerRoute from "./SellerRoute";
+import Spinner from "../shared/components/ui/Spinner";
 
 const lazyLoad = (importFn) => {
   const Component = lazy(importFn);
@@ -17,7 +18,7 @@ const lazyLoad = (importFn) => {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-bg-primary">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       }
     >

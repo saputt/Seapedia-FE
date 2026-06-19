@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import Spinner from "../../../shared/components/ui/Spinner";
 import { useAddresses } from "../../../features/address/hooks/useAddresses";
 import { createAddress } from "../api/order.api";
 
@@ -9,13 +10,6 @@ const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }) => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ label: "", completeAddress: "" });
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowForm(false);
-      setForm({ label: "", completeAddress: "" });
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,7 +21,7 @@ const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }) => {
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       setShowForm(false);
       setForm({ label: "", completeAddress: "" });
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
     setSaving(false);
   };
 
@@ -87,7 +81,7 @@ const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }) => {
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <span className="w-6 h-6 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  <Spinner />
                 </div>
               ) : addresses.length === 0 ? (
                 <p className="text-sm text-text-secondary text-center py-8">Belum ada alamat tersimpan.</p>

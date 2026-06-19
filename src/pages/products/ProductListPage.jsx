@@ -1,22 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
+import Spinner from "../../shared/components/ui/Spinner";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
 import useProductSearchStore from "../../features/catalog/store/productSearchStore";
+import useDebounce from "../../shared/hooks/useDebounce";
+import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
   const { data: wallet } = useWallet();
   const searchQuery = useProductSearchStore((s) => s.query);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const loadMoreRef = useRef(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const debouncedSearch = useDebounce(searchQuery);
 
   const {
     data,
@@ -29,26 +25,9 @@ const ProductListPage = () => {
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
 
-  const handleObserver = useCallback(
-    (entries) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      rootMargin: "100px",
-    });
-    const el = loadMoreRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [handleObserver]);
+  const loadMoreRef = useInfiniteScroll(fetchNextPage, {
+    enabled: hasNextPage && !isFetchingNextPage,
+  });
 
   return (
     <MainLayout navbarVariant="products">
@@ -118,7 +97,7 @@ const ProductListPage = () => {
             <div ref={loadMoreRef} className="mt-8 flex justify-center">
               {isFetchingNextPage && (
                 <div className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="sm" />
                   Memuat produk lainnya...
                 </div>
               )}

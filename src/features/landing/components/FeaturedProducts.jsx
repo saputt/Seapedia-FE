@@ -1,30 +1,5 @@
+import ProductCard from "../../catalog/components/ProductCard";
 import { useFeaturedProducts } from "../hooks/useFeaturedProducts";
-
-const ProductCard = ({ product }) => {
-  const price = product.price?.toLocaleString("id-ID");
-
-  return (
-    <div className="card group cursor-pointer">
-      <div className="aspect-square bg-bg-tertiary flex items-center justify-center mb-4 overflow-hidden">
-        {product.imageUrl ? (
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <span className="text-text-muted text-sm">No Image</span>
-        )}
-      </div>
-      <h3 className="font-semibold text-text-primary text-lg truncate">
-        {product.name}
-      </h3>
-      <p className="text-brand-deep font-bold text-xl mt-1">
-        Rp{price}
-      </p>
-    </div>
-  );
-};
 
 const FeaturedProducts = () => {
   const { data, isLoading, isError } = useFeaturedProducts(6);

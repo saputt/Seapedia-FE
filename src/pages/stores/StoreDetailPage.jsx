@@ -1,21 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
+import Spinner from "../../shared/components/ui/Spinner";
 import { useStore } from "../../features/store/hooks/useStore";
 import { useStoreProducts } from "../../features/store/hooks/useStoreProducts";
+import useDebounce from "../../shared/hooks/useDebounce";
+import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
 const StoreDetailPage = () => {
   const { storeId } = useParams();
   const { data: store, isLoading: storeLoading, isError: storeError } = useStore(storeId);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const loadMoreRef = useRef(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 400);
-    return () => clearTimeout(timer);
-  }, [search]);
+  const debouncedSearch = useDebounce(search);
 
   const {
     data,
@@ -29,24 +26,9 @@ const StoreDetailPage = () => {
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
   const totalProducts = data?.pages[0]?.total ?? 0;
 
-  const handleObserver = useCallback(
-    (entries) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, { rootMargin: "100px" });
-    const el = loadMoreRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [handleObserver]);
+  const loadMoreRef = useInfiniteScroll(fetchNextPage, {
+    enabled: hasNextPage && !isFetchingNextPage,
+  });
 
   if (storeLoading) {
     return (
@@ -152,7 +134,7 @@ const StoreDetailPage = () => {
             <div ref={loadMoreRef} className="mt-8 flex justify-center">
               {isFetchingNextPage && (
                 <div className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="sm" />
                   Memuat produk lainnya...
                 </div>
               )}

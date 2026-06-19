@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../../features/auth/store/authStore";
 import { switchUserRole } from "../../features/auth/api/auth.api";
 import { getReadableError } from "../../shared/utils/errorMapper";
+import Spinner from "../../shared/components/ui/Spinner";
 
 const roleConfig = {
   BUYER: { label: "Pembeli", desc: "Belanja produk dari berbagai toko", color: "role-buyer", emoji: "🛒" },
@@ -33,13 +34,9 @@ const RoleSelectPage = () => {
     switchMutation.mutate(role);
   };
 
-  useEffect(() => {
-    if (!userRoles || userRoles.length === 0) {
-      navigate("/auth/login", { replace: true });
-    }
-  }, [userRoles, navigate]);
-
-  if (!userRoles || userRoles.length === 0) return null;
+  if (!userRoles || userRoles.length === 0) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-secondary px-4">
@@ -80,7 +77,7 @@ const RoleSelectPage = () => {
                   <p className="text-text-secondary text-sm">{config.desc}</p>
                 </div>
                 {isLoading && (
-                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="sm" />
                 )}
                 {!isLoading && (
                   <span className="text-text-muted text-sm">Pilih &rarr;</span>
