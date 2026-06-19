@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "./Button";
 
 const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, actionTo, onAction }) => {
   const navigate = useNavigate();
@@ -35,23 +36,21 @@ const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, action
         </p>
 
         <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={onClose}
-            className="btn-ghost text-sm !py-2 !px-6"
-          >
+          <Button onClick={onClose} variant="ghost" size="sm">
             Tutup
-          </button>
+          </Button>
           {actionLabel && (actionTo || onAction) && (
-            <button
+            <Button
               onClick={() => {
                 if (onAction) onAction();
                 else if (actionTo) navigate(actionTo);
                 onClose();
               }}
-              className="btn-primary text-sm !py-2 !px-6"
+              variant="primary"
+              size="sm"
             >
               {actionLabel}
-            </button>
+            </Button>
           )}
         </div>
       </div>
