@@ -4,6 +4,7 @@ import useAuthStore from "../../../features/auth/store/authStore";
 import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./SwitchRoleModal";
+import AlertModal from "./AlertModal";
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const ProfileDropdown = () => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [switchingRole, setSwitchingRole] = useState(null);
+  const [logoutModal, setLogoutModal] = useState(false);
   const profileRef = useRef(null);
 
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
@@ -189,7 +191,7 @@ const ProfileDropdown = () => {
                 </button>
               )}
               <button
-                onClick={() => { logout(); setDropdownOpen(false); }}
+                onClick={() => { setDropdownOpen(false); setLogoutModal(true); }}
                 className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-red-50 rounded transition-colors"
               >
                 Keluar
@@ -199,6 +201,18 @@ const ProfileDropdown = () => {
         )}
       </div>
       <SwitchRoleModal role={switchingRole} />
+      <AlertModal
+        isOpen={logoutModal}
+        onClose={() => setLogoutModal(false)}
+        icon="👋"
+        title="Yakin ingin keluar?"
+        message="Anda akan logout dari akun ini."
+        actionLabel="Keluar"
+        onAction={() => {
+          logout();
+          navigate("/", { replace: true });
+        }}
+      />
     </>
   );
 };
