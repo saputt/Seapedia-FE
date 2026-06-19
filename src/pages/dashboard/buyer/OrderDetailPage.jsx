@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import MainLayout from "../../../shared/components/layout/MainLayout";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
@@ -38,26 +37,22 @@ const OrderDetailPage = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" />
-        </div>
-      </MainLayout>
+      <div className="flex items-center justify-center py-20">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   if (error || !order) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
-            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-              Coba Lagi
-            </Button>
-          </div>
+      <div className="flex items-center justify-center py-20">
+        <div className="card text-center py-10">
+          <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
+            Coba Lagi
+          </Button>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
@@ -68,7 +63,7 @@ const OrderDetailPage = () => {
   const totalPrice = order.totalPrice ?? 0;
 
   return (
-    <MainLayout>
+    <>
       <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Detail Pesanan</h1>
@@ -241,7 +236,7 @@ const OrderDetailPage = () => {
         actionLabel={modal === "cancel" ? "Ya, Batalkan" : "Ya, Konfirmasi"}
         onAction={modal === "cancel" ? handleCancel : handleConfirm}
       />
-    </MainLayout>
+    </>
   );
 };
 

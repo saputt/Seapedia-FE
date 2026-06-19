@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import MainLayout from "../../../shared/components/layout/MainLayout";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
@@ -51,17 +50,14 @@ const TransactionHistoryPage = () => {
 
   if (loading) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" />
-        </div>
-      </MainLayout>
+      <div className="flex items-center justify-center py-20">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-text-primary">Riwayat Transaksi</h1>
@@ -191,7 +187,6 @@ const TransactionHistoryPage = () => {
           </>
         )}
       </div>
-    </MainLayout>
   );
 };
 

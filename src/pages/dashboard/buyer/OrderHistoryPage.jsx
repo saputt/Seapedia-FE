@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import MainLayout from "../../../shared/components/layout/MainLayout";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
@@ -43,33 +42,29 @@ const OrderHistoryPage = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" />
-        </div>
-      </MainLayout>
+      <div className="flex items-center justify-center py-20">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-              Coba Lagi
-            </Button>
-          </div>
+      <div className="flex items-center justify-center py-20">
+        <div className="card text-center py-10">
+          <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
+            Coba Lagi
+          </Button>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
-        <h1 className="text-xl font-bold text-text-primary">Riwayat Pesanan</h1>
+    <>
+    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+      <h1 className="text-xl font-bold text-text-primary">Riwayat Pesanan</h1>
 
         <div className="flex flex-wrap gap-2">
           {statuses.map((s) => (
@@ -211,7 +206,7 @@ const OrderHistoryPage = () => {
             : handleConfirm(modal.orderId, modal.storeId)
         }
       />
-    </MainLayout>
+    </>
   );
 };
 

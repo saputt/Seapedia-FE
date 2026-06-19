@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MainLayout from "../../../shared/components/layout/MainLayout";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { useWallet, useTransactions, useTopUp } from "../../../features/wallet/hooks/useWallet";
@@ -39,17 +38,14 @@ const WalletPage = () => {
 
   if (loading) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" />
-        </div>
-      </MainLayout>
+      <div className="flex items-center justify-center py-20">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="card text-center py-10">
             <p className="text-danger font-semibold mb-4">{error?.message || "Gagal memuat dompet."}</p>
@@ -159,13 +155,13 @@ const WalletPage = () => {
                   ))}
                 </div>
               )}
-              {allTransactions.length > 5 && (
+              {allTransactions.length >= 5 && (
                 <div className="mt-3 pt-3 border-t-[2px] border-bg-tertiary text-center">
                   <Button
                     variant="ghost"
                     onClick={() => navigate("/dashboard/buyer/wallet/history")}
                   >
-                    Lihat Semua ({allTransactions.length})
+                    Lihat Semua Transaksi
                   </Button>
                 </div>
               )}
@@ -173,7 +169,6 @@ const WalletPage = () => {
           </>
         )}
       </div>
-    </MainLayout>
   );
 };
 
