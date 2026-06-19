@@ -63,7 +63,7 @@ const ProfileDropdown = () => {
       const res = await switchUserRole("BUYER");
       switchRole("BUYER", res.accessToken);
       setSwitchingRole(null);
-      navigate("/products", { replace: true });
+      navigate("/", { replace: true });
     } catch {
       setSwitchingRole(null);
     }
@@ -210,7 +210,7 @@ const ProfileDropdown = () => {
         actionLabel="Keluar"
         onAction={() => {
           logout();
-          navigate("/", { replace: true });
+          navigate("/about", { replace: true });
         }}
       />
     </>
