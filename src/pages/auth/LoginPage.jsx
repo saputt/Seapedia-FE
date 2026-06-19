@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AuthLayout from "../../shared/components/layout/AuthLayout";
+import Button from "../../shared/components/ui/Button";
 import { useLogin } from "../../features/auth/hooks/useLogin";
 import { getReadableError } from "../../shared/utils/errorMapper";
 
@@ -66,20 +67,15 @@ const LoginPage = () => {
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
-          className="btn-primary w-full !py-3 flex items-center justify-center gap-2"
-          disabled={loginMutation.isPending}
+          variant="primary"
+          size="lg"
+          fullWidth
+          loading={loginMutation.isPending}
         >
-          {loginMutation.isPending ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Memproses...
-            </>
-          ) : (
-            "Masuk"
-          )}
-        </button>
+          {loginMutation.isPending ? "Memproses..." : "Masuk"}
+        </Button>
 
         <p className="text-center text-text-secondary text-sm">
           Belum punya akun?{" "}

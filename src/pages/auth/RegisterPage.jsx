@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../../shared/components/layout/AuthLayout";
+import Button from "../../shared/components/ui/Button";
 import { useRegister } from "../../features/auth/hooks/useRegister";
 import { getReadableError } from "../../shared/utils/errorMapper";
 
@@ -114,20 +115,15 @@ const RegisterPage = () => {
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
-          className="btn-primary w-full !py-3 flex items-center justify-center gap-2"
-          disabled={registerMutation.isPending}
+          variant="primary"
+          size="lg"
+          fullWidth
+          loading={registerMutation.isPending}
         >
-          {registerMutation.isPending ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Mendaftar...
-            </>
-          ) : (
-            "Daftar"
-          )}
-        </button>
+          {registerMutation.isPending ? "Mendaftar..." : "Daftar"}
+        </Button>
 
         <p className="text-center text-text-secondary text-sm">
           Sudah punya akun?{" "}
