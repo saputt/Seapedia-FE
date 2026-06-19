@@ -1,5 +1,7 @@
 import { useAvailableJobs, useTakeJob } from "../../../features/driver/hooks/useDriverJobs";
 import { STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const DriverJobsPage = () => {
   const { data: jobs = [], isLoading, error } = useAvailableJobs();
@@ -17,9 +19,9 @@ const DriverJobsPage = () => {
         <p className="text-sm text-text-muted mb-6">Cari pesanan yang siap dikirim</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat pekerjaan.</p>
-          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -48,7 +50,7 @@ const DriverJobsPage = () => {
 
       {isLoading ? (
         <div className="min-h-[40vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       ) : jobs.length === 0 ? (
         <div className="card text-center py-10">
@@ -124,13 +126,13 @@ const DriverJobsPage = () => {
                     Rp{job.shippingFee?.toLocaleString("id-ID")}
                   </p>
                 </div>
-                <button
+                <Button
                   onClick={() => handleTakeJob(job.id)}
-                  disabled={takeJobMutation.isPending}
-                  className="btn-primary text-sm !py-2 !px-5"
+                  variant="primary"
+                  loading={takeJobMutation.isPending}
                 >
                   {takeJobMutation.isPending ? "Mengambil..." : "Ambil Pekerjaan"}
-                </button>
+                </Button>
               </div>
             </div>
           ))}

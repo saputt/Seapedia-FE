@@ -1,5 +1,7 @@
 import { useMyDriverJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const DriverHistoryPage = () => {
   const { data: jobs = [], isLoading, error } = useMyDriverJobs();
@@ -11,9 +13,9 @@ const DriverHistoryPage = () => {
         <p className="text-sm text-text-muted mb-6">Riwayat pengiriman Anda</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat riwayat.</p>
-          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -26,7 +28,7 @@ const DriverHistoryPage = () => {
 
       {isLoading ? (
         <div className="min-h-[40vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+          <Spinner size="lg" />
         </div>
       ) : jobs.length === 0 ? (
         <div className="card text-center py-10">

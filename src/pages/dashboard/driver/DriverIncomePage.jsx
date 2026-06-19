@@ -1,34 +1,25 @@
-import { useRef, useEffect } from "react";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
+import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
 
 const DriverIncomePage = () => {
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError } = useTransactions();
-  const sentinelRef = useRef(null);
 
   const loading = walletLoading || txLoading;
   const error = walletError || txError;
   const transactions = data?.pages.flatMap((p) => p.data) ?? [];
   const totalIncome = transactions.reduce((sum, tx) => sum + tx.amount, 0);
 
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) fetchNextPage();
-      },
-      { rootMargin: "100px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const sentinelRef = useInfiniteScroll(fetchNextPage, {
+    enabled: hasNextPage && !isFetchingNextPage,
+  });
 
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -40,9 +31,9 @@ const DriverIncomePage = () => {
         <p className="text-sm text-text-muted mb-6">Riwayat pendapatan dari pengiriman</p>
         <div className="card text-center py-10">
           <p className="text-danger font-semibold mb-4">Gagal memuat data pemasukkan.</p>
-          <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -100,7 +91,7 @@ const DriverIncomePage = () => {
             ))}
             {isFetchingNextPage && (
               <div className="flex justify-center py-3">
-                <span className="w-6 h-6 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                <Spinner />
               </div>
             )}
             {hasNextPage && !isFetchingNextPage && (
