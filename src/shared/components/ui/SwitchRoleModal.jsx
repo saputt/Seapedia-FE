@@ -1,3 +1,5 @@
+import Spinner from "./Spinner";
+
 const roleLabel = {
   SELLER: "Penjual",
   BUYER: "Pembeli",
@@ -22,7 +24,7 @@ const SwitchRoleModal = ({ role }) => {
         <p className="text-lg font-semibold text-text-primary text-center">
           Beralih ke {roleLabel[role]}
         </p>
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
         <p className="text-sm text-text-muted">Mohon tunggu sebentar...</p>
       </div>
     </div>
