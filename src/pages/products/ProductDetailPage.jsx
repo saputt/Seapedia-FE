@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
+import Button from "../../shared/components/ui/Button";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
 import useAuthStore from "../../features/auth/store/authStore";
-import useCartStore from "../../features/cart/store/cartStore";
 import { addToCart, clearCart } from "../../features/cart/api/cart.api";
+import useCartStore from "../../features/cart/store/cartStore";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -17,43 +19,42 @@ const ProductDetailPage = () => {
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [showStoreAlert, setShowStoreAlert] = useState(false);
   const [addError, setAddError] = useState("");
-  const [adding, setAdding] = useState(false);
 
   const isLoggedIn = !!token;
 
-  const handleAddToCart = async () => {
-    setAdding(true);
-    setAddError("");
-    try {
-      await addToCart(productId, 1);
+  const addMutation = useMutation({
+    mutationFn: () => addToCart(productId, 1),
+    onSuccess: async () => {
       await refreshCart();
       hideBadge();
-    } catch (err) {
+    },
+    onError: (err) => {
       const msg = err?.message || "";
       if (msg.includes("cart must be one store only")) {
         setShowStoreAlert(true);
       } else {
         setAddError(msg || "Gagal menambahkan ke keranjang.");
       }
-    } finally {
-      setAdding(false);
-    }
-  };
+    },
+  });
 
-  const handleClearAndAdd = async () => {
-    setAdding(true);
-    try {
+  const clearAndAddMutation = useMutation({
+    mutationFn: async () => {
       await clearCart();
       await addToCart(productId, 1);
+    },
+    onSuccess: async () => {
       await refreshCart();
       hideBadge();
       setShowStoreAlert(false);
-    } catch {
+    },
+    onError: () => {
       setAddError("Gagal menambahkan ke keranjang.");
-    } finally {
-      setAdding(false);
-    }
-  };
+    },
+  });
+
+  const handleAddToCart = () => addMutation.mutate();
+  const handleClearAndAdd = () => clearAndAddMutation.mutate();
 
   return (
     <MainLayout>
@@ -150,13 +151,16 @@ const ProductDetailPage = () => {
 
               {isLoggedIn ? (
                 <div className="flex flex-col gap-2">
-                  <button
+                  <Button
                     onClick={handleAddToCart}
-                    disabled={adding || product.stock < 1}
-                    className="btn-primary w-full !py-3 mt-4 text-base"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    loading={addMutation.isPending}
+                    disabled={product.stock < 1}
                   >
-                    {adding ? "Menambahkan..." : "Tambah ke Keranjang"}
-                  </button>
+                    {addMutation.isPending ? "Menambahkan..." : "Tambah ke Keranjang"}
+                  </Button>
                   {addError && (
                     <p className="text-danger text-xs text-center">
                       {addError}
@@ -164,12 +168,14 @@ const ProductDetailPage = () => {
                   )}
                 </div>
               ) : (
-                <button
+                <Button
                   onClick={() => setShowLoginAlert(true)}
-                  className="btn-primary w-full !py-3 mt-4 text-base cursor-pointer"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
                 >
                   Tambah ke Keranjang
-                </button>
+                </Button>
               )}
             </div>
           </div>
