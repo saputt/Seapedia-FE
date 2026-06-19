@@ -1,13 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
+import Button from "../../shared/components/ui/Button";
+import Spinner from "../../shared/components/ui/Spinner";
 import AddressSelector from "../../features/order/components/AddressSelector";
-import {
-  getOrderSummary,
-  checkoutOrder,
-  fetchAddresses,
-} from "../../features/order/api/order.api";
+import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
+import { checkoutOrder } from "../../features/order/api/order.api";
+import { useAddresses } from "../../features/address/hooks/useAddresses";
 
 const SHIPPING_LIST = [
   { id: "REGULAR", name: "Regular", price: 10000, desc: "Estimasi 3–5 hari" },
@@ -18,133 +19,68 @@ const SHIPPING_LIST = [
 const CheckoutPage = () => {
   const navigate = useNavigate();
 
-  const [summary, setSummary] = useState(null);
-  const [orderToken, setOrderToken] = useState(null);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [initialError, setInitialError] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-
   const [shippingMethod, setShippingMethod] = useState("REGULAR");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
-  const [discountError, setDiscountError] = useState("");
-  const [discountSuccess, setDiscountSuccess] = useState("");
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
 
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
-  const checkoutUrlRef = useRef(window.location.href);
+  const { data: summaryData, isLoading, isFetching, error: summaryError, refetch } = useOrderSummary(appliedCode, shippingMethod);
+  const summary = summaryData?.order ?? null;
+  const orderToken = summaryData?.orderToken ?? null;
 
+  const { data: addressesData } = useAddresses(true);
+
+  const initialAddressSet = useRef(false);
   useEffect(() => {
-    if (checkoutSuccess) return;
-
-    const handler = (e) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [checkoutSuccess]);
-
-  useEffect(() => {
-    if (checkoutSuccess) return;
-
-    const handlePopState = () => {
-      const stay = window.confirm("Yakin ingin keluar? Pesanan Anda akan hilang.");
-      if (!stay) {
-        window.history.pushState(null, "", checkoutUrlRef.current);
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [checkoutSuccess]);
-
-  const fetchSummary = useCallback(async (discount, shipping, isInitial = false) => {
-    if (isInitial) {
-      setInitialLoading(true);
-      setInitialError("");
-    } else {
-      setRefreshing(true);
+    if (isLoading || initialAddressSet.current || !addressesData) return;
+    const addr = Array.isArray(addressesData) ? addressesData[0] : null;
+    if (addr) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedAddress(addr);
+      initialAddressSet.current = true;
     }
-    try {
-      const body = {};
-      if (discount) body.discountCode = discount;
-      if (shipping) body.shippingMethod = shipping;
-      const result = await getOrderSummary(body);
-      setSummary(result.order);
-      setOrderToken(result.orderToken);
-      if (discount) {
-        setDiscountSuccess(`Diskon ${discount} berhasil diterapkan!`);
-        setDiscountError("");
-      }
-    } catch (err) {
+  }, [isLoading, addressesData]);
+
+  const summaryErrorMessage = summaryError?.message || "";
+  const discountErrorMsg = !appliedCode ? "" :
+    summaryErrorMessage.toLowerCase().includes("not found") ? "Kode diskon tidak ditemukan." :
+    (summaryErrorMessage.toLowerCase().includes("expired") || summaryErrorMessage.toLowerCase().includes("not available")) ? "Kode diskon sudah tidak berlaku." :
+    summaryErrorMessage || "Gagal menerapkan diskon.";
+
+  const checkoutMutation = useMutation({
+    mutationFn: () =>
+      checkoutOrder({ orderToken, addressId: selectedAddress.id }),
+    onSuccess: () => {
+      navigate("/checkout/success");
+    },
+    onError: (err) => {
       const msg = err?.message || "";
-      if (discount && msg.toLowerCase().includes("not found")) {
-        setAppliedCode("");
-        setDiscountCode("");
-        setDiscountError("Kode diskon tidak ditemukan.");
-        setDiscountSuccess("");
-      } else if (discount && (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("not available"))) {
-        setAppliedCode("");
-        setDiscountCode("");
-        setDiscountError("Kode diskon sudah tidak berlaku.");
-        setDiscountSuccess("");
-      } else if (isInitial) {
-        setInitialError(msg || "Gagal memuat ringkasan pesanan.");
+      if (msg.toLowerCase().includes("not sufficient")) {
+        setShowInsufficientModal(true);
+        setCheckoutError("");
       } else {
-        setDiscountError(msg || "Gagal menerapkan diskon.");
-        setDiscountSuccess("");
+        setCheckoutError(msg || "Checkout gagal. Silakan coba lagi.");
       }
-    } finally {
-      if (isInitial) setInitialLoading(false);
-      else setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSummary(null, null, true);
-  }, [fetchSummary]);
-
-  useEffect(() => {
-    if (!initialLoading && !initialError) {
-      fetchSummary(appliedCode, shippingMethod, false);
-    }
-  }, [appliedCode, shippingMethod]);
-
-  useEffect(() => {
-    if (initialLoading || initialError) return;
-    fetchAddresses()
-      .then((data) => {
-        const list = Array.isArray(data) ? data : [];
-        if (list.length > 0 && !selectedAddress) {
-          setSelectedAddress(list[0]);
-        }
-      })
-      .catch(() => {});
-  }, [initialLoading, initialError]);
+    },
+  });
 
   const handleApplyDiscount = () => {
     const trimmed = discountCode.trim().toUpperCase();
     if (!trimmed) return;
     setAppliedCode(trimmed);
-    setDiscountError("");
-    setDiscountSuccess("");
   };
 
   const handleRemoveDiscount = () => {
     setDiscountCode("");
     setAppliedCode("");
-    setDiscountError("");
-    setDiscountSuccess("");
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!selectedAddress) {
       setCheckoutError("Silakan pilih alamat pengiriman terlebih dahulu.");
       return;
@@ -153,26 +89,8 @@ const CheckoutPage = () => {
       setCheckoutError("Ringkasan pesanan tidak valid. Silakan refresh.");
       return;
     }
-
-    setCheckingOut(true);
     setCheckoutError("");
-    try {
-      await checkoutOrder({
-        orderToken,
-        addressId: selectedAddress.id,
-      });
-      navigate("/checkout/success");
-    } catch (err) {
-      const msg = err?.message || "";
-      if (msg.toLowerCase().includes("not sufficient")) {
-        setShowInsufficientModal(true);
-        setCheckoutError("");
-      } else {
-        setCheckoutError(msg || "Checkout gagal. Silakan coba lagi.");
-      }
-    } finally {
-      setCheckingOut(false);
-    }
+    checkoutMutation.mutate();
   };
 
   const subtotal = summary?.subtotal ?? 0;
@@ -184,7 +102,7 @@ const CheckoutPage = () => {
   return (
     <MainLayout navbarVariant="checkout">
       <div className="max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
-        {initialLoading && (
+        {isLoading && (
           <div className="space-y-6 animate-pulse">
             <div className="card h-24 bg-bg-tertiary" />
             <div className="card h-48 bg-bg-tertiary" />
@@ -192,21 +110,18 @@ const CheckoutPage = () => {
           </div>
         )}
 
-        {initialError && !initialLoading && (
+        {summaryError && !isLoading && (
           <div className="text-center py-20">
             <p className="text-danger font-semibold text-lg mb-4">
-              {initialError}
+              {summaryError?.message || "Gagal memuat ringkasan pesanan."}
             </p>
-            <button
-              onClick={() => fetchSummary(null, null, true)}
-              className="btn-primary text-sm !py-2 !px-6"
-            >
+            <Button onClick={() => refetch()} variant="primary" size="sm">
               Coba Lagi
-            </button>
+            </Button>
           </div>
         )}
 
-        {!initialLoading && !initialError && summary && (
+        {!isLoading && !summaryError && summary && (
           <div className="space-y-6">
             {/* Address */}
             <div className="card">
@@ -229,17 +144,17 @@ const CheckoutPage = () => {
                   </p>
                 </div>
               ) : (
-                <div>
-                  <p className="text-sm text-text-secondary mb-3">
-                    Belum ada alamat pengiriman dipilih.
-                  </p>
-                  <button
-                    onClick={() => setShowAddressSelector(true)}
-                    className="btn-primary text-sm !py-1 !px-4"
-                  >
-                    Pilih Alamat
-                  </button>
-                </div>
+                  <div>
+                    <p className="text-sm text-text-secondary mb-3">
+                      Belum ada alamat pengiriman dipilih.
+                    </p>
+                    <Button
+                      onClick={() => setShowAddressSelector(true)}
+                      variant="primary"
+                    >
+                      Pilih Alamat
+                    </Button>
+                  </div>
               )}
             </div>
 
@@ -313,20 +228,21 @@ const CheckoutPage = () => {
                     className="input-neo w-full !py-2 !text-sm"
                     placeholder="Masukkan kode diskon"
                   />
-                  <button
+                  <Button
                     onClick={handleApplyDiscount}
+                    variant="primary"
+                    size="sm"
                     disabled={!discountCode.trim()}
-                    className="btn-primary text-sm !py-2 !px-5 w-full sm:w-auto whitespace-nowrap"
                   >
                     Pakai
-                  </button>
+                  </Button>
                 </div>
               )}
-              {discountError && (
-                <p className="text-danger text-xs mt-1">{discountError}</p>
+              {discountErrorMsg && (
+                <p className="text-danger text-xs mt-1">{discountErrorMsg}</p>
               )}
-              {discountSuccess && (
-                <p className="text-success text-xs mt-1">{discountSuccess}</p>
+              {appliedCode && !discountErrorMsg && (
+                <p className="text-success text-xs mt-1">Diskon {appliedCode} berhasil diterapkan!</p>
               )}
             </div>
 
@@ -366,9 +282,9 @@ const CheckoutPage = () => {
                 ))}
               </div>
 
-              {refreshing && (
+              {isFetching && (
                 <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded">
-                  <span className="w-6 h-6 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  <Spinner />
                 </div>
               )}
             </div>
@@ -418,13 +334,16 @@ const CheckoutPage = () => {
             {checkoutError && (
               <p className="text-danger text-sm text-center">{checkoutError}</p>
             )}
-            <button
+            <Button
               onClick={handleCheckout}
-              disabled={checkingOut || !selectedAddress}
-              className="btn-primary w-full !py-3 text-base"
+              variant="primary"
+              size="lg"
+              fullWidth
+              loading={checkoutMutation.isPending}
+              disabled={!selectedAddress}
             >
-              {checkingOut ? "Memproses..." : "Buat Pesanan"}
-            </button>
+              {checkoutMutation.isPending ? "Memproses..." : "Buat Pesanan"}
+            </Button>
           </div>
         )}
       </div>

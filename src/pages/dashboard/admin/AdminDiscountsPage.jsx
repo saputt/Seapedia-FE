@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { apiFetch } from "../../../api/client";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
+import { useDiscounts, useCreateDiscount, useDeleteDiscount } from "../../../features/discount/hooks/useDiscounts";
 
 const TABS = [
   { key: "all", label: "Semua" },
@@ -7,76 +9,49 @@ const TABS = [
   { key: "VOUCHER", label: "Voucher" },
 ];
 
+const formInitial = { code: "", type: "PROMO", value: "", isPercent: false, maxUses: "", expiredAt: "" };
+
 const AdminDiscountsPage = () => {
   const [tab, setTab] = useState("all");
-  const [discounts, setDiscounts] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({
-    code: "",
-    type: "PROMO",
-    value: "",
-    isPercent: false,
-    maxUses: "",
-    expiredAt: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState(formInitial);
 
-  const fetchDiscounts = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch("discounts/all");
-      setDiscounts(res ?? []);
-    } catch (e) {
-      setError(e?.message || "Gagal memuat data");
-    }
-    setLoading(false);
-  };
+  const { data: discounts, isLoading, error, refetch } = useDiscounts();
+  const createMutation = useCreateDiscount();
+  const deleteMutation = useDeleteDiscount();
 
-  useState(() => { fetchDiscounts(); }, []);
+  const list = discounts ?? [];
+  const filtered = tab === "all" ? list : list.filter((d) => d.type === tab);
 
-  const filtered = tab === "all" ? (discounts ?? []) : (discounts ?? []).filter((d) => d.type === tab);
-
-  const handleCreate = async () => {
+  const handleCreate = () => {
     if (!form.code || !form.value || !form.expiredAt) return;
-    setSubmitting(true);
-    try {
-      await apiFetch("discounts", {
-        method: "POST",
-        body: JSON.stringify({
-          code: form.code,
-          type: form.type,
-          value: parseInt(form.value, 10),
-          isPercent: form.isPercent,
-          maxUses: form.maxUses ? parseInt(form.maxUses, 10) : null,
-          expiredAt: new Date(form.expiredAt).toISOString(),
-        }),
-      });
-      setShowCreate(false);
-      setForm({ code: "", type: "PROMO", value: "", isPercent: false, maxUses: "", expiredAt: "" });
-      fetchDiscounts();
-    } catch (e) {
-      setError(e?.message || "Gagal membuat diskon");
-    }
-    setSubmitting(false);
+    createMutation.mutate(
+      {
+        code: form.code,
+        type: form.type,
+        value: parseInt(form.value, 10),
+        isPercent: form.isPercent,
+        maxUses: form.maxUses ? parseInt(form.maxUses, 10) : null,
+        expiredAt: new Date(form.expiredAt).toISOString(),
+      },
+      {
+        onSuccess: () => {
+          setShowCreate(false);
+          setForm(formInitial);
+        },
+      }
+    );
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     if (!window.confirm("Hapus diskon ini?")) return;
-    try {
-      await apiFetch(`discounts/${id}`, { method: "DELETE" });
-      fetchDiscounts();
-    } catch (e) {
-      setError(e?.message || "Gagal menghapus");
-    }
+    deleteMutation.mutate(id);
   };
 
-  if (loading && !discounts) {
+  if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -85,18 +60,18 @@ const AdminDiscountsPage = () => {
     <>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Kelola Diskon</h1>
-        <button onClick={() => setShowCreate(true)} className="btn-primary text-sm !py-2 !px-5">
+        <Button onClick={() => setShowCreate(true)} variant="primary">
           + Buat Diskon
-        </button>
+        </Button>
       </div>
       <p className="text-sm text-text-muted mb-6">Atur kode promo dan voucher untuk pengguna</p>
 
       {error && (
         <div className="card mb-4">
-          <p className="text-danger text-sm">{error}</p>
-          <button onClick={fetchDiscounts} className="btn-ghost text-sm !py-1 !px-4 mt-2">
+          <p className="text-danger text-sm">{error?.message || "Gagal memuat data"}</p>
+          <Button onClick={() => refetch()} variant="ghost" className="mt-2">
             Coba Lagi
-          </button>
+          </Button>
         </div>
       )}
 
@@ -152,12 +127,16 @@ const AdminDiscountsPage = () => {
             />
           </div>
           <div className="flex items-center gap-3 mt-4">
-            <button onClick={handleCreate} disabled={submitting} className="btn-primary text-sm !py-2 !px-5">
-              {submitting ? "Menyimpan..." : "Simpan"}
-            </button>
-            <button onClick={() => setShowCreate(false)} className="btn-ghost text-sm !py-2 !px-5">
+            <Button
+              onClick={handleCreate}
+              variant="primary"
+              loading={createMutation.isPending}
+            >
+              {createMutation.isPending ? "Menyimpan..." : "Simpan"}
+            </Button>
+            <Button onClick={() => setShowCreate(false)} variant="ghost">
               Batal
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -211,8 +190,11 @@ const AdminDiscountsPage = () => {
                       {new Date(d.expiredAt).toLocaleDateString("id-ID")}
                     </td>
                     <td className="py-2.5">
-                      <button onClick={() => handleDelete(d.id)} className="text-danger font-semibold text-xs hover:underline">
-                        Hapus
+                      <button
+                        onClick={() => handleDelete(d.id)}
+                        className="text-danger font-semibold text-xs hover:underline"
+                      >
+                        {deleteMutation.isPending ? "..." : "Hapus"}
                       </button>
                     </td>
                   </tr>
