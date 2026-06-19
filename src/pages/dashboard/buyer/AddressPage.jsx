@@ -108,14 +108,32 @@ const AddressPage = () => {
       )}
 
       {!isLoading && addresses && addresses.length > 0 && (
-        <div className="grid gap-4">
-          {addresses.map((addr) => (
-            <div key={addr.id} className="card">
-              <div className="flex items-start justify-between gap-4">
+        <div className="grid gap-3">
+          {addresses.map((addr) => {
+            const isDefault = addr.lastUsed;
+            return (
+              <div
+                key={addr.id}
+                onClick={() => { if (!isDefault) defaultMutation.mutate(addr.id); }}
+                className={`card flex items-start gap-4 cursor-pointer transition-all ${
+                  isDefault
+                    ? "border-brand-deep bg-brand-subtle/20 shadow-[6px_6px_0px_0px_var(--color-brand-deep)]"
+                    : "hover:border-brand-deep/40 hover:shadow-[4px_4px_0px_0px_var(--color-brand-deep)]"
+                }`}
+              >
+                {/* Radio indicator */}
+                <div className="mt-0.5 shrink-0">
+                  <div className={`w-5 h-5 rounded-full border-[3px] flex items-center justify-center transition-colors ${
+                    isDefault ? "border-brand-deep" : "border-border"
+                  }`}>
+                    {isDefault && <div className="w-2.5 h-2.5 rounded-full bg-brand-deep" />}
+                  </div>
+                </div>
+
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-text-primary">{addr.label}</span>
-                    {addr.lastUsed && (
+                    {isDefault && (
                       <span className="text-[10px] bg-brand-deep text-white font-semibold px-2 py-0.5 rounded">Utama</span>
                     )}
                   </div>
@@ -123,16 +141,8 @@ const AddressPage = () => {
                     {addr.completeAddress}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {!addr.lastUsed && (
-                    <Button
-                      onClick={() => defaultMutation.mutate(addr.id)}
-                      variant="ghost"
-                      size="sm"
-                    >
-                      Jadikan Utama
-                    </Button>
-                  )}
+
+                <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                   <Button
                     onClick={() => { setEditingAddress(addr); setShowForm(true); }}
                     variant="ghost"
@@ -149,8 +159,8 @@ const AddressPage = () => {
                   </Button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
