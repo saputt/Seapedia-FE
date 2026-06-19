@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import MainLayout from "./MainLayout";
+import Navbar from "./Navbar";
 import DashboardSidebar from "./DashboardSidebar";
 
 const links = [
@@ -22,14 +22,15 @@ const links = [
 
 const BuyerLayout = () => {
   return (
-    <MainLayout navbarVariant="seller">
-      <div className="flex min-h-[calc(100vh-4rem)]">
+    <div className="min-h-screen flex flex-col bg-bg-primary">
+      <Navbar />
+      <div className="flex flex-1">
         <DashboardSidebar title="Pembeli" subtitle="Dashboard Pembeli" links={links} />
-        <div className="flex-1 p-6 lg:p-8 overflow-auto">
+        <div className="flex-1 p-6 lg:p-8">
           <Outlet />
         </div>
       </div>
-    </MainLayout>
+    </div>
   );
 };
 

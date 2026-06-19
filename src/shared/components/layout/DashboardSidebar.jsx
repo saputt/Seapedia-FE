@@ -10,7 +10,7 @@ const DashboardSidebar = ({ title, subtitle, links }) => {
   const location = useLocation();
 
   return (
-    <aside className="w-60 shrink-0 border-r-[3px] border-brand-deep/20 bg-bg-secondary hidden lg:flex lg:flex-col">
+    <aside className="w-60 shrink-0 border-r-[3px] border-brand-deep/20 bg-bg-secondary hidden lg:flex lg:flex-col sticky top-16 self-start h-[calc(100vh-4rem)]">
       <div className="p-5 border-b-[3px] border-brand-deep/20">
         <h2 className="font-bold text-text-primary truncate">{title}</h2>
         <p className="text-xs text-text-muted">{subtitle}</p>
