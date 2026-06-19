@@ -1,10 +1,16 @@
-import { useMyDriverJobs } from "../../../features/driver/hooks/useDriverJobs";
+import { useMyDriverJobs, useDeliveryDone } from "../../../features/driver/hooks/useDriverJobs";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 
 const DriverHistoryPage = () => {
   const { data: jobs = [], isLoading, error } = useMyDriverJobs();
+  const deliveryDoneMutation = useDeliveryDone();
+
+  const handleDeliveryDone = (orderId) => {
+    if (deliveryDoneMutation.isPending) return;
+    deliveryDoneMutation.mutate(orderId);
+  };
 
   if (error) {
     return (
@@ -25,6 +31,22 @@ const DriverHistoryPage = () => {
     <div>
       <h1 className="text-2xl font-bold text-text-primary mb-1">Riwayat Pekerjaan</h1>
       <p className="text-sm text-text-muted mb-6">Riwayat pengiriman Anda</p>
+
+      {deliveryDoneMutation.isSuccess && (
+        <div className="card !p-4 mb-6 border-success">
+          <p className="text-success font-semibold text-sm">
+            Pengiriman ditandai selesai! Menunggu konfirmasi pembeli.
+          </p>
+        </div>
+      )}
+
+      {deliveryDoneMutation.isError && (
+        <div className="card !p-4 mb-6 border-danger">
+          <p className="text-danger font-semibold text-sm">
+            {deliveryDoneMutation.error?.message || "Gagal menandai selesai."}
+          </p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="min-h-[40vh] flex items-center justify-center">
@@ -116,6 +138,18 @@ const DriverHistoryPage = () => {
                   </div>
                 )}
               </div>
+              {job.status === "ON_DELIVERY" && !job.driverJob?.doneAt && (
+                <div className="pt-3">
+                  <Button
+                    onClick={() => handleDeliveryDone(job.id)}
+                    variant="primary"
+                    loading={deliveryDoneMutation.isPending}
+                    fullWidth
+                  >
+                    {deliveryDoneMutation.isPending ? "Memproses..." : "Selesai"}
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAvailableJobs, getMyDriverJobs, takeJob, progressJob } from "../api/driver.api";
+import { getAvailableJobs, getMyDriverJobs, takeJob, progressJob, deliveryDone } from "../api/driver.api";
 
 export const useAvailableJobs = () =>
   useQuery({
@@ -19,6 +19,16 @@ export const useTakeJob = () => {
     mutationFn: (orderId) => takeJob(orderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["availableJobs"] });
+      queryClient.invalidateQueries({ queryKey: ["myDriverJobs"] });
+    },
+  });
+};
+
+export const useDeliveryDone = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId) => deliveryDone(orderId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myDriverJobs"] });
     },
   });

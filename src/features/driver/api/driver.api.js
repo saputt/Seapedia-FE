@@ -7,6 +7,9 @@ export const getMyDriverJobs = () => apiFetch("orders/driver/my-jobs");
 export const takeJob = (orderId) =>
   apiFetch(`orders/${orderId}/take-job`, { method: "PATCH" });
 
+export const deliveryDone = (orderId) =>
+  apiFetch(`orders/${orderId}/delivery-done`, { method: "PATCH" });
+
 export const progressJob = (orderId, storeId) =>
   apiFetch(`orders/${orderId}/progress`, {
     method: "PATCH",
