@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import Button from "../../../shared/components/ui/Button";
-import CustomSelect from "../../../shared/components/ui/CustomSelect";
 import AlertModal from "../../../shared/components/ui/AlertModal";
+import CategoryPicker from "../../../shared/components/ui/CategoryPicker";
 import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
-import { CATEGORY_LABEL, CATEGORIES } from "../../../shared/constants/product";
+import { CATEGORY_LABEL } from "../../../shared/constants/product";
 
 const ProductFormModal = ({ storeId, product, onClose, onSuccess }) => {
   const queryClient = useQueryClient();
@@ -85,11 +85,7 @@ const ProductFormModal = ({ storeId, product, onClose, onSuccess }) => {
           </div>
           <div>
             <label className="block text-text-secondary font-medium text-sm mb-1">Kategori</label>
-            <CustomSelect
-              value={category}
-              options={CATEGORIES.map((c) => [c.key, c.label])}
-              onChange={setCategory}
-            />
+            <CategoryPicker value={category} onChange={setCategory} />
           </div>
 
           <div className="flex gap-3 pt-2">

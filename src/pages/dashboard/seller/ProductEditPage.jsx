@@ -5,9 +5,10 @@ import { getProductById, updateProduct } from "../../../features/catalog/api/cat
 import { apiFetch } from "../../../api/client";
 import Button from "../../../shared/components/ui/Button";
 import AlertModal from "../../../shared/components/ui/AlertModal";
+import CategoryPicker from "../../../shared/components/ui/CategoryPicker";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { getReadableError } from "../../../shared/utils/errorMapper";
-import { CATEGORY_LABEL, CATEGORIES } from "../../../shared/constants/product";
+import { CATEGORY_LABEL } from "../../../shared/constants/product";
 
 const ProductEditPage = () => {
   const { productId } = useParams();
@@ -30,7 +31,6 @@ const ProductEditPage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [initialized, setInitialized] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
-  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
   if (product && !initialized) {
     setName(product.name || "");
@@ -170,14 +170,7 @@ const ProductEditPage = () => {
             </div>
             <div>
               <label className="block text-text-secondary font-medium text-sm mb-1">Kategori</label>
-              <button
-                type="button"
-                onClick={() => setShowCategoryPicker(true)}
-                className="input-neo w-full text-left flex items-center justify-between"
-              >
-                <span>{CATEGORY_LABEL[category]}</span>
-                <span className="text-text-muted text-xs">&#9660;</span>
-              </button>
+              <CategoryPicker value={category} onChange={setCategory} />
             </div>
 
             <div className="flex gap-3 pt-2">
@@ -189,43 +182,6 @@ const ProductEditPage = () => {
           </div>
         </div>
       </form>
-
-      {/* Floating Category Picker */}
-      {showCategoryPicker && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-          onClick={() => setShowCategoryPicker(false)}
-        >
-          <div
-            className="card max-w-sm w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-bold text-text-primary mb-4">Pilih Kategori</h3>
-            <div className="space-y-2">
-              {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => { setCategory(key); setShowCategoryPicker(false); }}
-                  className={`w-full text-left px-4 py-3 rounded font-medium text-sm transition-colors ${
-                    category === key
-                      ? "bg-brand-deep text-white"
-                      : "bg-bg-secondary text-text-primary hover:bg-brand-subtle"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowCategoryPicker(false)}
-              className="mt-4 text-sm text-text-muted hover:text-text-primary transition-colors"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      )}
 
       <AlertModal
         isOpen={successModal}
