@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
@@ -7,18 +7,29 @@ import { useWallet } from "../../features/wallet/hooks/useWallet";
 import useProductSearchStore from "../../features/catalog/store/productSearchStore";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
 
+const CATEGORY_ICONS = {
+  ELECTRONICS: "💻",
+  FASHION: "👕",
+  HOME: "🏠",
+  FOOD: "🍔",
+  HOBBY: "🎮",
+};
+
 const ProductListPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: wallet } = useWallet();
   const searchQuery = useProductSearchStore((s) => s.query);
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const categoryFilter = searchParams.get("category") || "";
   const loadMoreRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const showHero = !debouncedSearch && !categoryFilter;
 
   const {
     data,
@@ -52,55 +63,53 @@ const ProductListPage = () => {
     };
   }, [handleObserver]);
 
+  const handleCategoryClick = (key) => {
+    if (key === categoryFilter) {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category: key });
+    }
+  };
+
   return (
     <MainLayout navbarVariant="products">
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
 
-        {/* Wallet Info & Category Filter — only on initial page (no search) */}
-        {!debouncedSearch && (
-          <>
-            <button
-              onClick={() => navigate("/dashboard/buyer/wallet")}
-              className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
-            >
-              <div className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                  <line x1="1" y1="10" x2="23" y2="10" />
-                </svg>
-                <span className="text-sm font-medium text-text-primary">Saldo Dompet</span>
-              </div>
-              <span className="text-sm font-bold text-brand-deep">
-                Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
-              </span>
-            </button>
-
-            <div className="flex flex-wrap gap-2 mb-6">
-              <button
-                onClick={() => setCategoryFilter("")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                  !categoryFilter
-                    ? "bg-brand-deep text-white border-brand-deep"
-                    : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-                }`}
-              >
-                Semua
-              </button>
-              {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setCategoryFilter(key)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                    categoryFilter === key
-                      ? "bg-brand-deep text-white border-brand-deep"
-                      : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
+        {/* Wallet Info — only when not searching and not filtering by category */}
+        {showHero && (
+          <button
+            onClick={() => navigate("/dashboard/buyer/wallet")}
+            className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
+              <span className="text-sm font-medium text-text-primary">Saldo Dompet</span>
             </div>
-          </>
+            <span className="text-sm font-bold text-brand-deep">
+              Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
+            </span>
+          </button>
+        )}
+
+        {/* Category Cards — only on initial page */}
+        {showHero && (
+          <div className="grid grid-cols-5 gap-3 mb-8">
+            {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => handleCategoryClick(key)}
+                className="card flex flex-col items-center justify-center gap-2 py-5 px-2 hover:bg-brand-subtle transition-colors cursor-pointer"
+              >
+                <span className="text-3xl">{CATEGORY_ICONS[key]}</span>
+                <span className="text-xs font-semibold text-text-primary text-center leading-tight">
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
         )}
 
         {/* Loading State */}
