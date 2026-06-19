@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
@@ -10,13 +10,23 @@ const Navbar = ({ variant = "default" }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const token = useAuthStore((s) => s.token);
   const refreshCart = useCartStore((s) => s.refreshCart);
-  const searchValue = searchParams.get("q") || "";
+  const [searchInput, setSearchInput] = useState(searchParams.get("q") || "");
 
   const isLoggedIn = !!token;
 
   useEffect(() => {
     if (isLoggedIn) refreshCart();
   }, [isLoggedIn, refreshCart]);
+
+  useEffect(() => {
+    setSearchInput(searchParams.get("q") || "");
+  }, [searchParams.get("q")]);
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchParams({ q: searchInput }, { replace: true });
+    }
+  };
 
   if (variant === "checkout") {
     return (
@@ -72,10 +82,9 @@ const Navbar = ({ variant = "default" }) => {
           <div className="flex-1 max-w-md mx-auto">
             <input
               type="text"
-              value={searchValue}
-              onChange={(e) => {
-                setSearchParams({ q: e.target.value }, { replace: true });
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               className="input-neo w-full !py-1.5 !text-sm"
               placeholder="Cari produk..."
             />
