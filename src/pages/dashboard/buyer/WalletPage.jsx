@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../../../shared/components/layout/MainLayout";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
-import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import { useWallet, useTransactions, useTopUp } from "../../../features/wallet/hooks/useWallet";
 
 const TYPE_LABEL = {
@@ -14,8 +14,9 @@ const TYPE_LABEL = {
 };
 
 const WalletPage = () => {
+  const navigate = useNavigate();
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError } = useTransactions();
+  const { data, isLoading: txLoading, error: txError } = useTransactions();
   const topUpMutation = useTopUp();
 
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -23,11 +24,8 @@ const WalletPage = () => {
 
   const loading = walletLoading || txLoading;
   const error = walletError || txError;
-  const transactions = data?.pages.flatMap((p) => p.data) ?? [];
-
-  const sentinelRef = useInfiniteScroll(fetchNextPage, {
-    enabled: hasNextPage && !isFetchingNextPage,
-  });
+  const allTransactions = data?.pages.flatMap((p) => p.data) ?? [];
+  const transactions = allTransactions.slice(0, 5);
 
   const handleTopUp = async () => {
     const amount = parseInt(topUpAmount, 10);
@@ -159,14 +157,16 @@ const WalletPage = () => {
                       </p>
                     </div>
                   ))}
-                  {isFetchingNextPage && (
-                    <div className="flex justify-center py-3">
-                      <Spinner />
-                    </div>
-                  )}
-                  {hasNextPage && !isFetchingNextPage && (
-                    <div ref={sentinelRef} className="h-4" />
-                  )}
+                </div>
+              )}
+              {allTransactions.length > 5 && (
+                <div className="mt-3 pt-3 border-t-[2px] border-bg-tertiary text-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/dashboard/buyer/wallet/history")}
+                  >
+                    Lihat Semua ({allTransactions.length})
+                  </Button>
                 </div>
               )}
             </div>
