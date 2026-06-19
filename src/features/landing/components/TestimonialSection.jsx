@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../../../shared/components/ui/Button";
 import { useAppReviews, useSubmitAppReview } from "../hooks/useAppReviews";
 
 const StarInput = ({ value, onChange }) => {
@@ -170,13 +171,14 @@ const TestimonialSection = () => {
                     required
                   />
                 </div>
-                <button
+                <Button
                   type="submit"
-                  className="btn-primary w-full"
-                  disabled={submitReview.isPending}
+                  variant="primary"
+                  fullWidth
+                  loading={submitReview.isPending}
                 >
                   {submitReview.isPending ? "Mengirim..." : "Kirim Review"}
-                </button>
+                </Button>
                 {submitted && (
                   <p className="text-success font-semibold text-sm text-center">
                     Review berhasil dikirim! Terima kasih.
