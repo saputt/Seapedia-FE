@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
+import CustomSelect from "../../../shared/components/ui/CustomSelect";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
 
 const TYPE_LABEL = {
@@ -22,7 +23,6 @@ const TransactionHistoryPage = () => {
   const [endDate, setEndDate] = useState(null);
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [showCalendar, setShowCalendar] = useState(false);
-  const [typeOpen, setTypeOpen] = useState(false);
 
   const loading = walletLoading || txLoading;
   const error = walletError || txError;
@@ -98,39 +98,11 @@ const TransactionHistoryPage = () => {
                 </div>
                 <div className="sm:w-48">
                   <p className="text-xs font-semibold text-text-muted mb-1.5">Jenis Transaksi</p>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setTypeOpen((o) => !o)}
-                      className="w-full border-[3px] border-brand-deep px-3 py-2 text-sm bg-white text-left flex items-center justify-between gap-2 hover:bg-brand-subtle transition-colors"
-                    >
-                      <span>{typeFilter === "ALL" ? "Semua" : TYPE_LABEL[typeFilter]}</span>
-                      <svg className={`w-4 h-4 transition-transform ${typeOpen ? "rotate-180" : ""}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                    {typeOpen && (
-                      <>
-                        <div className="fixed inset-0 z-10" onClick={() => setTypeOpen(false)} />
-                        <div className="absolute right-0 top-full mt-1 w-full card !p-1 z-20 shadow-[4px_4px_0px_0px_var(--color-brand-deep)]">
-                          {[["ALL", "Semua"], ...Object.entries(TYPE_LABEL)].map(([key, label]) => (
-                            <button
-                              key={key}
-                              type="button"
-                              onClick={() => { setTypeFilter(key); setTypeOpen(false); }}
-                              className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${
-                                typeFilter === key
-                                  ? "bg-brand-deep text-white font-semibold"
-                                  : "text-text-secondary hover:bg-brand-subtle"
-                              }`}
-                            >
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  <CustomSelect
+                    value={typeFilter}
+                    options={[["ALL", "Semua"], ...Object.entries(TYPE_LABEL)]}
+                    onChange={setTypeFilter}
+                  />
                 </div>
               </div>
             </div>
