@@ -31,7 +31,6 @@ const DayBtn = ({ day, selected, inRange, onClick }) => {
 const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }) => {
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
-  const [selecting, setSelecting] = useState("start");
 
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
@@ -54,17 +53,9 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
   };
 
   const handleDayClick = (day) => {
-    if (selecting === "start") {
-      onStartChange(day);
-      onEndChange(null);
-      setSelecting("end");
-    } else if (startDate && day >= startDate) {
-      onEndChange(day);
-      setSelecting("start");
-    } else {
-      onStartChange(day);
-      onEndChange(null);
-    }
+    onStartChange(day);
+    onEndChange(day);
+    onClose();
   };
 
   const isInRange = (day) => {
@@ -80,13 +71,11 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
     start.setHours(0, 0, 0, 0);
     onStartChange(start);
     onEndChange(end);
-    setSelecting("start");
   };
 
   const clearFilter = () => {
     onStartChange(null);
     onEndChange(null);
-    setSelecting("start");
   };
 
   const formatDate = (d) => {
@@ -97,9 +86,7 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
   return (
     <div className="card !p-5 w-full max-w-sm">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-text-primary">
-          {selecting === "start" ? "Pilih Tanggal Mulai" : "Pilih Tanggal Akhir"}
-        </h3>
+        <h3 className="text-sm font-bold text-text-primary">Pilih Tanggal</h3>
         <button
           type="button"
           onClick={onClose}
@@ -109,25 +96,23 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
         </button>
       </div>
 
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-3 min-h-[36px]">
         <Button type="button" variant="ghost" onClick={() => quickSelect(7)}>
           7 Hari
         </Button>
         <Button type="button" variant="ghost" onClick={() => quickSelect(30)}>
           30 Hari
         </Button>
-        {(startDate || endDate) && (
-          <button
-            type="button"
-            onClick={clearFilter}
-            className="text-xs text-danger hover:underline ml-auto"
-          >
-            Hapus
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={clearFilter}
+          className={`text-xs text-danger hover:underline ml-auto transition-opacity ${startDate || endDate ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        >
+          Hapus
+        </button>
       </div>
 
-      <div className="text-xs text-text-muted mb-3">
+      <div className="text-xs text-text-muted mb-3 min-h-[18px]">
         {formatDate(startDate)} &ndash; {formatDate(endDate)}
       </div>
 
@@ -175,11 +160,13 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
         )}
       </div>
 
-      {startDate && (
-        <p className="text-xs text-text-muted mt-3 text-center">
-          {selecting === "end" ? "Pilih tanggal akhir (atau klik tanggal lain untuk ganti mulai)" : "Klik tanggal untuk mulai"}
-        </p>
-      )}
+      <p className="text-xs text-text-muted mt-3 text-center min-h-[18px]">
+        {startDate && endDate && startDate.toDateString() === endDate.toDateString()
+          ? `Menampilkan transaksi ${startDate.toLocaleDateString("id-ID")}`
+          : startDate && endDate
+            ? `${startDate.toLocaleDateString("id-ID")} — ${endDate.toLocaleDateString("id-ID")}`
+            : "Klik tanggal untuk filter"}
+      </p>
     </div>
   );
 };
