@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useMyDriverJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { useWallet } from "../../../features/wallet/hooks/useWallet";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const StatCard = ({ label, value, color }) => (
   <div className="card !p-5 flex items-center gap-4">
@@ -32,7 +33,7 @@ const DriverDashboardPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -57,7 +58,7 @@ const DriverDashboardPage = () => {
                 Pesanan #{stats.activeJob.id.slice(0, 8)} sedang dalam pengiriman
               </p>
             </div>
-            <Link to="/dashboard/driver/history" className="btn-primary text-sm !py-2 !px-4">
+            <Link to="/dashboard/driver/history" className="btn-primary text-sm !py-2 !px-4 inline-block">
               Lihat Detail
             </Link>
           </div>
@@ -73,7 +74,7 @@ const DriverDashboardPage = () => {
                 Ambil pekerjaan baru yang tersedia
               </p>
             </div>
-            <Link to="/dashboard/driver/jobs" className="btn-primary text-sm !py-2 !px-4">
+            <Link to="/dashboard/driver/jobs" className="btn-primary text-sm !py-2 !px-4 inline-block">
               Cari Pekerjaan
             </Link>
           </div>
