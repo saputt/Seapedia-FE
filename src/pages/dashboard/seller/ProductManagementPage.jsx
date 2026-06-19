@@ -3,8 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import Button from "../../../shared/components/ui/Button";
+import CustomSelect from "../../../shared/components/ui/CustomSelect";
 import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
+import { CATEGORY_LABEL, CATEGORIES } from "../../../shared/constants/product";
 
 const ProductFormModal = ({ storeId, product, onClose }) => {
   const queryClient = useQueryClient();
@@ -15,6 +17,7 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
   const [price, setPrice] = useState(product?.price?.toString() || "");
   const [stock, setStock] = useState(product?.stock?.toString() || "");
   const [imageUrl, setImageUrl] = useState(product?.imageUrl || "");
+  const [category, setCategory] = useState(product?.category || "HOBBY");
 
   const mutation = useMutation({
     mutationFn: async (dto) => {
@@ -36,6 +39,7 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
       description: description.trim(),
       price: parseInt(price, 10),
       stock: parseInt(stock, 10),
+      category,
       ...(imageUrl.trim() ? { imageUrl: imageUrl.trim() } : {}),
     });
   };
@@ -76,6 +80,14 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
           <div>
             <label className="block text-text-secondary font-medium text-sm mb-1">URL Gambar</label>
             <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="input-neo w-full" placeholder="https://..." />
+          </div>
+          <div>
+            <label className="block text-text-secondary font-medium text-sm mb-1">Kategori</label>
+            <CustomSelect
+              value={category}
+              options={CATEGORIES.map((c) => [c.key, c.label])}
+              onChange={setCategory}
+            />
           </div>
 
           <div className="flex gap-3 pt-2">
@@ -153,6 +165,7 @@ const ProductManagementPage = () => {
             <thead>
               <tr className="border-b-[3px] border-bg-tertiary">
                 <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4">Produk</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4 hidden sm:table-cell">Kategori</th>
                 <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4 hidden sm:table-cell">Harga</th>
                 <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4 hidden sm:table-cell">Stok</th>
                 <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide pb-3">Aksi</th>
@@ -175,6 +188,11 @@ const ProductManagementPage = () => {
                         <p className="text-xs text-text-muted truncate hidden sm:block">{product.description}</p>
                       </div>
                     </div>
+                  </td>
+                  <td className="py-3 pr-4 hidden sm:table-cell">
+                    <span className="text-xs bg-brand-subtle text-text-primary px-2 py-0.5 rounded font-medium">
+                      {CATEGORY_LABEL[product.category] || product.category}
+                    </span>
                   </td>
                   <td className="py-3 pr-4 hidden sm:table-cell">
                     <p className="text-sm font-semibold text-text-primary">Rp{product.price?.toLocaleString("id-ID")}</p>

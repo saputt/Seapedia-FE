@@ -1,18 +1,24 @@
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
-import Spinner from "../../shared/components/ui/Spinner";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
 import useProductSearchStore from "../../features/catalog/store/productSearchStore";
-import useDebounce from "../../shared/hooks/useDebounce";
-import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
+import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
   const { data: wallet } = useWallet();
   const searchQuery = useProductSearchStore((s) => s.query);
-  const debouncedSearch = useDebounce(searchQuery);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const loadMoreRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const {
     data,
@@ -21,34 +27,81 @@ const ProductListPage = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useProducts(debouncedSearch);
+  } = useProducts(debouncedSearch, categoryFilter);
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
 
-  const loadMoreRef = useInfiniteScroll(fetchNextPage, {
-    enabled: hasNextPage && !isFetchingNextPage,
-  });
+  const handleObserver = useCallback(
+    (entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage]
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      rootMargin: "100px",
+    });
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [handleObserver]);
 
   return (
-    <MainLayout>
+    <MainLayout navbarVariant="products">
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
 
-        {/* Wallet Info */}
-        <button
-          onClick={() => navigate("/dashboard/buyer/wallet")}
-          className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
-        >
-          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-              <line x1="1" y1="10" x2="23" y2="10" />
-            </svg>
-            <span className="text-sm font-medium text-text-primary">Saldo Dompet</span>
-          </div>
-          <span className="text-sm font-bold text-brand-deep">
-            Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
-          </span>
-        </button>
+        {/* Wallet Info & Category Filter — only on initial page (no search) */}
+        {!debouncedSearch && (
+          <>
+            <button
+              onClick={() => navigate("/dashboard/buyer/wallet")}
+              className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                <span className="text-sm font-medium text-text-primary">Saldo Dompet</span>
+              </div>
+              <span className="text-sm font-bold text-brand-deep">
+                Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
+              </span>
+            </button>
+
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                onClick={() => setCategoryFilter("")}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+                  !categoryFilter
+                    ? "bg-brand-deep text-white border-brand-deep"
+                    : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
+                }`}
+              >
+                Semua
+              </button>
+              {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => setCategoryFilter(key)}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+                    categoryFilter === key
+                      ? "bg-brand-deep text-white border-brand-deep"
+                      : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Loading State */}
         {isLoading && (
@@ -97,7 +150,7 @@ const ProductListPage = () => {
             <div ref={loadMoreRef} className="mt-8 flex justify-center">
               {isFetchingNextPage && (
                 <div className="flex items-center gap-2 text-text-secondary">
-                  <Spinner size="sm" />
+                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
                   Memuat produk lainnya...
                 </div>
               )}

@@ -8,6 +8,7 @@ import { useProductDetail } from "../../features/catalog/hooks/useProductDetail"
 import useAuthStore from "../../features/auth/store/authStore";
 import { addToCart, clearCart } from "../../features/cart/api/cart.api";
 import useCartStore from "../../features/cart/store/cartStore";
+import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -137,6 +138,15 @@ const ProductDetailPage = () => {
                   >
                     {product.store.storeName}
                   </Link>
+                </div>
+              )}
+
+              {product.category && (
+                <div className="flex items-center gap-2">
+                  <span className="text-text-secondary">Kategori:</span>
+                  <span className="text-xs bg-brand-subtle text-text-primary px-2 py-0.5 rounded font-medium">
+                    {CATEGORY_LABEL[product.category] || product.category}
+                  </span>
                 </div>
               )}
 
