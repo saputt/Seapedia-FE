@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../../features/catalog/api/catalog.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import Button from "../../../shared/components/ui/Button";
 import CustomSelect from "../../../shared/components/ui/CustomSelect";
+import AlertModal from "../../../shared/components/ui/AlertModal";
 import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { CATEGORY_LABEL, CATEGORIES } from "../../../shared/constants/product";
 
-const ProductFormModal = ({ storeId, product, onClose }) => {
+const ProductFormModal = ({ storeId, product, onClose, onSuccess }) => {
   const queryClient = useQueryClient();
   const isEdit = !!product;
 
@@ -28,7 +30,7 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
-      onClose();
+      onSuccess();
     },
   });
 
@@ -103,10 +105,13 @@ const ProductFormModal = ({ storeId, product, onClose }) => {
 };
 
 const ProductManagementPage = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [search, setSearch] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [successModal, setSuccessModal] = useState({ open: false, message: "" });
 
   const { data: store } = useQuery({
     queryKey: ["myStore"],
@@ -123,6 +128,8 @@ const ProductManagementPage = () => {
     mutationFn: deleteProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
+      setDeleteTarget(null);
+      setSuccessModal({ open: true, message: "Produk berhasil dihapus!" });
     },
   });
 
@@ -205,18 +212,14 @@ const ProductManagementPage = () => {
                   <td className="py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
-                        onClick={() => { setEditingProduct(product); setShowForm(true); }}
+                        onClick={() => navigate(`/dashboard/seller/products/${product.id}/edit`)}
                         variant="ghost"
                         size="sm"
                       >
                         Edit
                       </Button>
                       <Button
-                        onClick={() => {
-                          if (confirm("Hapus produk ini?")) {
-                            deleteMutation.mutate(product.id);
-                          }
-                        }}
+                        onClick={() => setDeleteTarget(product)}
                         variant="danger"
                         size="sm"
                       >
@@ -236,8 +239,31 @@ const ProductManagementPage = () => {
           storeId={store?.id}
           product={editingProduct}
           onClose={() => { setShowForm(false); setEditingProduct(null); }}
+          onSuccess={() => {
+            setShowForm(false);
+            setEditingProduct(null);
+            setSuccessModal({ open: true, message: "Produk berhasil ditambahkan!" });
+          }}
         />
       )}
+
+      <AlertModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        icon="🗑️"
+        title="Hapus Produk"
+        message={`Yakin ingin menghapus "${deleteTarget?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+        actionLabel="Hapus"
+        onAction={() => deleteMutation.mutate(deleteTarget.id)}
+      />
+
+      <AlertModal
+        isOpen={successModal.open}
+        onClose={() => setSuccessModal({ open: false, message: "" })}
+        icon="✅"
+        title="Berhasil"
+        message={successModal.message}
+      />
     </>
   );
 };
