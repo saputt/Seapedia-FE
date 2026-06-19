@@ -8,11 +8,40 @@ import useProductSearchStore from "../../features/catalog/store/productSearchSto
 import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const CATEGORY_ICONS = {
-  ELECTRONICS: "💻",
-  FASHION: "👕",
-  HOME: "🏠",
-  FOOD: "🍔",
-  HOBBY: "🎮",
+  ELECTRONICS: (
+    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+      <rect x="6" y="5" width="28" height="22" rx="3" stroke="currentColor" strokeWidth="2.5" fill="none" />
+      <line x1="14" y1="31" x2="26" y2="31" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="20" y1="27" x2="20" y2="31" stroke="currentColor" strokeWidth="2.5" />
+    </svg>
+  ),
+  FASHION: (
+    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+      <path d="M10 8L6 16L12 20L20 12L28 20L34 16L30 8H26L22 14H18L14 8H10Z" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" fill="none" />
+      <line x1="20" y1="12" x2="20" y2="30" stroke="currentColor" strokeWidth="2.5" />
+    </svg>
+  ),
+  HOME: (
+    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+      <path d="M6 18L20 6L34 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <rect x="14" y="20" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    </svg>
+  ),
+  FOOD: (
+    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+      <path d="M12 6V18C12 22.5 16 26 20 26C24 26 28 22.5 28 18V6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <line x1="8" y1="32" x2="32" y2="32" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  ),
+  HOBBY: (
+    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+      <circle cx="14" cy="20" r="8" stroke="currentColor" strokeWidth="2.5" fill="none" />
+      <circle cx="26" cy="20" r="8" stroke="currentColor" strokeWidth="2.5" fill="none" />
+      <line x1="20" y1="8" x2="20" y2="12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="10" y1="28" x2="14" y2="30" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="30" y1="28" x2="26" y2="30" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 const ProductListPage = () => {
@@ -101,10 +130,12 @@ const ProductListPage = () => {
               <button
                 key={key}
                 onClick={() => handleCategoryClick(key)}
-                className="card flex flex-col items-center justify-center gap-2 py-5 px-2 hover:bg-brand-subtle transition-colors cursor-pointer"
+                className="card flex flex-col items-center justify-center gap-2 py-5 px-2 bg-brand-deep text-white hover:brightness-110 transition-all cursor-pointer"
               >
-                <span className="text-3xl">{CATEGORY_ICONS[key]}</span>
-                <span className="text-xs font-semibold text-text-primary text-center leading-tight">
+                <span className="w-8 h-8 flex items-center justify-center text-white">
+                  {CATEGORY_ICONS[key]}
+                </span>
+                <span className="text-[11px] font-semibold text-white text-center leading-tight">
                   {label}
                 </span>
               </button>
