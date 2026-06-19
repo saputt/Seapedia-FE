@@ -130,7 +130,7 @@ const ProductListPage = () => {
               <button
                 key={key}
                 onClick={() => handleCategoryClick(key)}
-                className="card flex flex-col items-center justify-center gap-2 py-5 px-2 bg-brand-deep text-white hover:brightness-110 transition-all cursor-pointer"
+                className="flex flex-col items-center justify-center gap-2 py-5 px-2 bg-brand-deep text-white border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] hover:shadow-[8px_8px_0_0_var(--color-brand-deep)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all cursor-pointer"
               >
                 <span className="w-8 h-8 flex items-center justify-center text-white">
                   {CATEGORY_ICONS[key]}
