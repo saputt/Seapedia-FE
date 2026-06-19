@@ -21,7 +21,7 @@ const Navbar = ({ variant = "default" }) => {
 
   if (variant === "checkout") {
     return (
-      <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
+      <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -39,7 +39,7 @@ const Navbar = ({ variant = "default" }) => {
 
   if (variant === "seller") {
     return (
-      <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
+      <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between">
           <Link className="text-brand-deep font-extrabold text-2xl tracking-tight">
             SEAPEDIA
@@ -53,7 +53,7 @@ const Navbar = ({ variant = "default" }) => {
   }
 
   return (
-    <nav className="bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
+    <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
       <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between gap-4">
         <div className="flex items-center gap-8 shrink-0">
           <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
