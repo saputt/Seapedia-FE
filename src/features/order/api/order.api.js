@@ -23,6 +23,15 @@ export const createAddress = (data) =>
 export const deleteAddress = (id) =>
   apiFetch(`address/${id}`, { method: "DELETE" });
 
+export const updateAddress = (id, data) =>
+  apiFetch(`address/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+
+export const setDefaultAddress = (id) =>
+  apiFetch(`address/${id}/default`, { method: "PATCH" });
+
 export const checkDiscount = (code) =>
   apiFetch(`discounts/check?code=${encodeURIComponent(code)}`);
 

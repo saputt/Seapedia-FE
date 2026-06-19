@@ -39,6 +39,7 @@ const OrderDetailPage = lazyLoad(() => import("../pages/dashboard/buyer/OrderDet
 const WalletPage = lazyLoad(() => import("../pages/dashboard/buyer/WalletPage"), "WalletPage");
 const TransactionHistoryPage = lazyLoad(() => import("../pages/dashboard/buyer/TransactionHistoryPage"), "TransactionHistoryPage");
 const ProfilePage = lazyLoad(() => import("../pages/dashboard/buyer/ProfilePage"), "ProfilePage");
+const AddressPage = lazyLoad(() => import("../pages/dashboard/buyer/AddressPage"), "AddressPage");
 const StoreManagement = lazyLoad(() => import("../pages/dashboard/seller/StoreManagement"), "StoreManagement");
 const CreateStorePage = lazyLoad(() => import("../pages/stores/CreateStorePage"), "CreateStorePage");
 const SellerDashboardPage = lazyLoad(() => import("../pages/dashboard/seller/SellerDashboardPage"), "SellerDashboardPage");
@@ -148,6 +149,7 @@ const AppRoutes = () => {
                 sidebarTitle="Pembeli"
                 sidebarSubtitle="Dashboard Pembeli"
                 sidebarLinks={[
+                  { to: "/dashboard/buyer/addresses", label: "Alamat", icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" },
                   { to: "/dashboard/buyer/wallet", label: "Wallet", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
                   { to: "/dashboard/buyer/orders", label: "Pesanan", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" },
                   { to: "/dashboard/buyer/profile", label: "Profil", icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" },
@@ -164,6 +166,7 @@ const AppRoutes = () => {
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
         <Route path="wallet" element={<WalletPage />} />
         <Route path="wallet/history" element={<TransactionHistoryPage />} />
+        <Route path="addresses" element={<AddressPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>
 
