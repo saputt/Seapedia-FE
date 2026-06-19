@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAdminOrders } from "../../../features/admin/hooks/useAdmin";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
-
-const PAGE_SIZE = 10;
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const AdminOrdersPage = () => {
   const [page, setPage] = useState(1);
@@ -13,7 +13,7 @@ const AdminOrdersPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -22,9 +22,9 @@ const AdminOrdersPage = () => {
     return (
       <div className="card text-center py-10">
         <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-        <button onClick={() => window.location.reload()} className="btn-primary text-sm !py-2 !px-6">
+        <Button onClick={() => window.location.reload()} variant="primary" size="sm">
           Coba Lagi
-        </button>
+        </Button>
       </div>
     );
   }
@@ -76,23 +76,23 @@ const AdminOrdersPage = () => {
 
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-            <button
+            <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
+              variant="ghost"
               disabled={page <= 1}
-              className={`text-sm font-semibold !py-1.5 !px-4 ${page <= 1 ? "opacity-40 cursor-not-allowed" : ""} btn-ghost`}
             >
               Sebelumnya
-            </button>
+            </Button>
             <span className="text-sm text-text-muted">
               Halaman {page} dari {totalPages}
             </span>
-            <button
+            <Button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              variant="ghost"
               disabled={page >= totalPages}
-              className={`text-sm font-semibold !py-1.5 !px-4 ${page >= totalPages ? "opacity-40 cursor-not-allowed" : ""} btn-ghost`}
             >
               Selanjutnya
-            </button>
+            </Button>
           </div>
         )}
       </div>

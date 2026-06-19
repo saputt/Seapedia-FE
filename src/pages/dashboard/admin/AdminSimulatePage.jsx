@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSimulateOverdue, useResetSimulation, useSimulationStatus } from "../../../features/admin/hooks/useAdmin";
+import Button from "../../../shared/components/ui/Button";
+import Spinner from "../../../shared/components/ui/Spinner";
 
 const SHIPPING_LABEL = { INSTANT: "Instan", NEXT_DAY: "Besok", REGULAR: "Reguler" };
 const SHIPPING_COLOR = { INSTANT: "text-warning", NEXT_DAY: "text-info", REGULAR: "text-text-primary" };
@@ -19,8 +21,8 @@ const AdminSimulatePage = () => {
     try {
       const res = await mutation.mutateAsync(daysToSkip);
       setResult({ success: true, data: res });
-    } catch (e) {
-      setResult({ success: false, message: e?.message || "Simulasi gagal." });
+    } catch (err) {
+      setResult({ success: false, message: err?.message || "Simulasi gagal." });
     }
   };
 
@@ -29,7 +31,7 @@ const AdminSimulatePage = () => {
     try {
       await resetMutation.mutateAsync();
       refetchStatus();
-    } catch (e) { /* handled */ }
+    } catch { /* handled */ }
   };
 
   return (
@@ -66,27 +68,29 @@ const AdminSimulatePage = () => {
               className="input-neo !py-2 !text-sm w-24"
               placeholder="1"
             />
-            <button
+            <Button
               onClick={handleSimulate}
-              disabled={mutation.isPending || !days.trim()}
-              className="btn-primary text-sm !py-2 !px-6 whitespace-nowrap"
+              variant="primary"
+              size="sm"
+              loading={mutation.isPending}
+              disabled={!days.trim()}
             >
               {mutation.isPending ? "Memproses..." : `Skip ${days || 1} Hari + Proses`}
-            </button>
+            </Button>
             {totalSkipped > 0 && (
-              <button
+              <Button
                 onClick={handleReset}
-                disabled={resetMutation.isPending}
-                className="btn-ghost text-sm !py-2 !px-4"
+                variant="ghost"
+                loading={resetMutation.isPending}
               >
                 Reset Waktu
-              </button>
+              </Button>
             )}
           </div>
 
           {mutation.isPending && (
             <div className="flex items-center gap-2 text-sm text-text-muted">
-              <span className="w-4 h-4 border-[2px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+              <Spinner size="sm" />
               Majuin waktu {days || 1} hari + proses overdue...
             </div>
           )}
@@ -117,7 +121,7 @@ const AdminSimulatePage = () => {
             </div>
           ) : (
             <div className="flex items-center justify-center py-6">
-              <span className="w-5 h-5 border-[2px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+              <Spinner size="sm" />
             </div>
           )}
         </div>
