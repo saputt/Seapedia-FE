@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
+import Button from "../../shared/components/ui/Button";
 
 const CheckoutSuccessPage = () => {
   const navigate = useNavigate();
@@ -16,18 +17,20 @@ const CheckoutSuccessPage = () => {
             Pesanan Anda sedang diproses. Silakan pantau status pesanan Anda.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
+            <Button
               onClick={() => navigate("/dashboard/buyer/orders")}
-              className="btn-primary text-sm !py-2 !px-6"
+              variant="primary"
+              size="sm"
             >
               Lihat Pesanan
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => navigate("/products")}
-              className="btn-ghost text-sm !py-2 !px-6"
+              variant="ghost"
+              size="sm"
             >
               Cari Produk Lain
-            </button>
+            </Button>
           </div>
         </div>
       </div>
