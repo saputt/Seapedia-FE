@@ -2,58 +2,44 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
+import Button from "../../shared/components/ui/Button";
 import useCartStore from "../../features/cart/store/cartStore";
-import {
-  updateCartItem,
-  removeCartItem,
-  clearCart,
-} from "../../features/cart/api/cart.api";
+import { useUpdateCartItem, useRemoveCartItem, useClearCart } from "../../features/cart/hooks/useCartMutations";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { items, setItems, refreshCart } = useCartStore();
+  const items = useCartStore((s) => s.items);
+  const refreshCart = useCartStore((s) => s.refreshCart);
   const [loading, setLoading] = useState(true);
   const [busyItems, setBusyItems] = useState({});
   const [confirmClear, setConfirmClear] = useState(false);
 
+  const updateMutation = useUpdateCartItem();
+  const removeMutation = useRemoveCartItem();
+  const clearMutation = useClearCart();
+
   useEffect(() => {
     refreshCart().finally(() => setLoading(false));
-  }, []);
+  }, [refreshCart]);
 
-  const handleUpdateQty = async (productId, newQty) => {
+  const handleUpdateQty = (productId, newQty) => {
     if (newQty < 1) return;
     setBusyItems((prev) => ({ ...prev, [productId]: true }));
-    try {
-      const updated = await updateCartItem(productId, newQty);
-      setItems(
-        items.map((item) =>
-          item.productId === productId
-            ? { ...item, quantity: updated.quantity }
-            : item
-        )
-      );
-    } catch {
-      await refreshCart();
-    } finally {
-      setBusyItems((prev) => ({ ...prev, [productId]: false }));
-    }
+    updateMutation.mutate(
+      { productId, quantity: newQty },
+      { onSettled: () => setBusyItems((prev) => ({ ...prev, [productId]: false })) }
+    );
   };
 
-  const handleRemove = async (productId) => {
+  const handleRemove = (productId) => {
     setBusyItems((prev) => ({ ...prev, [productId]: true }));
-    try {
-      await removeCartItem(productId);
-      setItems(items.filter((item) => item.productId !== productId));
-    } catch {
-      await refreshCart();
-    } finally {
-      setBusyItems((prev) => ({ ...prev, [productId]: false }));
-    }
+    removeMutation.mutate(productId, {
+      onSettled: () => setBusyItems((prev) => ({ ...prev, [productId]: false })),
+    });
   };
 
-  const handleClear = async () => {
-    await clearCart();
-    setItems([]);
+  const handleClear = () => {
+    clearMutation.mutate();
     setConfirmClear(false);
   };
 
@@ -261,12 +247,13 @@ const CartPage = () => {
             {/* Summary */}
             <div className="card mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center justify-between sm:justify-start gap-4">
-                <button
+                <Button
                   onClick={() => setConfirmClear(true)}
-                  className="btn-ghost text-sm !py-2 !px-5"
+                  variant="ghost"
+                  size="sm"
                 >
                   Hapus Semua
-                </button>
+                </Button>
                 <div className="sm:hidden">
                   <p className="text-xs text-text-muted">Subtotal</p>
                   <p className="text-lg font-extrabold text-brand-deep">
@@ -282,12 +269,13 @@ const CartPage = () => {
                     Rp{subtotal.toLocaleString("id-ID")}
                   </p>
                 </div>
-                <button
+                <Button
                   onClick={() => navigate("/checkout")}
-                  className="btn-primary text-sm !py-2 !px-6 w-full sm:w-auto"
+                  variant="primary"
+                  size="sm"
                 >
                   Lanjut ke Checkout
-                </button>
+                </Button>
               </div>
             </div>
           </>
