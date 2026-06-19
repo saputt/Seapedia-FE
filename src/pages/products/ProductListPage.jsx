@@ -4,7 +4,6 @@ import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
-import useProductSearchStore from "../../features/catalog/store/productSearchStore";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const CATEGORY_ICONS = {
@@ -48,15 +47,15 @@ const ProductListPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: wallet } = useWallet();
-  const searchQuery = useProductSearchStore((s) => s.query);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const rawQuery = searchParams.get("q") || "";
+  const [debouncedSearch, setDebouncedSearch] = useState(rawQuery);
   const categoryFilter = searchParams.get("category") || "";
   const loadMoreRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
+    const timer = setTimeout(() => setDebouncedSearch(rawQuery), 400);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [rawQuery]);
 
   const showHero = !debouncedSearch && !categoryFilter;
 
@@ -180,7 +179,7 @@ const ProductListPage = () => {
         {/* Product Grid */}
         {!isLoading && !isError && allProducts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {allProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

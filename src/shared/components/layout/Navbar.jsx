@@ -1,17 +1,16 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
-import useProductSearchStore from "../../../features/catalog/store/productSearchStore";
 import ProfileDropdown from "../ui/ProfileDropdown";
 import CartPreview from "../ui/CartPreview";
 
 const Navbar = ({ variant = "default" }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const token = useAuthStore((s) => s.token);
   const refreshCart = useCartStore((s) => s.refreshCart);
-  const searchQuery = useProductSearchStore((s) => s.query);
-  const setSearchQuery = useProductSearchStore((s) => s.setQuery);
+  const searchValue = searchParams.get("q") || "";
 
   const isLoggedIn = !!token;
 
@@ -73,8 +72,10 @@ const Navbar = ({ variant = "default" }) => {
           <div className="flex-1 max-w-md mx-auto">
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchValue}
+              onChange={(e) => {
+                setSearchParams({ q: e.target.value }, { replace: true });
+              }}
               className="input-neo w-full !py-1.5 !text-sm"
               placeholder="Cari produk..."
             />
