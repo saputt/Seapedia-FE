@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMyStore } from "../../../features/store/hooks/useMyStore";
+import { useSellerProducts, useDeleteProduct } from "../../../features/catalog/hooks/useProductMutations";
 import { useNavigate } from "react-router-dom";
-import { getAllProducts, deleteProduct } from "../../../features/catalog/api/catalog.api";
-import { getMyStore } from "../../../features/store/api/store.api";
 import Button from "../../../shared/components/ui/Button";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -10,33 +9,25 @@ import { CATEGORY_LABEL } from "../../../shared/constants/product";
 
 const ProductManagementPage = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [successModal, setSuccessModal] = useState({ open: false, message: "" });
 
-  const { data: store } = useQuery({
-    queryKey: ["myStore"],
-    queryFn: getMyStore,
-  });
-
-  const { data: productsData, isLoading } = useQuery({
-    queryKey: ["sellerProducts", store?.id, search],
-    queryFn: () => getAllProducts({ storeId: store.id, limit: 100, search }),
-    enabled: !!store?.id,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
-      setDeleteTarget(null);
-      setSuccessModal({ open: true, message: "Produk berhasil dihapus!" });
-    },
-  });
+  const { data: store } = useMyStore();
+  const { data: productsData, isLoading } = useSellerProducts(store?.id, search);
+  const deleteMutation = useDeleteProduct();
 
   const products = productsData?.products || [];
   const total = productsData?.total || 0;
+
+  const handleDelete = () => {
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        setDeleteTarget(null);
+        setSuccessModal({ open: true, message: "Produk berhasil dihapus!" });
+      },
+    });
+  };
 
   return (
     <>
@@ -143,7 +134,7 @@ const ProductManagementPage = () => {
         title="Hapus Produk"
         message={`Yakin ingin menghapus "${deleteTarget?.name}"? Tindakan ini tidak dapat dibatalkan.`}
         actionLabel="Hapus"
-        onAction={() => deleteMutation.mutate(deleteTarget.id)}
+        onAction={handleDelete}
       />
 
       <AlertModal

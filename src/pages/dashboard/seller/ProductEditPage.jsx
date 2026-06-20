@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProductById, updateProduct } from "../../../features/catalog/api/catalog.api";
-import { apiFetch } from "../../../api/client";
+import { useProductDetail } from "../../../features/catalog/hooks/useProductDetail";
+import { useUpdateProduct } from "../../../features/catalog/hooks/useProductMutations";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import ProductForm from "../../../features/catalog/components/ProductForm";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -11,31 +10,10 @@ import { getReadableError } from "../../../shared/utils/errorMapper";
 const ProductEditPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [successModal, setSuccessModal] = useState(false);
 
-  const { data: product, isLoading } = useQuery({
-    queryKey: ["product", productId],
-    queryFn: () => getProductById(productId),
-    enabled: !!productId,
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (data) => {
-      if (data instanceof FormData) {
-        return apiFetch(`products/${productId}`, {
-          method: "PUT",
-          body: data,
-        });
-      }
-      return updateProduct(productId, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
-      queryClient.invalidateQueries({ queryKey: ["product", productId] });
-      setSuccessModal(true);
-    },
-  });
+  const { data: product, isLoading } = useProductDetail(productId);
+  const mutation = useUpdateProduct(productId);
 
   if (isLoading) {
     return (

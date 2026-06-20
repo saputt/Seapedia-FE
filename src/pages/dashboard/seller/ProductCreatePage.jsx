@@ -1,38 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { createProduct } from "../../../features/catalog/api/catalog.api";
-import { apiFetch } from "../../../api/client";
+import { useMyStore } from "../../../features/store/hooks/useMyStore";
+import { useCreateProduct } from "../../../features/catalog/hooks/useProductMutations";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import ProductForm from "../../../features/catalog/components/ProductForm";
 import { getReadableError } from "../../../shared/utils/errorMapper";
-import { getMyStore } from "../../../features/store/api/store.api";
 
 const ProductCreatePage = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [successModal, setSuccessModal] = useState(false);
 
-  const { data: store } = useQuery({
-    queryKey: ["myStore"],
-    queryFn: getMyStore,
-  });
+  const { data: store } = useMyStore();
+  const mutation = useCreateProduct();
 
-  const mutation = useMutation({
-    mutationFn: async (data) => {
-      if (data instanceof FormData) {
-        return apiFetch(`products/${store.id}`, {
-          method: "POST",
-          body: data,
-        });
-      }
-      return createProduct(store.id, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
-      setSuccessModal(true);
-    },
-  });
+  const handleSubmit = (data) => {
+    mutation.mutate({ storeId: store.id, data });
+  };
 
   return (
     <>
@@ -52,7 +35,7 @@ const ProductCreatePage = () => {
       )}
 
       <ProductForm
-        onSubmit={(data) => mutation.mutate(data)}
+        onSubmit={handleSubmit}
         isPending={mutation.isPending}
         submitLabel="Tambah"
         pendingLabel="Menambah..."
