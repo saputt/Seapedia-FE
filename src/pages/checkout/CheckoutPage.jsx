@@ -9,12 +9,7 @@ import AddressSelector from "../../features/order/components/AddressSelector";
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
 import { checkoutOrder } from "../../features/order/api/order.api";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
-
-const SHIPPING_LIST = [
-  { id: "REGULAR", name: "Regular", price: 10000, desc: "Estimasi 3–5 hari" },
-  { id: "INSTANT", name: "Instant", price: 15000, desc: "Estimasi 1–2 hari" },
-  { id: "NEXT_DAY", name: "Next Day", price: 20000, desc: "Besok sampai" },
-];
+import { SHIPPING_LIST } from "../../shared/constants/order";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();

@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useSimulateOverdue, useResetSimulation, useSimulationStatus } from "../../../features/admin/hooks/useAdmin";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
-
-const SHIPPING_LABEL = { INSTANT: "Instan", NEXT_DAY: "Besok", REGULAR: "Reguler" };
-const SHIPPING_COLOR = { INSTANT: "text-warning", NEXT_DAY: "text-info", REGULAR: "text-text-primary" };
+import { SHIPPING_LABEL, SHIPPING_COLOR } from "../../../shared/constants/order";
 
 const AdminSimulatePage = () => {
   const [days, setDays] = useState("1");
