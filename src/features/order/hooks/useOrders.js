@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getBuyerOrders, cancelOrder, getSellerOrders, updateOrderStatus } from "../api/order.api";
+import { getBuyerOrders, cancelOrder, getSellerOrders, updateOrderStatus, checkoutOrder } from "../api/order.api";
 
 export const useBuyerOrders = () =>
   useQuery({
@@ -42,5 +42,12 @@ export const useBuyerConfirmOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
     },
+  });
+};
+
+export const useCheckoutOrder = () => {
+  return useMutation({
+    mutationFn: ({ orderToken, addressId }) =>
+      checkoutOrder({ orderToken, addressId }),
   });
 };

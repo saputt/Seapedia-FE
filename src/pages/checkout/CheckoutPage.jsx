@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
 import Spinner from "../../shared/components/ui/Spinner";
 import AddressSelector from "../../features/order/components/AddressSelector";
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
-import { checkoutOrder } from "../../features/order/api/order.api";
+import { useCheckoutOrder } from "../../features/order/hooks/useOrders";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
 import { SHIPPING_LIST } from "../../shared/constants/order";
 
@@ -47,33 +46,7 @@ const CheckoutPage = () => {
     (summaryErrorMessage.toLowerCase().includes("expired") || summaryErrorMessage.toLowerCase().includes("not available")) ? "Kode diskon sudah tidak berlaku." :
     summaryErrorMessage || "Gagal menerapkan diskon.";
 
-  const checkoutMutation = useMutation({
-    mutationFn: () =>
-      checkoutOrder({ orderToken, addressId: selectedAddress.id }),
-    onSuccess: () => {
-      navigate("/checkout/success");
-    },
-    onError: (err) => {
-      const msg = err?.message || "";
-      if (msg.toLowerCase().includes("not sufficient")) {
-        setShowInsufficientModal(true);
-        setCheckoutError("");
-      } else {
-        setCheckoutError(msg || "Checkout gagal. Silakan coba lagi.");
-      }
-    },
-  });
-
-  const handleApplyDiscount = () => {
-    const trimmed = discountCode.trim().toUpperCase();
-    if (!trimmed) return;
-    setAppliedCode(trimmed);
-  };
-
-  const handleRemoveDiscount = () => {
-    setDiscountCode("");
-    setAppliedCode("");
-  };
+  const checkoutMutation = useCheckoutOrder();
 
   const handleCheckout = () => {
     if (!selectedAddress) {
@@ -85,7 +58,34 @@ const CheckoutPage = () => {
       return;
     }
     setCheckoutError("");
-    checkoutMutation.mutate();
+    checkoutMutation.mutate(
+      { orderToken, addressId: selectedAddress.id },
+      {
+        onSuccess: () => {
+          navigate("/checkout/success");
+        },
+        onError: (err) => {
+          const msg = err?.message || "";
+          if (msg.toLowerCase().includes("not sufficient")) {
+            setShowInsufficientModal(true);
+            setCheckoutError("");
+          } else {
+            setCheckoutError(msg || "Checkout gagal. Silakan coba lagi.");
+          }
+        },
+      }
+    );
+  };
+
+  const handleApplyDiscount = () => {
+    const trimmed = discountCode.trim().toUpperCase();
+    if (!trimmed) return;
+    setAppliedCode(trimmed);
+  };
+
+  const handleRemoveDiscount = () => {
+    setDiscountCode("");
+    setAppliedCode("");
   };
 
   const subtotal = summary?.subtotal ?? 0;
