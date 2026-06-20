@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { Navigate } from "react-router-dom";
 import useAuthStore from "../../features/auth/store/authStore";
-import { switchUserRole } from "../../features/auth/api/auth.api";
+import { useSwitchRole } from "../../features/auth/hooks/useSwitchRole";
 import { getReadableError } from "../../shared/utils/errorMapper";
 import Spinner from "../../shared/components/ui/Spinner";
 
@@ -14,20 +13,10 @@ const roleConfig = {
 };
 
 const RoleSelectPage = () => {
-  const navigate = useNavigate();
   const userRoles = useAuthStore((s) => s.userRoles);
-  const switchRole = useAuthStore((s) => s.switchRole);
   const [selectedRole, setSelectedRole] = useState(null);
 
-  const switchMutation = useMutation({
-    mutationFn: switchUserRole,
-    onSuccess: (data) => {
-      switchRole(data.activeRole, data.accessToken);
-      const redirectPath =
-        data.activeRole === "BUYER" ? "/" : `/dashboard/${data.activeRole.toLowerCase()}`;
-      navigate(redirectPath, { replace: true });
-    },
-  });
+  const switchMutation = useSwitchRole();
 
   const handleSelect = (role) => {
     setSelectedRole(role);
