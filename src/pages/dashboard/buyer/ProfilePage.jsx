@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
+import ErrorState from "../../../shared/components/ui/ErrorState";
+import PasswordForm from "../../../features/user/components/PasswordForm";
 import { useProfile, useUpdateProfile, useChangePassword } from "../../../features/user/hooks/useUser";
 
 const ProfilePage = () => {
@@ -11,10 +13,6 @@ const ProfilePage = () => {
   const [username, setUsername] = useState("");
   const [editing, setEditing] = useState(false);
 
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -24,14 +22,7 @@ const ProfilePage = () => {
   }
 
   if (error) {
-    return (
-      <div className="card text-center py-10">
-        <p className="text-danger font-semibold mb-4">Gagal memuat profil.</p>
-        <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-          Coba Lagi
-        </Button>
-      </div>
-    );
+    return <ErrorState message="Gagal memuat profil." onRetry={() => window.location.reload()} />;
   }
 
   const handleSaveUsername = async () => {
@@ -39,16 +30,6 @@ const ProfilePage = () => {
     try {
       await updateProfileMutation.mutateAsync({ username });
       setEditing(false);
-    } catch { /* handled */ }
-  };
-
-  const handleChangePassword = async () => {
-    if (!oldPassword || !newPassword || newPassword.length < 8) return;
-    try {
-      await changePasswordMutation.mutateAsync({ oldPassword, newPassword });
-      setOldPassword("");
-      setNewPassword("");
-      setChangingPassword(false);
     } catch { /* handled */ }
   };
 
@@ -118,57 +99,13 @@ const ProfilePage = () => {
 
       <div className="card">
         <h2 className="text-sm font-bold text-text-primary mb-4">Ubah Password</h2>
-
-        {changingPassword ? (
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-semibold text-text-muted mb-0.5">Password Lama</p>
-              <input
-                type="password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="input-neo w-full !py-1.5 !text-sm"
-                placeholder="Masukkan password lama"
-              />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-text-muted mb-0.5">Password Baru</p>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="input-neo w-full !py-1.5 !text-sm"
-                placeholder="Minimal 8 karakter"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={handleChangePassword}
-                variant="primary"
-                loading={changePasswordMutation.isPending}
-                disabled={!oldPassword || !newPassword || newPassword.length < 8}
-              >
-                {changePasswordMutation.isPending ? "Mengubah..." : "Simpan Password"}
-              </Button>
-              <Button
-                onClick={() => { setChangingPassword(false); setOldPassword(""); setNewPassword(""); changePasswordMutation.reset(); }}
-                variant="ghost"
-              >
-                Batal
-              </Button>
-            </div>
-            {changePasswordMutation.isSuccess && (
-              <p className="text-success text-xs">Password berhasil diubah!</p>
-            )}
-            {changePasswordMutation.isError && (
-              <p className="text-danger text-xs">{changePasswordMutation.error?.message || "Gagal mengubah password."}</p>
-            )}
-          </div>
-        ) : (
-          <Button onClick={() => setChangingPassword(true)} variant="ghost">
-            Ubah Password
-          </Button>
-        )}
+        <PasswordForm
+          onSubmit={({ oldPassword, newPassword }) => changePasswordMutation.mutateAsync({ oldPassword, newPassword })}
+          isPending={changePasswordMutation.isPending}
+          isSuccess={changePasswordMutation.isSuccess}
+          isError={changePasswordMutation.isError}
+          errorMessage={changePasswordMutation.error?.message}
+        />
       </div>
     </div>
   );
