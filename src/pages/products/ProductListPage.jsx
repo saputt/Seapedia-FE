@@ -2,46 +2,11 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
+import ProductFilterSidebar from "../../features/catalog/components/ProductFilterSidebar";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
-
-const CATEGORY_ICONS = {
-  ELECTRONICS: (
-    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-      <rect x="6" y="5" width="28" height="22" rx="3" stroke="currentColor" strokeWidth="2.5" fill="none" />
-      <line x1="14" y1="31" x2="26" y2="31" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="20" y1="27" x2="20" y2="31" stroke="currentColor" strokeWidth="2.5" />
-    </svg>
-  ),
-  FASHION: (
-    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-      <path d="M10 8L6 16L12 20L20 12L28 20L34 16L30 8H26L22 14H18L14 8H10Z" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" fill="none" />
-      <line x1="20" y1="12" x2="20" y2="30" stroke="currentColor" strokeWidth="2.5" />
-    </svg>
-  ),
-  HOME: (
-    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-      <path d="M6 18L20 6L34 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <rect x="14" y="20" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    </svg>
-  ),
-  FOOD: (
-    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-      <path d="M12 6V18C12 22.5 16 26 20 26C24 26 28 22.5 28 18V6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      <line x1="8" y1="32" x2="32" y2="32" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    </svg>
-  ),
-  HOBBY: (
-    <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
-      <circle cx="14" cy="20" r="8" stroke="currentColor" strokeWidth="2.5" fill="none" />
-      <circle cx="26" cy="20" r="8" stroke="currentColor" strokeWidth="2.5" fill="none" />
-      <line x1="20" y1="8" x2="20" y2="12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="10" y1="28" x2="14" y2="30" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="30" y1="28" x2="26" y2="30" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    </svg>
-  ),
-};
+import { CATEGORY_ICONS } from "../../shared/constants/productIcons";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
@@ -50,14 +15,21 @@ const ProductListPage = () => {
   const rawQuery = searchParams.get("q") || "";
   const [debouncedSearch, setDebouncedSearch] = useState(rawQuery);
   const categoryFilter = searchParams.get("category") || "";
+  const minPriceParam = searchParams.get("minPrice") || "";
+  const maxPriceParam = searchParams.get("maxPrice") || "";
+  const sortByParam = searchParams.get("sortBy") || "newest";
   const loadMoreRef = useRef(null);
+
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterMinPrice, setFilterMinPrice] = useState(minPriceParam);
+  const [filterMaxPrice, setFilterMaxPrice] = useState(maxPriceParam);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(rawQuery), 400);
     return () => clearTimeout(timer);
   }, [rawQuery]);
 
-  const showHero = !debouncedSearch && !categoryFilter;
+  const showHero = !debouncedSearch;
 
   const {
     data,
@@ -66,7 +38,13 @@ const ProductListPage = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useProducts(debouncedSearch, categoryFilter);
+  } = useProducts({
+    search: debouncedSearch,
+    category: categoryFilter,
+    minPrice: minPriceParam || undefined,
+    maxPrice: maxPriceParam || undefined,
+    sortBy: sortByParam,
+  });
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
 
@@ -91,19 +69,92 @@ const ProductListPage = () => {
     };
   }, [handleObserver]);
 
+  const updateParams = (updates) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, val]) => {
+      if (val) next.set(key, val);
+      else next.delete(key);
+    });
+    setSearchParams(next);
+  };
+
   const handleCategoryClick = (key) => {
     if (key === categoryFilter) {
-      setSearchParams({});
+      updateParams({ category: "" });
     } else {
-      setSearchParams({ category: key });
+      updateParams({ category: key });
     }
   };
+
+  const handleApplyPriceFilter = () => {
+    updateParams({ minPrice: filterMinPrice, maxPrice: filterMaxPrice, page: "" });
+  };
+
+  const handleClearAll = () => {
+    setSearchParams({});
+    setFilterMinPrice("");
+    setFilterMaxPrice("");
+  };
+
+  const renderProductGrid = () => (
+    <>
+      {isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="card animate-pulse">
+              <div className="aspect-square bg-bg-tertiary mb-4" />
+              <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
+              <div className="h-6 bg-bg-tertiary rounded w-1/3 mb-2" />
+              <div className="h-4 bg-bg-tertiary rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isError && (
+        <div className="text-center py-20">
+          <p className="text-danger font-semibold text-lg">Gagal memuat produk. Silakan coba lagi.</p>
+        </div>
+      )}
+
+      {!isLoading && !isError && allProducts.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-text-secondary text-lg">
+            {debouncedSearch
+              ? `Tidak ditemukan produk untuk "${debouncedSearch}"`
+              : "Belum ada produk tersedia."}
+          </p>
+        </div>
+      )}
+
+      {!isLoading && !isError && allProducts.length > 0 && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {allProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div ref={loadMoreRef} className="mt-8 flex justify-center">
+            {isFetchingNextPage && (
+              <div className="flex items-center gap-2 text-text-secondary">
+                <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                Memuat produk lainnya...
+              </div>
+            )}
+            {!hasNextPage && allProducts.length > 0 && (
+              <p className="text-text-muted text-sm">Semua produk telah ditampilkan</p>
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
 
   return (
     <MainLayout navbarVariant="products">
       <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
 
-        {/* Wallet Info — only when not searching and not filtering by category */}
         {showHero && (
           <button
             onClick={() => navigate("/dashboard/buyer/wallet")}
@@ -122,7 +173,6 @@ const ProductListPage = () => {
           </button>
         )}
 
-        {/* Category Cards — only on initial page */}
         {showHero && (
           <div className="grid grid-cols-5 gap-3 mb-8">
             {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
@@ -142,64 +192,37 @@ const ProductListPage = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="aspect-square bg-bg-tertiary mb-4" />
-                <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
-                <div className="h-6 bg-bg-tertiary rounded w-1/3 mb-2" />
-                <div className="h-4 bg-bg-tertiary rounded w-1/2" />
-              </div>
-            ))}
-          </div>
-        )}
+        {debouncedSearch ? (
+          <div className="flex gap-8">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden flex items-center gap-1 text-sm font-semibold text-brand-deep"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+              Filter
+            </button>
 
-        {/* Error State */}
-        {isError && (
-          <div className="text-center py-20">
-            <p className="text-danger font-semibold text-lg">
-              Gagal memuat produk. Silakan coba lagi.
-            </p>
-          </div>
-        )}
+            <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6`}>
+              <ProductFilterSidebar
+                categoryFilter={categoryFilter}
+                sortByParam={sortByParam}
+                filterMinPrice={filterMinPrice}
+                filterMaxPrice={filterMaxPrice}
+                onCategoryClick={handleCategoryClick}
+                onApplyPriceFilter={handleApplyPriceFilter}
+                onSortChange={(val) => updateParams({ sortBy: val, page: "" })}
+                onClearAll={handleClearAll}
+                onMinPriceChange={setFilterMinPrice}
+                onMaxPriceChange={setFilterMaxPrice}
+              />
+            </aside>
 
-        {/* Empty State */}
-        {!isLoading && !isError && allProducts.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-text-secondary text-lg">
-              {debouncedSearch
-                ? `Tidak ditemukan produk untuk "${debouncedSearch}"`
-                : "Belum ada produk tersedia."}
-            </p>
-          </div>
-        )}
-
-        {/* Product Grid */}
-        {!isLoading && !isError && allProducts.length > 0 && (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {allProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            <div className="flex-1 min-w-0">
+              {renderProductGrid()}
             </div>
-
-            {/* Load More Trigger */}
-            <div ref={loadMoreRef} className="mt-8 flex justify-center">
-              {isFetchingNextPage && (
-                <div className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-                  Memuat produk lainnya...
-                </div>
-              )}
-              {!hasNextPage && allProducts.length > 0 && (
-                <p className="text-text-muted text-sm">
-                  Semua produk telah ditampilkan
-                </p>
-              )}
-            </div>
-          </>
+          </div>
+        ) : (
+          renderProductGrid()
         )}
       </div>
     </MainLayout>
