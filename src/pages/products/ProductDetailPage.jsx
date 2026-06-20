@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
 import StarRating from "../../shared/components/ui/StarRating";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
 import { useProductReviews } from "../../features/review/hooks/useReviews";
+import { useAddToCart, useClearAndAddToCart } from "../../features/cart/hooks/useCartMutations";
 import useAuthStore from "../../features/auth/store/authStore";
-import { addToCart, clearCart } from "../../features/cart/api/cart.api";
-import useCartStore from "../../features/cart/store/cartStore";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const ProductDetailPage = () => {
@@ -18,8 +16,6 @@ const ProductDetailPage = () => {
   const { data: reviewsData } = useProductReviews(productId);
   const reviews = reviewsData?.reviews || [];
   const token = useAuthStore((s) => s.token);
-  const hideBadge = useCartStore((s) => s.hideBadge);
-  const refreshCart = useCartStore((s) => s.refreshCart);
 
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [showStoreAlert, setShowStoreAlert] = useState(false);
@@ -27,39 +23,31 @@ const ProductDetailPage = () => {
 
   const isLoggedIn = !!token;
 
-  const addMutation = useMutation({
-    mutationFn: () => addToCart(productId, 1),
-    onSuccess: async () => {
-      await refreshCart();
-      hideBadge();
-    },
-    onError: (err) => {
-      const msg = err?.message || "";
-      if (msg.includes("cart must be one store only")) {
-        setShowStoreAlert(true);
-      } else {
-        setAddError(msg || "Gagal menambahkan ke keranjang.");
+  const addMutation = useAddToCart();
+  const clearAndAddMutation = useClearAndAddToCart();
+
+  const handleAddToCart = () => {
+    addMutation.mutate(
+      { productId, quantity: 1 },
+      {
+        onError: (err) => {
+          const msg = err?.message || "";
+          if (msg.includes("cart must be one store only")) {
+            setShowStoreAlert(true);
+          } else {
+            setAddError(msg || "Gagal menambahkan ke keranjang.");
+          }
+        },
       }
-    },
-  });
+    );
+  };
 
-  const clearAndAddMutation = useMutation({
-    mutationFn: async () => {
-      await clearCart();
-      await addToCart(productId, 1);
-    },
-    onSuccess: async () => {
-      await refreshCart();
-      hideBadge();
-      setShowStoreAlert(false);
-    },
-    onError: () => {
-      setAddError("Gagal menambahkan ke keranjang.");
-    },
-  });
-
-  const handleAddToCart = () => addMutation.mutate();
-  const handleClearAndAdd = () => clearAndAddMutation.mutate();
+  const handleClearAndAdd = () => {
+    clearAndAddMutation.mutate(productId, {
+      onSuccess: () => setShowStoreAlert(false),
+      onError: () => setAddError("Gagal menambahkan ke keranjang."),
+    });
+  };
 
   return (
     <MainLayout>

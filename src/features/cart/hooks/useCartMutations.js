@@ -57,3 +57,21 @@ export const useClearCart = () => {
     },
   });
 };
+
+export const useClearAndAddToCart = () => {
+  const queryClient = useQueryClient();
+  const refreshCart = useCartStore((s) => s.refreshCart);
+  const hideBadge = useCartStore((s) => s.hideBadge);
+
+  return useMutation({
+    mutationFn: async (productId) => {
+      await clearCart();
+      return addToCart(productId, 1);
+    },
+    onSuccess: async () => {
+      await refreshCart();
+      hideBadge();
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+    },
+  });
+};

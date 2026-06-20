@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import Button from "../../shared/components/ui/Button";
 import { useCreateStore } from "../../features/store/hooks/useCreateStore";
-import { getMyStore } from "../../features/store/api/store.api";
+import { useMyStore } from "../../features/store/hooks/useMyStore";
 import { getReadableError } from "../../shared/utils/errorMapper";
 import Spinner from "../../shared/components/ui/Spinner";
 
 const CreateStorePage = () => {
   const navigate = useNavigate();
-  const { data: store, isLoading } = useQuery({
-    queryKey: ["myStore"],
-    queryFn: getMyStore,
-    retry: false,
-  });
+  const { data: store, isLoading } = useMyStore();
 
   useEffect(() => {
     if (!isLoading && store) {
