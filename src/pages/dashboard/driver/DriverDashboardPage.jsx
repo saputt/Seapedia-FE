@@ -3,18 +3,7 @@ import { Link } from "react-router-dom";
 import { useMyDriverJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { useWallet } from "../../../features/wallet/hooks/useWallet";
 import Spinner from "../../../shared/components/ui/Spinner";
-
-const StatCard = ({ label, value, color }) => (
-  <div className="card !p-5 flex items-center gap-4">
-    <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center`}>
-      <span className="text-white text-lg font-bold">{value}</span>
-    </div>
-    <div>
-      <p className="text-sm text-text-muted">{label}</p>
-      <p className="text-xl font-bold text-text-primary">{value}</p>
-    </div>
-  </div>
-);
+import StatCard from "../../../shared/components/ui/StatCard";
 
 const DriverDashboardPage = () => {
   const { data: jobs = [], isLoading } = useMyDriverJobs();
@@ -44,9 +33,9 @@ const DriverDashboardPage = () => {
       <p className="text-sm text-text-muted mb-8">Ringkasan aktivitas kurir Anda</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Pengiriman Aktif" value={stats.onDelivery} color="bg-info" />
-        <StatCard label="Pesanan Selesai" value={stats.delivered} color="bg-success" />
-        <StatCard label="Saldo Dompet" value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`} color="bg-brand-deep" />
+        <StatCard label="Pengiriman Aktif" value={stats.onDelivery} variant="badge" color="bg-info" />
+        <StatCard label="Pesanan Selesai" value={stats.delivered} variant="badge" color="bg-success" />
+        <StatCard label="Saldo Dompet" value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`} variant="badge" color="bg-brand-deep" />
       </div>
 
       {stats.activeJob && (

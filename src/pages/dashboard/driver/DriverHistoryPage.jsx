@@ -1,6 +1,6 @@
 import { useMyDriverJobs, useDeliveryDone } from "../../../features/driver/hooks/useDriverJobs";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 
 const DriverHistoryPage = () => {
@@ -17,12 +17,7 @@ const DriverHistoryPage = () => {
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-1">Riwayat Pekerjaan</h1>
         <p className="text-sm text-text-muted mb-6">Riwayat pengiriman Anda</p>
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat riwayat.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat riwayat." onRetry={() => window.location.reload()} />
       </div>
     );
   }

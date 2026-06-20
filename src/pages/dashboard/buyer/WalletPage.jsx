@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { useWallet, useTransactions, useTopUp } from "../../../features/wallet/hooks/useWallet";
-
-const TYPE_LABEL = {
-  TOP_UP: "Top Up",
-  PAYMENT: "Pembayaran",
-  REFUND: "Refund",
-  SELLER_EARNING: "Pendapatan Toko",
-  DRIVER_EARNING: "Pendapatan Driver",
-};
+import { WALLET_TYPE_LABEL } from "../../../shared/constants/wallet";
 
 const WalletPage = () => {
   const navigate = useNavigate();
@@ -47,12 +41,7 @@ const WalletPage = () => {
   return (
     <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
         {error && (
-          <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">{error?.message || "Gagal memuat dompet."}</p>
-            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-              Coba Lagi
-            </Button>
-          </div>
+          <ErrorState message={error?.message || "Gagal memuat dompet."} onRetry={() => window.location.reload()} />
         )}
 
         {!error && (
@@ -130,7 +119,7 @@ const WalletPage = () => {
                     >
                       <div>
                         <p className="text-sm font-medium text-text-primary">
-                          {TYPE_LABEL[tx.type] || tx.type}
+                          {WALLET_TYPE_LABEL[tx.type] || tx.type}
                         </p>
                         <p className="text-xs text-text-muted">
                           {new Date(tx.createdAt).toLocaleDateString("id-ID", {

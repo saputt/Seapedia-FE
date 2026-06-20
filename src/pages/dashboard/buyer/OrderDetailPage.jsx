@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
+import ReviewModal from "../../../features/review/components/ReviewModal";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
+import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
 import Spinner from "../../../shared/components/ui/Spinner";
 
@@ -13,9 +16,11 @@ const OrderDetailPage = () => {
   const order = raw?.order ?? raw;
   const cancelMutation = useCancelOrder();
   const confirmMutation = useBuyerConfirmOrder();
+  const reviewMutation = useCreateProductReview();
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [modal, setModal] = useState(null);
+  const [reviewModal, setReviewModal] = useState(null);
 
   const handleCancel = async () => {
     setModal(null);
@@ -35,6 +40,20 @@ const OrderDetailPage = () => {
     setConfirming(false);
   };
 
+  const handleOpenReview = (item) => {
+    setReviewModal(item);
+  };
+
+  const handleSubmitReview = async (productId, rating, comment) => {
+    await reviewMutation.mutateAsync({
+      productId,
+      orderId,
+      rating,
+      comment,
+    });
+    setReviewModal(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -46,12 +65,7 @@ const OrderDetailPage = () => {
   if (error || !order) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat detail pesanan.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat detail pesanan." onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -111,9 +125,19 @@ const OrderDetailPage = () => {
                   </p>
                   <p className="text-xs text-text-muted">{item.quantity}x @ Rp{item.price?.toLocaleString("id-ID")}</p>
                 </div>
-                <p className="text-sm font-semibold text-text-primary">
-                  Rp{(item.price * item.quantity)?.toLocaleString("id-ID")}
-                </p>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-text-primary">
+                    Rp{(item.price * item.quantity)?.toLocaleString("id-ID")}
+                  </p>
+                  {order.status === "DELIVERED" && (
+                    <button
+                      onClick={() => handleOpenReview(item)}
+                      className="text-xs text-brand-deep font-semibold mt-1 hover:underline"
+                    >
+                      Beri Review
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -236,6 +260,24 @@ const OrderDetailPage = () => {
         actionLabel={modal === "cancel" ? "Ya, Batalkan" : "Ya, Konfirmasi"}
         onAction={modal === "cancel" ? handleCancel : handleConfirm}
       />
+
+      {reviewModal && (
+        <ReviewModal
+          order={{
+            id: orderId,
+            product: reviewModal.product,
+            productId: reviewModal.productId,
+            alreadyReviewed: order.reviews?.some(
+              (r) => r.productId === (reviewModal.product?.id || reviewModal.productId)
+            ),
+          }}
+          onClose={() => setReviewModal(null)}
+          onSubmit={handleSubmitReview}
+          isPending={reviewMutation.isPending}
+          error={reviewMutation.isError ? reviewMutation.error : null}
+          multiProduct={false}
+        />
+      )}
     </>
   );
 };

@@ -1,15 +1,8 @@
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
-
-const TYPE_LABEL = {
-  SELLER_EARNING: "Pendapatan Toko",
-  TOP_UP: "Top Up",
-  PAYMENT: "Pembayaran",
-  REFUND: "Refund",
-  DRIVER_EARNING: "Pendapatan Driver",
-};
+import { WALLET_TYPE_LABEL } from "../../../shared/constants/wallet";
 
 const IncomeHistoryPage = () => {
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
@@ -39,12 +32,7 @@ const IncomeHistoryPage = () => {
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-1">Riwayat Pemasukkan</h1>
         <p className="text-sm text-text-muted mb-6">Riwayat pendapatan dari penjualan</p>
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat data pemasukkan.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat data pemasukkan." onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -86,7 +74,7 @@ const IncomeHistoryPage = () => {
               >
                 <div>
                   <p className="text-sm font-medium text-text-primary">
-                    {TYPE_LABEL[tx.type] || tx.type}
+                    {WALLET_TYPE_LABEL[tx.type] || tx.type}
                   </p>
                   <p className="text-xs text-text-muted">
                     {new Date(tx.createdAt).toLocaleDateString("id-ID", {

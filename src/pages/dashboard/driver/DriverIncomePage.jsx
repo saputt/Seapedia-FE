@@ -1,4 +1,4 @@
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
@@ -29,12 +29,7 @@ const DriverIncomePage = () => {
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-1">Pemasukkan</h1>
         <p className="text-sm text-text-muted mb-6">Riwayat pendapatan dari pengiriman</p>
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat data pemasukkan.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat data pemasukkan." onRetry={() => window.location.reload()} />
       </div>
     );
   }

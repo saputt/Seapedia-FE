@@ -1,18 +1,12 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
 import CustomSelect from "../../../shared/components/ui/CustomSelect";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
-
-const TYPE_LABEL = {
-  TOP_UP: "Top Up",
-  PAYMENT: "Pembayaran",
-  REFUND: "Refund",
-  SELLER_EARNING: "Pendapatan Toko",
-  DRIVER_EARNING: "Pendapatan Driver",
-};
+import { WALLET_TYPE_LABEL } from "../../../shared/constants/wallet";
 
 const TransactionHistoryPage = () => {
   const navigate = useNavigate();
@@ -72,12 +66,7 @@ const TransactionHistoryPage = () => {
         </div>
 
         {error && (
-          <div className="card text-center py-10">
-            <p className="text-danger font-semibold mb-4">{error?.message || "Gagal memuat data."}</p>
-            <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-              Coba Lagi
-            </Button>
-          </div>
+          <ErrorState message={error?.message || "Gagal memuat data."} onRetry={() => window.location.reload()} />
         )}
 
         {!error && (
@@ -100,7 +89,7 @@ const TransactionHistoryPage = () => {
                   <p className="text-xs font-semibold text-text-muted mb-1.5">Jenis Transaksi</p>
                   <CustomSelect
                     value={typeFilter}
-                    options={[["ALL", "Semua"], ...Object.entries(TYPE_LABEL)]}
+                    options={[["ALL", "Semua"], ...Object.entries(WALLET_TYPE_LABEL)]}
                     onChange={setTypeFilter}
                   />
                 </div>
@@ -124,7 +113,7 @@ const TransactionHistoryPage = () => {
             <div className="card">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-bold text-text-primary">
-                  {typeFilter === "ALL" ? "Semua Transaksi" : TYPE_LABEL[typeFilter]}
+                  {typeFilter === "ALL" ? "Semua Transaksi" : WALLET_TYPE_LABEL[typeFilter]}
                 </h2>
                 <span className="text-xs text-text-muted">{filtered.length} transaksi</span>
               </div>
@@ -140,7 +129,7 @@ const TransactionHistoryPage = () => {
                     >
                       <div>
                         <p className="text-sm font-medium text-text-primary">
-                          {TYPE_LABEL[tx.type] || tx.type}
+                          {WALLET_TYPE_LABEL[tx.type] || tx.type}
                         </p>
                         <p className="text-xs text-text-muted">
                           {new Date(tx.createdAt).toLocaleDateString("id-ID", {

@@ -1,17 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useAdminDashboard } from "../../../features/admin/hooks/useAdmin";
 import { STATUS_LABEL } from "../../../shared/constants/order";
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
-
-const StatCard = ({ label, value, color, prefix }) => (
-  <div className="card">
-    <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">{label}</p>
-    <p className={`text-2xl font-bold ${color || "text-text-primary"}`}>
-      {prefix || ""}{value?.toLocaleString("id-ID") ?? 0}
-    </p>
-  </div>
-);
+import StatCard from "../../../shared/components/ui/StatCard";
 
 const AdminDashboardPage = () => {
   const { data, isLoading, error } = useAdminDashboard();
@@ -29,14 +21,7 @@ const AdminDashboardPage = () => {
   }
 
   if (error) {
-    return (
-      <div className="card text-center py-10">
-        <p className="text-danger font-semibold mb-4">Gagal memuat dashboard.</p>
-        <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-          Coba Lagi
-        </Button>
-      </div>
-    );
+    return <ErrorState message="Gagal memuat dashboard." onRetry={() => window.location.reload()} />;
   }
 
   return (

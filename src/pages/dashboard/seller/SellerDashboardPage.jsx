@@ -2,20 +2,9 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useSellerOrders } from "../../../features/order/hooks/useOrders";
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
-
-const StatCard = ({ label, value, color }) => (
-  <div className="card !p-5 flex items-center gap-4">
-    <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center`}>
-      <span className="text-white text-lg font-bold">{value}</span>
-    </div>
-    <div>
-      <p className="text-sm text-text-muted">{label}</p>
-      <p className="text-xl font-bold text-text-primary">{value}</p>
-    </div>
-  </div>
-);
+import StatCard from "../../../shared/components/ui/StatCard";
 
 const SellerDashboardPage = () => {
   const { data: store, isLoading: storeLoading } = useMyStore();
@@ -60,12 +49,7 @@ const SellerDashboardPage = () => {
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard</h1>
         <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat data dashboard.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat data dashboard." onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -76,10 +60,10 @@ const SellerDashboardPage = () => {
       <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Produk" value={store ? "—" : 0} color="bg-blue-500" />
-        <StatCard label="Total Pesanan" value={stats.totalOrders} color="bg-brand-deep" />
-        <StatCard label="Pendapatan" value={`Rp${stats.totalRevenue.toLocaleString("id-ID")}`} color="bg-success" />
-        <StatCard label="Perlu Diproses" value={stats.pending} color="bg-warning" />
+        <StatCard label="Total Produk" value={store ? "—" : 0} variant="badge" color="bg-blue-500" />
+        <StatCard label="Total Pesanan" value={stats.totalOrders} variant="badge" color="bg-brand-deep" />
+        <StatCard label="Pendapatan" value={`Rp${stats.totalRevenue.toLocaleString("id-ID")}`} variant="badge" color="bg-success" />
+        <StatCard label="Perlu Diproses" value={stats.pending} variant="badge" color="bg-warning" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

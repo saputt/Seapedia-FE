@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
+import ReviewModal from "../../../features/review/components/ReviewModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
+import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 import Spinner from "../../../shared/components/ui/Spinner";
 
@@ -10,10 +13,12 @@ const OrderHistoryPage = () => {
   const { data: orders = [], isLoading, error } = useBuyerOrders();
   const cancelMutation = useCancelOrder();
   const confirmMutation = useBuyerConfirmOrder();
+  const reviewMutation = useCreateProductReview();
   const [filter, setFilter] = useState("ALL");
   const [cancellingId, setCancellingId] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
   const [modal, setModal] = useState(null);
+  const [reviewOrder, setReviewOrder] = useState(null);
 
   const statuses = ["ALL", ...new Set(orders.map((o) => o.status))];
 
@@ -40,6 +45,19 @@ const OrderHistoryPage = () => {
     setConfirmingId(null);
   };
 
+  const handleOpenReview = (order) => {
+    setReviewOrder(order);
+  };
+
+  const handleSubmitReview = async (productId, rating, comment) => {
+    await reviewMutation.mutateAsync({
+      productId,
+      orderId: reviewOrder.id,
+      rating,
+      comment,
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -51,12 +69,7 @@ const OrderHistoryPage = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="card text-center py-10">
-          <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-          <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-            Coba Lagi
-          </Button>
-        </div>
+        <ErrorState message="Gagal memuat pesanan." onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -180,6 +193,21 @@ const OrderHistoryPage = () => {
                       {cancellingId === order.id ? "Membatalkan..." : "Batalkan"}
                     </Button>
                   )}
+                  {order.status === "DELIVERED" && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={order.reviews?.length >= order.orderItems?.length}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!(order.reviews?.length >= order.orderItems?.length)) {
+                          handleOpenReview(order);
+                        }
+                      }}
+                    >
+                      {order.reviews?.length >= order.orderItems?.length ? "Sudah Direview" : "Beri Rating"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </Link>
@@ -204,6 +232,17 @@ const OrderHistoryPage = () => {
             : handleConfirm(modal.orderId, modal.storeId)
         }
       />
+
+      {reviewOrder && (
+        <ReviewModal
+          order={reviewOrder}
+          onClose={() => setReviewOrder(null)}
+          onSubmit={handleSubmitReview}
+          isPending={reviewMutation.isPending}
+          error={reviewMutation.isError ? reviewMutation.error : null}
+          multiProduct
+        />
+      )}
     </>
   );
 };

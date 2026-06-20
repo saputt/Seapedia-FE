@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAdminOrders } from "../../../features/admin/hooks/useAdmin";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
-import Button from "../../../shared/components/ui/Button";
+import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 
 const AdminOrdersPage = () => {
@@ -19,14 +19,7 @@ const AdminOrdersPage = () => {
   }
 
   if (error) {
-    return (
-      <div className="card text-center py-10">
-        <p className="text-danger font-semibold mb-4">Gagal memuat pesanan.</p>
-        <Button onClick={() => window.location.reload()} variant="primary" size="sm">
-          Coba Lagi
-        </Button>
-      </div>
-    );
+    return <ErrorState message="Gagal memuat pesanan." onRetry={() => window.location.reload()} />;
   }
 
   return (
