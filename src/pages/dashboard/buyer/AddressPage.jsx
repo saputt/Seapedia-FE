@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from "../../../features/address/api/address.api";
+import { useAddresses } from "../../../features/address/hooks/useAddresses";
+import { useSaveAddress, useDeleteAddress, useSetDefaultAddress } from "../../../features/address/hooks/useAddressMutations";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import AlertModal from "../../../shared/components/ui/AlertModal";
@@ -11,17 +11,14 @@ const AddressFormModal = ({ address, onClose, onSuccess }) => {
   const [label, setLabel] = useState(address?.label || "");
   const [completeAddress, setCompleteAddress] = useState(address?.completeAddress || "");
 
-  const mutation = useMutation({
-    mutationFn: async (dto) => {
-      if (isEdit) return updateAddress(address.id, dto);
-      return createAddress(dto);
-    },
-    onSuccess,
-  });
+  const mutation = useSaveAddress();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate({ label: label.trim(), completeAddress: completeAddress.trim() });
+    mutation.mutate(
+      { id: address?.id, data: { label: label.trim(), completeAddress: completeAddress.trim() } },
+      { onSuccess }
+    );
   };
 
   return (
@@ -60,30 +57,19 @@ const AddressFormModal = ({ address, onClose, onSuccess }) => {
 };
 
 const AddressPage = () => {
-  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const { data: addresses, isLoading } = useQuery({
-    queryKey: ["addresses"],
-    queryFn: fetchAddresses,
-  });
+  const { data: addresses, isLoading } = useAddresses();
+  const defaultMutation = useSetDefaultAddress();
+  const deleteMutation = useDeleteAddress();
 
-  const defaultMutation = useMutation({
-    mutationFn: setDefaultAddress,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["addresses"] });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteAddress,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["addresses"] });
-      setDeleteTarget(null);
-    },
-  });
+  const handleDelete = () => {
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => setDeleteTarget(null),
+    });
+  };
 
   return (
     <>
@@ -169,7 +155,6 @@ const AddressPage = () => {
           address={editingAddress}
           onClose={() => { setShowForm(false); setEditingAddress(null); }}
           onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["addresses"] });
             setShowForm(false);
             setEditingAddress(null);
           }}
@@ -183,7 +168,7 @@ const AddressPage = () => {
         title="Hapus Alamat"
         message={`Yakin ingin menghapus alamat "${deleteTarget?.label}"?`}
         actionLabel="Hapus"
-        onAction={() => deleteMutation.mutate(deleteTarget.id)}
+        onAction={handleDelete}
       />
     </>
   );
