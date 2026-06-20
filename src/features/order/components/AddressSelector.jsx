@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { useAddresses } from "../../../features/address/hooks/useAddresses";
-import { createAddress } from "../api/order.api";
+import { createAddress } from "../../address/api/address.api";
 
 const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }) => {
   const queryClient = useQueryClient();

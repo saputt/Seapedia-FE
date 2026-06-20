@@ -1,10 +1,13 @@
 import { apiFetch } from "../../../api/client";
 
-export const getAllProducts = ({ page = 1, limit = 12, search = "", storeId, category } = {}) => {
+export const getAllProducts = ({ page = 1, limit = 12, search = "", storeId, category, minPrice, maxPrice, sortBy } = {}) => {
   const params = new URLSearchParams({ page, limit });
   if (search) params.set("search", search);
   if (storeId) params.set("storeId", storeId);
   if (category) params.set("category", category);
+  if (minPrice) params.set("minPrice", minPrice);
+  if (maxPrice) params.set("maxPrice", maxPrice);
+  if (sortBy) params.set("sortBy", sortBy);
   return apiFetch(`products?${params.toString()}`);
 };
 

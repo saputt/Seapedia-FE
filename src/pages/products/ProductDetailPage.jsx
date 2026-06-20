@@ -4,7 +4,9 @@ import { useMutation } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
+import StarRating from "../../shared/components/ui/StarRating";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
+import { useProductReviews } from "../../features/review/hooks/useReviews";
 import useAuthStore from "../../features/auth/store/authStore";
 import { addToCart, clearCart } from "../../features/cart/api/cart.api";
 import useCartStore from "../../features/cart/store/cartStore";
@@ -13,6 +15,8 @@ import { CATEGORY_LABEL } from "../../shared/constants/product";
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { data: product, isLoading, isError } = useProductDetail(productId);
+  const { data: reviewsData } = useProductReviews(productId);
+  const reviews = reviewsData?.reviews || [];
   const token = useAuthStore((s) => s.token);
   const hideBadge = useCartStore((s) => s.hideBadge);
   const refreshCart = useCartStore((s) => s.refreshCart);
@@ -118,6 +122,15 @@ const ProductDetailPage = () => {
                 Rp{product.price?.toLocaleString("id-ID")}
               </p>
 
+              {product.averageRating > 0 && (
+                <div className="flex items-center gap-2">
+                  <StarRating value={Math.round(product.averageRating)} readonly />
+                  <span className="text-sm text-text-muted">
+                    {product.averageRating} ({product.reviewCount} ulasan)
+                  </span>
+                </div>
+              )}
+
               <div className="flex items-center gap-2">
                 <span className="text-text-secondary">Stok:</span>
                 <span
@@ -188,6 +201,40 @@ const ProductDetailPage = () => {
                 </Button>
               )}
             </div>
+          </div>
+        )}
+
+        {!isLoading && !isError && product && (
+          <div className="mt-12">
+            <h2 className="text-xl font-bold text-text-primary mb-6">
+              Ulasan Pembeli{reviews.length > 0 ? ` (${product.reviewCount || reviews.length})` : ""}
+            </h2>
+            {reviews.length === 0 ? (
+              <div className="card text-center py-10">
+                <p className="text-text-muted">Belum ada ulasan untuk produk ini.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <div key={review.id} className="card">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-text-primary">
+                        {review.buyer?.username || "Pembeli"}
+                      </span>
+                      <span className="text-xs text-text-muted">
+                        {new Date(review.createdAt).toLocaleDateString("id-ID", {
+                          day: "numeric", month: "long", year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <StarRating value={review.rating} size="sm" readonly />
+                    <p className="text-sm text-text-secondary mt-2">
+                      {review.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

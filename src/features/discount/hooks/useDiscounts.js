@@ -1,20 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "../../../api/client";
+import {
+  fetchDiscounts,
+  createDiscount,
+  deleteDiscount,
+} from "../api/discount.api";
 
+/**
+ * Hook untuk mengelola diskon.
+ * Menggunakan discount.api.js yang sudah dipisah.
+ */
 export const useDiscounts = () =>
   useQuery({
     queryKey: ["discounts"],
-    queryFn: () => apiFetch("discounts/all"),
+    queryFn: fetchDiscounts,
   });
 
 export const useCreateDiscount = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data) =>
-      apiFetch("discounts", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: createDiscount,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
     },
@@ -24,8 +28,7 @@ export const useCreateDiscount = () => {
 export const useDeleteDiscount = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id) =>
-      apiFetch(`discounts/${id}`, { method: "DELETE" }),
+    mutationFn: deleteDiscount,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
     },

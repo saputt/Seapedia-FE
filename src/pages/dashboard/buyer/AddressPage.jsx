@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from "../../../features/order/api/order.api";
+import { fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from "../../../features/address/api/address.api";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import AlertModal from "../../../shared/components/ui/AlertModal";

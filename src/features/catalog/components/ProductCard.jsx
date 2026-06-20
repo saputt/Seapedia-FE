@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CATEGORY_LABEL } from "../../../shared/constants/product";
+import StarRating from "../../../shared/components/ui/StarRating";
 
 const ProductCard = ({ product }) => {
   const price = product.price?.toLocaleString("id-ID");
@@ -23,6 +24,17 @@ const ProductCard = ({ product }) => {
       <p className="text-brand-deep font-bold text-xl mt-1">
         Rp{price}
       </p>
+      <div className="flex items-center gap-3 mt-1">
+        {product.averageRating > 0 && (
+          <div className="flex items-center gap-1">
+            <StarRating value={Math.round(product.averageRating)} size="sm" readonly />
+            <span className="text-xs text-text-muted">{product.averageRating}</span>
+          </div>
+        )}
+        {product.soldCount > 0 && (
+          <span className="text-xs text-text-muted">{product.soldCount} terjual</span>
+        )}
+      </div>
       {product.category && (
         <p className="text-xs text-text-muted mt-1">
           {CATEGORY_LABEL[product.category] || product.category}
