@@ -10,6 +10,7 @@ import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayout";
 import SellerRoute from "./SellerRoute";
 import Spinner from "../shared/components/ui/Spinner";
+import ScrollToTop from "../shared/components/ScrollToTop";
 import { SidebarLink } from "../types";
 
 const lazyLoad = <T extends object>(importFn: () => Promise<{ default: ComponentType<T> }>) => {
@@ -87,8 +88,10 @@ const adminSidebarLinks: SidebarLink[] = [
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route
         path="/"
         element={
           <BuyerRoute>
@@ -287,6 +290,7 @@ const AppRoutes = () => {
         <Route path="simulate" element={<AdminSimulatePage />} />
       </Route>
     </Routes>
+    </>
   );
 };
 
