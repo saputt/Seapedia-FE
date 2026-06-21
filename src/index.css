@@ -126,7 +126,7 @@ body {
   background: white;
   border: 3px solid var(--color-brand-deep);
   box-shadow: 6px 6px 0px 0px var(--color-brand-deep);
-  padding: 1.5rem;
+  padding: 1rem;
   transition: all 0.15s ease;
 }
 .card:hover {

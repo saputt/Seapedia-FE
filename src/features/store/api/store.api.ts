@@ -1,0 +1,18 @@
+import { apiFetch } from "../../../api/client";
+import type { Store, StoreInput } from "../../../types";
+
+export const getStoreById = (storeId: string): Promise<Store> => apiFetch(`stores/${storeId}`);
+
+export const getMyStore = (): Promise<Store> => apiFetch("stores/my");
+
+export const createStore = (dto: StoreInput): Promise<Store> =>
+  apiFetch("stores", {
+    method: "POST",
+    body: JSON.stringify(dto),
+  });
+
+export const updateStore = (storeId: string, dto: StoreInput): Promise<Store> =>
+  apiFetch(`stores/${storeId}`, {
+    method: "PUT",
+    body: JSON.stringify(dto),
+  });
