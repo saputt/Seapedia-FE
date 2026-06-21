@@ -7,6 +7,7 @@ import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
 import LowStockAlerts from "./components/LowStockAlerts";
+import TopSellingProducts from "./components/TopSellingProducts";
 import DashboardReviewCard from "./components/DashboardReviewCard";
 import RevenueLineChart from "./components/RevenueLineChart";
 
@@ -84,10 +85,14 @@ const SellerDashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <LowStockAlerts products={productsData?.products ?? []} />
-        <DashboardReviewCard products={productsData?.products ?? []} />
+        <TopSellingProducts orders={orders} />
       </div>
 
-      <RevenueLineChart orders={orders} />
+      <DashboardReviewCard products={productsData?.products ?? []} />
+
+      <div className="mt-6">
+        <RevenueLineChart orders={orders} />
+      </div>
     </>
   );
 };
