@@ -29,6 +29,7 @@ export interface LoginData {
 export interface SwitchRoleResponse {
   activeRole: RoleName;
   accessToken: string;
+  userRoles: RoleName[];
 }
 
 // ==================== User/Profile ====================

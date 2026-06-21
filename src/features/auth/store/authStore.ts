@@ -12,7 +12,7 @@ interface AuthActions {
   login: (data: { token: string; user: AuthUser; roles: RoleName[]; activeRole: RoleName }) => void;
   setUser: (userData: Partial<AuthUser>) => void;
   logout: () => void;
-  switchRole: (role: RoleName, newToken?: string) => void;
+  switchRole: (role: RoleName, newToken?: string, roles?: RoleName[]) => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -56,10 +56,15 @@ const useAuthStore = create<AuthStore>((set) => ({
     set({ token: null, user: null, userRoles: [], activeRole: null });
   },
 
-  switchRole: (role: RoleName, newToken?: string) => {
+  switchRole: (role: RoleName, newToken?: string, roles?: RoleName[]) => {
     localStorage.setItem("activeRole", role);
     if (newToken) localStorage.setItem("token", newToken);
-    set({ activeRole: role, ...(newToken ? { token: newToken } : {}) });
+    if (roles) localStorage.setItem("userRoles", JSON.stringify(roles));
+    set({
+      activeRole: role,
+      ...(newToken ? { token: newToken } : {}),
+      ...(roles ? { userRoles: roles } : {}),
+    });
   },
 }));
 
