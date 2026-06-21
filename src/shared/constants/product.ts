@@ -8,4 +8,12 @@ export const CATEGORY_LABEL: Record<ProductCategory, string> & { [key: string]: 
   HOBBY: "Hobi & Hiburan",
 };
 
+export const CATEGORY_SHORT: Record<ProductCategory, string> = {
+  ELECTRONICS: "Elektronik",
+  FASHION: "Fashion",
+  HOME: "Rumah",
+  FOOD: "Makanan",
+  HOBBY: "Hobi",
+};
+
 export const CATEGORIES: { key: ProductCategory; label: string }[] = Object.entries(CATEGORY_LABEL).map(([key, label]) => ({ key: key as ProductCategory, label }));
