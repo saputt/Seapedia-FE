@@ -19,13 +19,13 @@ export const useAddToCart = () => {
 
 export const useUpdateCartItem = () => {
   const setItems = useCartStore((s) => s.setItems);
-  const items = useCartStore((s) => s.items);
 
   return useMutation({
     mutationFn: ({ productId, quantity }) => updateCartItem(productId, quantity),
     onSuccess: (updated, { productId }) => {
+      const currentItems = useCartStore.getState().items;
       setItems(
-        items.map((item) =>
+        currentItems.map((item) =>
           item.productId === productId
             ? { ...item, quantity: updated.quantity }
             : item
@@ -37,12 +37,12 @@ export const useUpdateCartItem = () => {
 
 export const useRemoveCartItem = () => {
   const setItems = useCartStore((s) => s.setItems);
-  const items = useCartStore((s) => s.items);
 
   return useMutation({
     mutationFn: (productId) => removeCartItem(productId),
     onSuccess: (_data, productId) => {
-      setItems(items.filter((item) => item.productId !== productId));
+      const currentItems = useCartStore.getState().items;
+      setItems(currentItems.filter((item) => item.productId !== productId));
     },
   });
 };
