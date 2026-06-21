@@ -10,7 +10,8 @@ const Navbar = ({ variant = "default" }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const token = useAuthStore((s) => s.token);
   const refreshCart = useCartStore((s) => s.refreshCart);
-  const [searchInput, setSearchInput] = useState(searchParams.get("q") || "");
+  const searchQuery = searchParams.get("q") || "";
+  const [searchInput, setSearchInput] = useState(searchQuery);
 
   const isLoggedIn = !!token;
 
@@ -19,8 +20,8 @@ const Navbar = ({ variant = "default" }) => {
   }, [isLoggedIn, refreshCart]);
 
   useEffect(() => {
-    setSearchInput(searchParams.get("q") || "");
-  }, [searchParams.get("q")]);
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
