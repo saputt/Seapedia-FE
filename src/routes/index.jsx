@@ -88,9 +88,11 @@ const AppRoutes = () => {
       <Route
         path="/cart"
         element={
-          <BuyerRoute>
-            <CartMainPage />
-          </BuyerRoute>
+          <PrivateRoute>
+            <BuyerRoute>
+              <CartMainPage />
+            </BuyerRoute>
+          </PrivateRoute>
         }
       />
 
