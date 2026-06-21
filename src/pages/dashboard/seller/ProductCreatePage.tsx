@@ -14,7 +14,10 @@ const ProductCreatePage: React.FC = () => {
   const mutation = useCreateProduct();
 
   const handleSubmit = async (data: any) => {
-    mutation.mutate({ storeId: store.id, data } as any);
+    mutation.mutate(
+      { storeId: store.id, data } as any,
+      { onSuccess: () => setSuccessModal(true) }
+    );
   };
 
   return (

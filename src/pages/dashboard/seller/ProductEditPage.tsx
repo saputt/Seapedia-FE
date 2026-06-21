@@ -42,7 +42,7 @@ const ProductEditPage: React.FC = () => {
 
       <ProductForm
         initialData={product}
-        onSubmit={async (data: any) => { mutation.mutate(data as any); }}
+        onSubmit={async (data: any) => { mutation.mutate(data as any, { onSuccess: () => setSuccessModal(true) }); }}
         isPending={mutation.isPending}
         submitLabel="Simpan"
         pendingLabel="Menyimpan..."
