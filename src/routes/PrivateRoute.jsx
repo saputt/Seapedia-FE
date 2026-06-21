@@ -1,14 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import useAuthStore from "../features/auth/store/authStore";
 import Button from "../shared/components/ui/Button";
 
 const PrivateRoute = ({ children }) => {
   const navigate = useNavigate();
   const token = useAuthStore((s) => s.token);
-  const [showModal, setShowModal] = useState(true);
 
-  if (!token && showModal) {
+  if (!token) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
         <div
@@ -38,8 +36,6 @@ const PrivateRoute = ({ children }) => {
       </div>
     );
   }
-
-  if (!token) return null;
 
   return children;
 };
