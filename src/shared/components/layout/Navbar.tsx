@@ -90,13 +90,13 @@ const Navbar = ({ variant = "default", onMenuClick }: NavbarProps) => {
     <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
       <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between gap-4">
         <div className="flex items-center gap-8 shrink-0">
-          <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight">
+          <Link to="/" className="text-brand-deep font-extrabold text-2xl tracking-tight hidden sm:block">
             SEAPEDIA
           </Link>
         </div>
 
         {(variant as string) !== "checkout" && (variant as string) !== "seller" && (
-          <div className="flex-1 max-w-md mx-auto">
+          <div className="flex-1 sm:max-w-md sm:mx-auto">
             <input
               type="text"
               value={searchInput}
@@ -115,10 +115,10 @@ const Navbar = ({ variant = "default", onMenuClick }: NavbarProps) => {
             <ProfileDropdown />
           ) : (
             <>
-              <Link to="/auth/login" className="btn-ghost text-sm !py-2 !px-5">
+              <Link to="/auth/login" className="btn-primary text-sm !py-2 !px-5">
                 Masuk
               </Link>
-              <Link to="/auth/register" className="btn-primary text-sm !py-2 !px-5">
+              <Link to="/auth/register" className="btn-ghost text-sm !py-2 !px-5 hidden sm:inline-flex">
                 Daftar
               </Link>
             </>
