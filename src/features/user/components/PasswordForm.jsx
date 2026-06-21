@@ -19,10 +19,14 @@ const PasswordForm = ({ onSubmit, isPending, isSuccess, isError, errorMessage })
 
   const handleSubmit = async () => {
     if (!oldPassword || !newPassword || newPassword.length < 8) return;
-    await onSubmit({ oldPassword, newPassword });
-    setOldPassword("");
-    setNewPassword("");
-    setExpanded(false);
+    try {
+      await onSubmit({ oldPassword, newPassword });
+      setOldPassword("");
+      setNewPassword("");
+      setExpanded(false);
+    } catch {
+      // form fields preserved so user can retry
+    }
   };
 
   if (!expanded) {
