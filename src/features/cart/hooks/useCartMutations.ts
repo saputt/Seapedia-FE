@@ -71,9 +71,16 @@ export const useClearAndAddToCart = () => {
       return addToCart(productId, 1);
     },
     onSuccess: async () => {
-      await refreshCart();
+      try {
+        await refreshCart();
+      } catch {
+        // refreshCart already returns empty array on failure
+      }
       hideBadge();
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+    },
+    onError: () => {
+      refreshCart();
     },
   });
 };
