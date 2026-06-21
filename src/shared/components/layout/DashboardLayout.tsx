@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import DashboardSidebar from "./DashboardSidebar";
 import BottomTabBar from "./BottomTabBar";
 import MobileSidebar from "./MobileSidebar";
 import { SidebarLink } from "../../../types";
+import { useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 
 interface DashboardLayoutProps {
   navbarVariant?: string;
@@ -16,6 +17,11 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubtitle, sidebarLinks, mobileNav }: DashboardLayoutProps) => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  const isDriver = location.pathname.startsWith("/dashboard/driver");
+  const { data: availableJobs } = (isDriver ? useAvailableJobs() : { data: undefined }) as any;
+  const availableCount = availableJobs?.length ?? 0;
 
   const handleOpenMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(true);
@@ -24,6 +30,10 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
   const handleCloseMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(false);
   }, []);
+
+  const badgeCounts: Record<string, number> = isDriver
+    ? { "/dashboard/driver/jobs": availableCount }
+    : {};
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
@@ -43,7 +53,7 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
       </div>
 
       {/* Mobile Navigation */}
-      {mobileNav === "bottom-tabs" && <BottomTabBar links={sidebarLinks} />}
+      {mobileNav === "bottom-tabs" && <BottomTabBar links={sidebarLinks} badgeCounts={badgeCounts} />}
       {mobileNav === "hamburger" && (
         <MobileSidebar
           isOpen={isMobileSidebarOpen}
