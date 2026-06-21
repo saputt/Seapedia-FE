@@ -12,9 +12,9 @@ export const useCreateStore = () => {
 
   return useMutation({
     mutationFn: async (dto: StoreInput) => {
+      await createStore(dto);
       const res = await switchUserRole("SELLER");
-      switchRole("SELLER", res.accessToken);
-      return createStore(dto);
+      switchRole("SELLER", res.accessToken, res.userRoles);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myStore"] });
