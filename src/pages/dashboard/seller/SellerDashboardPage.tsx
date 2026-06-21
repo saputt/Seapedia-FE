@@ -10,6 +10,9 @@ import TopSellingProducts from "./components/TopSellingProducts";
 import LowStockAlerts from "./components/LowStockAlerts";
 import RecentOrdersFeed from "./components/RecentOrdersFeed";
 import AverageRatingCard from "./components/AverageRatingCard";
+import OrderStatusDonut from "./components/OrderStatusDonut";
+import TopProductsBar from "./components/TopProductsBar";
+import ShippingMethodPie from "./components/ShippingMethodPie";
 
 const SellerDashboardPage: React.FC = () => {
   const { data: store, isLoading: storeLoading } = useMyStore() as any;
@@ -113,6 +116,15 @@ const SellerDashboardPage: React.FC = () => {
         <AverageRatingCard products={productsData?.products ?? []} />
         <RecentOrdersFeed orders={orders} />
         <LowStockAlerts products={productsData?.products ?? []} />
+      </div>
+
+      <h2 className="text-lg font-bold text-text-primary mt-10 mb-4">Grafik Penjualan</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <OrderStatusDonut orders={orders} />
+        <ShippingMethodPie orders={orders} />
+        <div className="lg:col-span-2">
+          <TopProductsBar orders={orders} />
+        </div>
       </div>
     </>
   );
