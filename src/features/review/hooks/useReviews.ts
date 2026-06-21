@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProductReview, getProductReviews } from "../api/review.api";
+import { createProductReview, getProductReviews, getSellerReviews } from "../api/review.api";
 import type { ReviewInput } from "../../../types";
 
 export const useProductReviews = (productId: string) =>
@@ -7,6 +7,12 @@ export const useProductReviews = (productId: string) =>
     queryKey: ["productReviews", productId],
     queryFn: () => getProductReviews(productId),
     enabled: !!productId,
+  });
+
+export const useSellerReviews = () =>
+  useQuery({
+    queryKey: ["sellerReviews"],
+    queryFn: getSellerReviews,
   });
 
 export const useCreateProductReview = () => {
