@@ -58,6 +58,8 @@ const AdminDashboardPage = lazyLoad(() => import("../pages/dashboard/admin/Admin
 const AdminOrdersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminOrdersPage"));
 const AdminDiscountsPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDiscountsPage"));
 const AdminSimulatePage = lazyLoad(() => import("../pages/dashboard/admin/AdminSimulatePage"));
+const SellerOnboarding = lazyLoad(() => import("../pages/onboarding/SellerOnboarding"));
+const DriverOnboarding = lazyLoad(() => import("../pages/onboarding/DriverOnboarding"));
 
 const sellerSidebarLinks: SidebarLink[] = [
   { to: "/dashboard/seller", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
@@ -167,6 +169,23 @@ const AppRoutes = () => {
       />
 
       <Route
+        path="/onboarding/seller"
+        element={
+          <PrivateRoute>
+            <SellerOnboarding />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/onboarding/driver"
+        element={
+          <PrivateRoute>
+            <DriverOnboarding />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/dashboard/buyer"
         element={
           <PrivateRoute>
@@ -188,6 +207,15 @@ const AppRoutes = () => {
       </Route>
 
       <Route
+        path="/dashboard/seller/create-store"
+        element={
+          <PrivateRoute>
+            <CreateStorePage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/dashboard/seller"
         element={
           <PrivateRoute>
@@ -197,6 +225,7 @@ const AppRoutes = () => {
                 sidebarTitle="Toko Saya"
                 sidebarSubtitle="Dashboard Penjual"
                 sidebarLinks={sellerSidebarLinks}
+                mobileNav="bottom-tabs"
               />
             </SellerRoute>
           </PrivateRoute>
@@ -212,15 +241,6 @@ const AppRoutes = () => {
       </Route>
 
       <Route
-        path="/dashboard/seller/create-store"
-        element={
-          <PrivateRoute>
-            <CreateStorePage />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
         path="/dashboard/driver"
         element={
           <PrivateRoute>
@@ -230,6 +250,7 @@ const AppRoutes = () => {
                 sidebarTitle="Driver"
                 sidebarSubtitle="Dashboard Kurir"
                 sidebarLinks={driverSidebarLinks}
+                mobileNav="bottom-tabs"
               />
             </RoleRoute>
           </PrivateRoute>
@@ -251,6 +272,7 @@ const AppRoutes = () => {
                 sidebarTitle="Admin Panel"
                 sidebarSubtitle="Manajemen Sistem"
                 sidebarLinks={adminSidebarLinks}
+                mobileNav="hamburger"
               />
             </RoleRoute>
           </PrivateRoute>
