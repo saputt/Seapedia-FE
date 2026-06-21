@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -16,6 +16,10 @@ const ProductDetailPage: React.FC = () => {
   const { data: reviewsData } = useProductReviews(productId!);
   const reviews = (reviewsData as any)?.reviews || [];
   const token = useAuthStore((s) => s.token);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [showStoreAlert, setShowStoreAlert] = useState(false);
