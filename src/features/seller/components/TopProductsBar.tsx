@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import type { Order } from "../../../../types";
+import type { Order } from "../../../types";
 
 interface TopProductsBarProps {
   orders: Order[];

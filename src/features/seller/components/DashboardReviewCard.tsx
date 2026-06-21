@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
-import { useSellerReviews } from "../../../../features/review/hooks/useReviews";
-import StarRating from "../../../../shared/components/ui/StarRating";
-import Spinner from "../../../../shared/components/ui/Spinner";
-import type { Product } from "../../../../types";
-
-// This file is at src/pages/dashboard/seller/components/
+import StarRating from "../../../shared/components/ui/StarRating";
+import Spinner from "../../../shared/components/ui/Spinner";
+import type { Product } from "../../../types";
+import { useSellerReviews } from "../../review/hooks/useReviews";
 
 interface DashboardReviewCardProps {
   products: Product[];

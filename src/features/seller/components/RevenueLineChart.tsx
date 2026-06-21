@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import type { Order } from "../../../../types";
+import type { Order } from "../../../types";
 
 interface RevenueLineChartProps {
   orders: Order[];

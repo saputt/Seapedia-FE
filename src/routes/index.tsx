@@ -10,8 +10,8 @@ import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayout";
 import SellerRoute from "./SellerRoute";
 import Spinner from "../shared/components/ui/Spinner";
-import ScrollToTop from "../shared/components/ScrollToTop";
 import { SidebarLink } from "../types";
+import ScrollToTop from "../shared/utils/ScrollToTop";
 
 const lazyLoad = <T extends object>(importFn: () => Promise<{ default: ComponentType<T> }>) => {
   const Component = lazy(importFn);

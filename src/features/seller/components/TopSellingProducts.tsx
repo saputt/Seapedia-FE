@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Order } from "../../../../types";
+import type { Order } from "../../../types";
 
 interface TopSellingProductsProps {
   orders: Order[];

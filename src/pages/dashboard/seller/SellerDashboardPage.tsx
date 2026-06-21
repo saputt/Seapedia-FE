@@ -6,10 +6,10 @@ import { useSellerOrders } from "../../../features/order/hooks/useOrders";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
-import LowStockAlerts from "./components/LowStockAlerts";
-import TopSellingProducts from "./components/TopSellingProducts";
-import DashboardReviewCard from "./components/DashboardReviewCard";
-import RevenueLineChart from "./components/RevenueLineChart";
+import LowStockAlerts from "../../../features/seller/components/LowStockAlerts";
+import TopSellingProducts from "../../../features/seller/components/TopSellingProducts";
+import DashboardReviewCard from "../../../features/seller/components/DashboardReviewCard";
+import RevenueLineChart from "../../../features/seller/components/RevenueLineChart";
 
 const SellerDashboardPage: React.FC = () => {
   const { data: store, isLoading: storeLoading } = useMyStore() as any;
