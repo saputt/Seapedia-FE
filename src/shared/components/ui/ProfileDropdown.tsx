@@ -46,7 +46,7 @@ const ProfileDropdown = () => {
       if (store) {
         setSwitchingRole("SELLER");
         const res = await switchUserRole("SELLER");
-        switchRole("SELLER", res.accessToken);
+        switchRole("SELLER", res.accessToken, res.userRoles);
         setSwitchingRole(null);
         navigate("/dashboard/seller", { replace: true });
       } else {
@@ -62,7 +62,7 @@ const ProfileDropdown = () => {
     setSwitchingRole("BUYER");
     try {
       const res = await switchUserRole("BUYER");
-      switchRole("BUYER", res.accessToken);
+      switchRole("BUYER", res.accessToken, res.userRoles);
       setSwitchingRole(null);
       navigate("/", { replace: true });
     } catch {
@@ -75,7 +75,7 @@ const ProfileDropdown = () => {
     setSwitchingRole("DRIVER");
     try {
       const res = await switchUserRole("DRIVER");
-      switchRole("DRIVER", res.accessToken);
+      switchRole("DRIVER", res.accessToken, res.userRoles);
       setSwitchingRole(null);
       navigate("/dashboard/driver", { replace: true });
     } catch {
@@ -167,7 +167,25 @@ const ProfileDropdown = () => {
             )}
 
             <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
-              {activeRole !== "BUYER" && (
+              {activeRole === "BUYER" && !userRoles.includes("SELLER") && (
+                <Link
+                  to="/onboarding/seller"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-brand-deep font-medium hover:bg-brand-subtle rounded transition-colors"
+                >
+                  Buka Toko
+                </Link>
+              )}
+              {activeRole === "BUYER" && !userRoles.includes("DRIVER") && (
+                <Link
+                  to="/onboarding/driver"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-brand-deep font-medium hover:bg-brand-subtle rounded transition-colors"
+                >
+                  Jadi Driver
+                </Link>
+              )}
+              {activeRole !== "BUYER" && userRoles.includes("BUYER") && (
                 <button
                   onClick={handleBuyerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -175,7 +193,7 @@ const ProfileDropdown = () => {
                   Buyer
                 </button>
               )}
-              {activeRole !== "SELLER" && (
+              {activeRole !== "SELLER" && userRoles.includes("SELLER") && (
                 <button
                   onClick={handleSellerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -183,7 +201,7 @@ const ProfileDropdown = () => {
                   Seller
                 </button>
               )}
-              {activeRole !== "DRIVER" && (
+              {activeRole !== "DRIVER" && userRoles.includes("DRIVER") && (
                 <button
                   onClick={handleDriverClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
