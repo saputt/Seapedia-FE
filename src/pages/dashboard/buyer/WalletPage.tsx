@@ -40,7 +40,7 @@ const WalletPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-[720px] mx-auto w-full space-y-6">
         {error && (
           <ErrorState message={error?.message || "Gagal memuat dompet."} onRetry={() => window.location.reload()} />
         )}

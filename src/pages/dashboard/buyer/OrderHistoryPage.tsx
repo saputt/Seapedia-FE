@@ -83,7 +83,7 @@ const OrderHistoryPage: React.FC = () => {
 
   return (
     <>
-    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-[720px] mx-auto w-full space-y-6">
       <h1 className="text-xl font-bold text-text-primary">Riwayat Pesanan</h1>
 
         <div className="flex flex-wrap gap-2">
