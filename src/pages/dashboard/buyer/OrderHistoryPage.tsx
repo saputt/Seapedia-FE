@@ -233,11 +233,12 @@ const OrderHistoryPage: React.FC = () => {
             : "Apakah Anda yakin ingin mengonfirmasi bahwa pesanan ini sudah diterima?"
         }
         actionLabel={modal?.type === "cancel" ? "Ya, Batalkan" : "Ya, Konfirmasi"}
-        onAction={() =>
-          modal?.type === "cancel"
+        onAction={() => {
+          if (!modal) return;
+          modal.type === "cancel"
             ? handleCancel(modal.orderId)
-            : handleConfirm(modal.orderId, modal.storeId!)
-        }
+            : handleConfirm(modal.orderId, modal.storeId!);
+        }}
       />
 
       {reviewOrder && (

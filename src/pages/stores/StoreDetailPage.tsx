@@ -10,7 +10,7 @@ import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
 const StoreDetailPage: React.FC = () => {
   const { storeId } = useParams<{ storeId: string }>();
-  const { data: store, isLoading: storeLoading, isError: storeError } = useStore(storeId);
+  const { data: store, isLoading: storeLoading, isError: storeError } = useStore(storeId!);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
@@ -21,7 +21,7 @@ const StoreDetailPage: React.FC = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useStoreProducts(storeId, debouncedSearch);
+  } = useStoreProducts(storeId!, debouncedSearch);
 
   const allProducts = data?.pages.flatMap((page: any) => page.products ?? page.data ?? []) ?? [];
   const totalProducts = (data as any)?.pages[0]?.total ?? 0;

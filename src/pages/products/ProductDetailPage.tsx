@@ -12,8 +12,8 @@ import { CATEGORY_LABEL } from "../../shared/constants/product";
 
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
-  const { data: product, isLoading, isError } = useProductDetail(productId);
-  const { data: reviewsData } = useProductReviews(productId);
+  const { data: product, isLoading, isError } = useProductDetail(productId!);
+  const { data: reviewsData } = useProductReviews(productId!);
   const reviews = (reviewsData as any)?.reviews || [];
   const token = useAuthStore((s) => s.token);
 
@@ -28,7 +28,7 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
     addMutation.mutate(
-      { productId, quantity: 1 },
+      { productId: productId!, quantity: 1 },
       {
         onError: (err: Error) => {
           const msg = err?.message || "";
@@ -43,7 +43,7 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const handleClearAndAdd = () => {
-    clearAndAddMutation.mutate(productId, {
+    clearAndAddMutation.mutate(productId!, {
       onSuccess: () => setShowStoreAlert(false),
       onError: () => setAddError("Gagal menambahkan ke keranjang."),
     });

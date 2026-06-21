@@ -350,7 +350,7 @@ const CheckoutPage: React.FC = () => {
           setSelectedAddress(addr);
           setShowAddressSelector(false);
         }}
-        selectedId={selectedAddress?.id}
+        selectedId={selectedAddress?.id ?? ""}
       />
 
       <AlertModal

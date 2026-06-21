@@ -31,7 +31,7 @@ const getStored = <T>(key: string, fallback: T | null = null): T | null => {
 const useAuthStore = create<AuthStore>((set) => ({
   token: getStored<string>("token"),
   user: getStored<AuthUser>("user"),
-  userRoles: getStored<RoleName[]>("userRoles", []),
+  userRoles: getStored<RoleName[]>("userRoles", []) ?? [],
   activeRole: getStored<RoleName>("activeRole"),
 
   login: ({ token, user, roles, activeRole }: { token: string; user: AuthUser; roles: RoleName[]; activeRole: RoleName }) => {

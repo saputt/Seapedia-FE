@@ -1,6 +1,6 @@
 import type { ProductCategory } from "../../types";
 
-export const CATEGORY_LABEL: Record<ProductCategory, string> = {
+export const CATEGORY_LABEL: Record<ProductCategory, string> & { [key: string]: string } = {
   ELECTRONICS: "Elektronik & Gadget",
   FASHION: "Fashion & Pakaian",
   HOME: "Kebutuhan Rumah Tangga",

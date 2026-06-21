@@ -13,7 +13,7 @@ import Spinner from "../../../shared/components/ui/Spinner";
 
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const { data: raw, isLoading, error } = useOrderDetail(orderId);
+  const { data: raw, isLoading, error } = useOrderDetail(orderId!);
   const order = (raw as any)?.order ?? raw;
   const cancelMutation = useCancelOrder();
   const confirmMutation = useBuyerConfirmOrder();
@@ -265,7 +265,7 @@ const OrderDetailPage: React.FC = () => {
       {reviewModal && (
         <ReviewModal
           order={{
-            id: orderId,
+            id: orderId!,
             product: reviewModal.product,
             productId: reviewModal.productId,
             alreadyReviewed: order.reviews?.some(
