@@ -8,6 +8,10 @@ const SellerRoute = ({ children }) => {
     return <Navigate to="/" replace />;
   } else if (activeRole === "DRIVER") {
     return <Navigate to="/dashboard/driver" replace />;
+  } else if (activeRole === "ADMIN") {
+    return <Navigate to="/dashboard/admin" replace />;
+  } else if (!activeRole) {
+    return <Navigate to="/auth/login" replace />;
   }
 
   return children;
