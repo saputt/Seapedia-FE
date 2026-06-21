@@ -32,7 +32,7 @@ const ProductManagementPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Produk</h1>
         <Button onClick={() => navigate("/dashboard/seller/products/create")} variant="primary">
@@ -146,7 +146,7 @@ const ProductManagementPage: React.FC = () => {
         title="Berhasil"
         message={successModal.message}
       />
-    </>
+    </div>
   );
 };
 

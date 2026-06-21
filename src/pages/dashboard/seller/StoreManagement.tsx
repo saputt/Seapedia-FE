@@ -48,7 +48,7 @@ const StoreManagement: React.FC = () => {
   if (!store) return null;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Manajemen Toko</h1>

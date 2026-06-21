@@ -25,7 +25,7 @@ const OrderManagementPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
         <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
         <ErrorState message="Gagal memuat pesanan." onRetry={() => window.location.reload()} />
@@ -34,7 +34,7 @@ const OrderManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
       <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
 

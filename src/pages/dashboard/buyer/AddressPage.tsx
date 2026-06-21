@@ -80,7 +80,7 @@ const AddressPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Alamat Saya</h1>
         <Button onClick={() => { setEditingAddress(null); setShowForm(true); }} variant="primary">
@@ -177,7 +177,7 @@ const AddressPage: React.FC = () => {
         actionLabel="Hapus"
         onAction={handleDelete}
       />
-    </>
+    </div>
   );
 };
 
