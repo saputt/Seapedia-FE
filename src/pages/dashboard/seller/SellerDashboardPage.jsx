@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
+import { useSellerProducts } from "../../../features/catalog/hooks/useProductMutations";
 import { useSellerOrders } from "../../../features/order/hooks/useOrders";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -8,6 +9,8 @@ import StatCard from "../../../shared/components/ui/StatCard";
 
 const SellerDashboardPage = () => {
   const { data: store, isLoading: storeLoading } = useMyStore();
+
+  const { data: productsData, isLoading: productsLoading } = useSellerProducts(store?.id);
 
   const { data: orders = [], isLoading: ordersLoading, error } = useSellerOrders(
     { orderBy: "desc" }
@@ -34,7 +37,7 @@ const SellerDashboardPage = () => {
     };
   }, [orders]);
 
-  const isLoading = storeLoading || ordersLoading;
+  const isLoading = storeLoading || productsLoading || ordersLoading;
 
   if (isLoading) {
     return (
@@ -60,7 +63,7 @@ const SellerDashboardPage = () => {
       <p className="text-sm text-text-muted mb-8">Ringkasan toko Anda</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Produk" value={store ? "—" : 0} variant="badge" color="bg-blue-500" />
+        <StatCard label="Total Produk" value={store ? (productsData?.total ?? 0) : 0} variant="badge" color="bg-blue-500" />
         <StatCard label="Total Pesanan" value={stats.totalOrders} variant="badge" color="bg-brand-deep" />
         <StatCard label="Pendapatan" value={`Rp${stats.totalRevenue.toLocaleString("id-ID")}`} variant="badge" color="bg-success" />
         <StatCard label="Perlu Diproses" value={stats.pending} variant="badge" color="bg-warning" />
