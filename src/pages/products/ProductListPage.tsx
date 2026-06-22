@@ -1,57 +1,18 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
-import PromoBannerCarousel from "../../shared/components/ui/PromoBannerCarousel";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import ProductFilterSidebar from "../../features/catalog/components/ProductFilterSidebar";
+import CategoryGrid from "../../features/catalog/components/CategoryGrid";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
 import { useTopSellingProducts } from "../../features/catalog/hooks/useTopSellingProducts";
 import useAuthStore from "../../features/auth/store/authStore";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
-import { CATEGORY_SHORT } from "../../shared/constants/product";
-import { CATEGORY_ICONS } from "../../shared/constants/productIcons";
 import type { ProductCategory } from "../../types";
-
-const PROMO_BANNERS = [
-  {
-    id: "1",
-    title: "Flash Sale Hari Ini!",
-    subtitle: "Diskon hingga 50% untuk produk pilihan",
-    gradient: "bg-gradient-to-r from-brand-subtle to-white",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-      </svg>
-    ),
-  },
-  {
-    id: "2",
-    title: "Gratis Ongkir Sepanjang Juni",
-    subtitle: "Berlaku untuk semua produk dengan min. transaksi Rp50.000",
-    gradient: "bg-gradient-to-r from-green-50 to-emerald-50",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="3" width="15" height="13" />
-        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-        <circle cx="5.5" cy="18.5" r="2.5" />
-        <circle cx="18.5" cy="18.5" r="2.5" />
-      </svg>
-    ),
-  },
-  {
-    id: "3",
-    title: "Baru Datang: Koleksi Elektronik",
-    subtitle: "Gadget terbaru dengan harga spesial",
-    gradient: "bg-gradient-to-r from-blue-50 to-indigo-50",
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-        <line x1="8" y1="21" x2="16" y2="21" />
-        <line x1="12" y1="17" x2="12" y2="21" />
-      </svg>
-    ),
-  },
-];
+import PromoBannerCarousel from "../../features/catalog/components/PromoBannerCarousel";
+import { PROMO_BANNERS } from "../../shared/constants/promoBanners";
+import useDebounce from "../../shared/hooks/useDebounce";
+import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
 const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -59,25 +20,20 @@ const ProductListPage: React.FC = () => {
   const token = useAuthStore((s) => s.token);
   const { data: wallet } = useWallet();
   const rawQuery = searchParams.get("q") || "";
-  const [debouncedSearch, setDebouncedSearch] = useState(rawQuery);
+  const debouncedSearch = useDebounce(rawQuery, 400);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const categoryFilter = searchParams.get("category") || "";
   const minPriceParam = searchParams.get("minPrice") || "";
   const maxPriceParam = searchParams.get("maxPrice") || "";
   const sortByParam = searchParams.get("sortBy") || "newest";
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const [showFilters, setShowFilters] = useState(false);
   const [filterMinPrice, setFilterMinPrice] = useState(minPriceParam);
   const [filterMaxPrice, setFilterMaxPrice] = useState(maxPriceParam);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(rawQuery), 400);
-    return () => clearTimeout(timer);
-  }, [rawQuery]);
 
   const showHero = !debouncedSearch && !categoryFilter && !minPriceParam && !maxPriceParam;
   const hasActiveFilter = !!debouncedSearch || !!categoryFilter || !!minPriceParam || !!maxPriceParam;
@@ -106,26 +62,14 @@ const ProductListPage: React.FC = () => {
 
   const { data: topSellingProducts = [] } = useTopSellingProducts(4);
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage && canLoadMore) {
+  const loadMoreRef = useInfiniteScroll(
+    () => {
+      if (hasNextPage && !isFetchingNextPage && canLoadMore) {
         fetchNextPage();
       }
     },
-    [hasNextPage, isFetchingNextPage, fetchNextPage, canLoadMore]
+    { enabled: canLoadMore && hasNextPage && !isFetchingNextPage }
   );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      rootMargin: "100px",
-    });
-    const el = loadMoreRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [handleObserver]);
 
   const updateParams = (updates: Record<string, string>) => {
     const next = new URLSearchParams(searchParams);
@@ -261,26 +205,7 @@ const ProductListPage: React.FC = () => {
         )}
 
         {showHero && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
-            {Object.entries(CATEGORY_SHORT).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => handleCategoryClick(key)}
-                className={`flex flex-col items-center justify-center gap-2 py-4 px-2 border-[3px] shadow-[6px_6px_0_0_var(--color-brand-deep)] hover:shadow-[8px_8px_0_0_var(--color-brand-deep)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all cursor-pointer ${
-                  categoryFilter === key
-                    ? "bg-brand-deep text-white border-brand-deep"
-                    : "bg-white text-brand-deep border-brand-deep"
-                }`}
-              >
-                <span className={`w-7 h-7 flex items-center justify-center ${categoryFilter === key ? "text-white" : "text-brand-deep"}`}>
-                  {CATEGORY_ICONS[key]}
-                </span>
-                <span className="text-[11px] font-semibold text-center leading-tight">
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
+          <CategoryGrid categoryFilter={categoryFilter} onCategoryClick={handleCategoryClick} />
         )}
 
         {showHero && topSellingProducts.length > 0 && (
