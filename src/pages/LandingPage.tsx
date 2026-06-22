@@ -1,14 +1,16 @@
 import React from "react";
 import MainLayout from "../shared/components/layout/MainLayout";
 import HeroSection from "../features/landing/components/HeroSection";
-import FeaturedProducts from "../features/landing/components/FeaturedProducts";
+import AboutSection from "../features/landing/components/AboutSection";
+import HowItWorksSection from "../features/landing/components/HowItWorksSection";
 import TestimonialSection from "../features/landing/components/TestimonialSection";
 
 const LandingPage: React.FC = () => {
   return (
     <MainLayout navbarVariant="default">
       <HeroSection />
-      <FeaturedProducts />
+      <AboutSection />
+      <HowItWorksSection />
       <TestimonialSection />
     </MainLayout>
   );

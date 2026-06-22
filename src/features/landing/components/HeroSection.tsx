@@ -17,7 +17,7 @@ const HeroSection = () => {
             <a href="/auth/register" className="btn-primary text-base !py-3 !px-8">
               Mulai Belanja
             </a>
-            <a href="/products" className="btn-ghost text-base !py-3 !px-8">
+            <a href="/" className="btn-ghost text-base !py-3 !px-8">
               Lihat Produk
             </a>
           </div>
