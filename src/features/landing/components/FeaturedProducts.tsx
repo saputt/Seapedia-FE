@@ -1,4 +1,4 @@
-import ProductCard from "../../catalog/components/ProductCard.tsx";
+import ProductCard from "../../catalog/components/ProductCard";
 import { useFeaturedProducts } from "../hooks/useFeaturedProducts";
 import type { Product } from "../../../types";
 
