@@ -1,5 +1,5 @@
 import { lazy, Suspense, ComponentType } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
@@ -81,10 +81,6 @@ const AppRoutes = () => {
       <Route
         path="/about"
         element={<LandingPage />}
-      />
-      <Route
-        path="/products"
-        element={<Navigate to="/" replace />}
       />
       <Route
         path="/products/:productId"
@@ -180,7 +176,6 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<ComingSoon title="Dashboard Pembeli" />} />
-        <Route path="cart" element={<ComingSoon title="Keranjang" />} />
         <Route path="checkout" element={<CheckoutMainPage />} />
         <Route path="orders" element={<OrderHistoryPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
