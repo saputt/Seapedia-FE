@@ -57,6 +57,7 @@ const DriverJobsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverJo
 const DriverHistoryPage = lazyLoad(() => import("../pages/dashboard/driver/DriverHistoryPage"));
 const DriverIncomePage = lazyLoad(() => import("../pages/dashboard/driver/DriverIncomePage"));
 const AdminDashboardPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDashboardPage"));
+const AdminUsersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminUsersPage"));
 const AdminOrdersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminOrdersPage"));
 const AdminDiscountsPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDiscountsPage"));
 const AdminSimulatePage = lazyLoad(() => import("../pages/dashboard/admin/AdminSimulatePage"));
@@ -259,6 +260,7 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<AdminDashboardPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="discounts" element={<AdminDiscountsPage />} />
         <Route path="simulate" element={<AdminSimulatePage />} />
