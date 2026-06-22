@@ -95,7 +95,7 @@ const ProductRatingsPage: React.FC = () => {
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-bg-tertiary overflow-hidden shrink-0">
                 {review.product?.imageUrl ? (
-                  <img src={review.product.imageUrl} alt={review.product.name} className="w-full h-full object-cover" />
+                  <img src={review.product.imageUrl} alt={review.product.name} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">Img</div>
                 )}

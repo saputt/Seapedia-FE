@@ -118,7 +118,7 @@ const ProductManagementPage: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-bg-tertiary rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                           {product.imageUrl ? (
-                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                            <img src={product.imageUrl} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                           ) : (
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
                               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -177,7 +177,7 @@ const ProductManagementPage: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 bg-bg-tertiary rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                     {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                      <img src={product.imageUrl} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                     ) : (
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />

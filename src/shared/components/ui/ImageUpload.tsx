@@ -26,6 +26,7 @@ const ImageUpload = ({ preview, onChange, onClear }: ImageUploadProps) => {
           <img
             src={preview}
             alt="Preview"
+            loading="lazy"
             className="w-full h-full object-cover"
           />
         ) : (

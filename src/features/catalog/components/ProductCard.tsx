@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORY_SHORT } from "../../../shared/constants/product";
 import StarRating from "../../../shared/components/ui/StarRating";
@@ -12,7 +13,7 @@ interface ProductCardProps {
   product: ProductCardProduct;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = memo(({ product }: ProductCardProps) => {
   const price = product.price?.toLocaleString("id-ID");
 
   return (
@@ -22,6 +23,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <img
             src={product.imageUrl}
             alt={product.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
@@ -54,6 +56,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
       )}
     </Link>
   );
-};
+});
 
 export default ProductCard;

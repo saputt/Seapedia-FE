@@ -52,6 +52,7 @@ const TopSellingProducts = ({ orders = [] }: TopSellingProductsProps) => {
               <img
                 src={product.imageUrl}
                 alt={product.name}
+                loading="lazy"
                 className="w-10 h-10 rounded-lg object-cover shrink-0"
               />
             )}
