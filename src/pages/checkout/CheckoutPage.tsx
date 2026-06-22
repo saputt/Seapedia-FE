@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -9,6 +10,7 @@ import CheckoutSummaryCard from "../../features/checkout/components/CheckoutSumm
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
 import { useCheckoutOrder } from "../../features/order/hooks/useOrders";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
+import { checkDiscount } from "../../features/discount/api/discount.api";
 import type { Address } from "../../types";
 
 const CheckoutPage: React.FC = () => {
@@ -17,6 +19,7 @@ const CheckoutPage: React.FC = () => {
   const [shippingMethod, setShippingMethod] = useState("REGULAR");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
+  const [discountCheckError, setDiscountCheckError] = useState("");
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
@@ -41,10 +44,10 @@ const CheckoutPage: React.FC = () => {
   }, [isLoading, addressesData]);
 
   const summaryErrorMessage = summaryError?.message || "";
-  const discountErrorMsg = !appliedCode ? "" :
+  const discountErrorMsg = !appliedCode || !summaryError ? "" :
     summaryErrorMessage.toLowerCase().includes("not found") ? "Kode diskon tidak ditemukan." :
     (summaryErrorMessage.toLowerCase().includes("expired") || summaryErrorMessage.toLowerCase().includes("not available")) ? "Kode diskon sudah tidak berlaku." :
-    summaryErrorMessage || "Gagal menerapkan diskon.";
+    summaryErrorMessage;
 
   const checkoutMutation = useCheckoutOrder();
 
@@ -77,15 +80,37 @@ const CheckoutPage: React.FC = () => {
     );
   };
 
+  const checkDiscountMutation = useMutation({
+    mutationFn: (code: string) => checkDiscount(code),
+    retry: false,
+  });
+
   const handleApplyDiscount = () => {
     const trimmed = discountCode.trim().toUpperCase();
     if (!trimmed) return;
-    setAppliedCode(trimmed);
+    setDiscountCheckError("");
+    checkDiscountMutation.mutate(trimmed, {
+      onSuccess: () => {
+        setAppliedCode(trimmed);
+        setDiscountCode(""); // Clear input after successful application
+      },
+      onError: (err: Error) => {
+        const msg = err?.message || "";
+        if (msg.toLowerCase().includes("not found")) {
+          setDiscountCheckError("Kode diskon tidak ditemukan.");
+        } else if (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("not available")) {
+          setDiscountCheckError("Kode diskon sudah tidak berlaku.");
+        } else {
+          setDiscountCheckError("Gagal memvalidasi diskon. Silakan coba lagi.");
+        }
+      },
+    });
   };
 
   const handleRemoveDiscount = () => {
     setDiscountCode("");
     setAppliedCode("");
+    setDiscountCheckError("");
   };
 
   const subtotal = summary?.subtotal ?? 0;
@@ -105,7 +130,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        {summaryError && !isLoading && (
+        {!summary && summaryError && !isLoading && (
           <div className="text-center py-20">
             <p className="text-danger font-semibold text-lg mb-4">
               {(summaryError as Error)?.message || "Gagal memuat ringkasan pesanan."}
@@ -116,7 +141,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && !summaryError && summary && (
+        {summary && (
           <div className="space-y-6">
             {/* Address */}
             <div className="card">
@@ -228,16 +253,16 @@ const CheckoutPage: React.FC = () => {
                     onClick={handleApplyDiscount}
                     variant="primary"
                     size="sm"
-                    disabled={!discountCode.trim()}
+                    disabled={!discountCode.trim() || checkDiscountMutation.isPending}
                   >
-                    Pakai
+                    {checkDiscountMutation.isPending ? "Memvalidasi..." : "Pakai"}
                   </Button>
                 </div>
               )}
-              {discountErrorMsg && (
-                <p className="text-danger text-xs mt-1">{discountErrorMsg}</p>
+              {(discountCheckError || discountErrorMsg) && (
+                <p className="text-danger text-xs mt-1">{discountCheckError || discountErrorMsg}</p>
               )}
-              {appliedCode && !discountErrorMsg && (
+              {appliedCode && !discountCheckError && !discountErrorMsg && (
                 <p className="text-success text-xs mt-1">Diskon {appliedCode} berhasil diterapkan!</p>
               )}
             </div>

@@ -3,8 +3,9 @@ import {
   fetchDiscounts,
   createDiscount,
   deleteDiscount,
+  checkDiscount,
 } from "../api/discount.api";
-import type { DiscountInput } from "../../../types";
+import type { DiscountInput, DiscountCheck } from "../../../types";
 
 export const useDiscounts = () =>
   useQuery({
@@ -47,3 +48,11 @@ export const useDeleteDiscount = () => {
     },
   });
 };
+
+export const useCheckDiscount = (code: string, enabled = true) =>
+  useQuery({
+    queryKey: ["discount", "check", code],
+    queryFn: () => checkDiscount(code),
+    enabled: enabled && !!code?.trim(),
+    retry: false,
+  });
