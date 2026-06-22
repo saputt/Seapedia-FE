@@ -20,8 +20,8 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
   const location = useLocation();
 
   const isDriver = location.pathname.startsWith("/dashboard/driver");
-  const { data: availableJobs } = (isDriver ? useAvailableJobs() : { data: undefined }) as any;
-  const availableCount = availableJobs?.length ?? 0;
+  const { data: availableJobs } = useAvailableJobs();
+  const availableCount = isDriver ? (availableJobs?.length ?? 0) : 0;
 
   const handleOpenMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(true);
