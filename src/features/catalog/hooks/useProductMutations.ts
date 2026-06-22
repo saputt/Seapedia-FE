@@ -50,7 +50,35 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (productId: string) => deleteProduct(productId),
-    onSuccess: () => {
+    onMutate: async (productId) => {
+      const queryKeys = queryClient.getQueryCache().findAll({ queryKey: ["sellerProducts"] });
+      const previousStates = queryKeys.map((q) => ({ queryKey: q.queryKey, data: q.state.data }));
+      await queryClient.cancelQueries({ queryKey: ["sellerProducts"] });
+      queryKeys.forEach((q) => {
+        queryClient.setQueryData(q.queryKey, (old: any) => {
+          if (!old) return old;
+          const pages = old.pages
+            ? { ...old, pages: old.pages.map((page: any) => ({
+                ...page,
+                products: page.products?.filter((p: any) => p.id !== productId),
+                data: page.data?.filter((p: any) => p.id !== productId),
+              }))}
+            : Array.isArray(old)
+              ? old.filter((p: any) => p.id !== productId)
+              : old;
+          return pages;
+        });
+      });
+      return { previousStates };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousStates) {
+        context.previousStates.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
     },
   });
