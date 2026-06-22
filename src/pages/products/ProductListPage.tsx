@@ -228,7 +228,7 @@ const ProductListPage: React.FC = () => {
 
         {hasActiveFilter && (
           <div className="flex gap-8">
-            <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6`}>
+            <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6 sticky top-[88px] self-start`}>
               <ProductFilterSidebar
                 categoryFilter={categoryFilter}
                 sortByParam={sortByParam}
