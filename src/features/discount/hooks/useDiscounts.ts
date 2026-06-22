@@ -26,7 +26,23 @@ export const useDeleteDiscount = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteDiscount(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["discounts"] });
+      const previous = queryClient.getQueryData(["discounts"]);
+      queryClient.setQueryData(["discounts"], (old: any) => {
+        if (!old) return old;
+        if (Array.isArray(old)) return old.filter((d: any) => d.id !== id);
+        if (old.pages) return { ...old, pages: old.pages.map((p: any) => ({ ...p, data: p.data?.filter((d: any) => d.id !== id) })) };
+        return old;
+      });
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["discounts"], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
     },
   });
