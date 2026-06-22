@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useSellerProducts, useDeleteProduct } from "../../../features/catalog/hooks/useProductMutations";
 import { useNavigate } from "react-router-dom";
+import useDebounce from "../../../shared/hooks/useDebounce";
 import Button from "../../../shared/components/ui/Button";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -11,12 +12,13 @@ import type { Product, ProductCategory } from "../../../types";
 const ProductManagementPage: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const [categoryFilter, setCategoryFilter] = useState<ProductCategory | "ALL">("ALL");
   const [deleteTarget, setDeleteTarget] = useState<Pick<Product, "id" | "name"> | null>(null);
   const [successModal, setSuccessModal] = useState<{ open: boolean; message: string }>({ open: false, message: "" });
 
   const { data: store } = useMyStore() as any;
-  const { data: productsData, isLoading } = useSellerProducts(store?.id ?? "", search) as any;
+  const { data: productsData, isLoading } = useSellerProducts(store?.id ?? "", debouncedSearch) as any;
   const deleteMutation = useDeleteProduct();
 
   const allProducts = productsData?.products || [];
