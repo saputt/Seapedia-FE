@@ -2,10 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, updateProfile, changePassword } from "../api/user.api";
 import useAuthStore from "../../auth/store/authStore";
 
-export const useProfile = () =>
+export const useProfile = (options = {}) =>
   useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
+    ...options,
   });
 
 export const useUpdateProfile = () => {

@@ -122,7 +122,23 @@ const ProductDetailPage: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && !isError && product && (
+        {!isLoading && !isError && product && (product as any).isHidden && (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🙈</div>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">Produk Disembunyikan</h2>
+            <p className="text-text-secondary text-lg mb-6 max-w-md mx-auto leading-relaxed">
+              Produk ini telah disembunyikan oleh admin dan tidak dapat diakses oleh pembeli.
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-deep text-white font-semibold rounded-lg hover:bg-brand-mid transition-colors border-[3px] border-brand-deep shadow-[4px_4px_0_0_var(--color-brand-deep)]"
+            >
+              Lihat Produk Lainnya
+            </Link>
+          </div>
+        )}
+
+        {!isLoading && !isError && product && !(product as any).isHidden && (
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left Column - Image and Product Info */}
             <div className="flex-1">

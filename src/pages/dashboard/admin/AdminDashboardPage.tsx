@@ -30,10 +30,11 @@ const AdminDashboardPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard Admin</h1>
       <p className="text-sm text-text-muted mb-6">Ringkasan sistem Seapedia</p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
         <StatCard label="Pengguna" value={stats?.totalUsers} color="text-brand-deep" />
         <StatCard label="Toko" value={stats?.totalStores} color="text-info" />
         <StatCard label="Produk" value={stats?.totalProducts} color="text-warning" />
+        <StatCard label="Driver" value={stats?.totalDrivers} color="text-danger" />
         <StatCard label="Pesanan" value={stats?.totalOrders} color="text-text-primary" />
       </div>
 

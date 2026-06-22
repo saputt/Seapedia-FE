@@ -12,6 +12,15 @@ export const getAdminStores = (page = 1, limit = 20): Promise<PaginatedResponse<
 export const getAdminProducts = (page = 1, limit = 20): Promise<PaginatedResponse<any>> =>
   apiFetch(`admin/products?page=${page}&limit=${limit}`);
 
+export const getAdminDrivers = (page = 1, limit = 20): Promise<PaginatedResponse<any>> =>
+  apiFetch(`admin/drivers?page=${page}&limit=${limit}`);
+
+export const toggleDriverSuspend = (id: string, reason?: string): Promise<any> =>
+  apiFetch(`admin/drivers/${id}/toggle-suspend`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason }),
+  });
+
 export const toggleStoreActive = (id: string, reason?: string): Promise<any> =>
   apiFetch(`admin/stores/${id}/toggle-active`, {
     method: "PATCH",

@@ -38,6 +38,8 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string;
+  isSuspended?: boolean;
+  suspensionReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -291,6 +293,7 @@ export interface AdminDashboard {
   totalOrders: number;
   totalRevenue: number;
   activeUsers: number;
+  totalDrivers: number;
 }
 
 export interface SimulationStatus {
