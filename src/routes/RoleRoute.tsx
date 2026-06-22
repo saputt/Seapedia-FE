@@ -14,11 +14,18 @@ interface RoleRouteProps {
   role: string;
 }
 
+const activeRoleHome: Record<string, string> = {
+  BUYER: "/",
+  SELLER: "/dashboard/seller",
+  DRIVER: "/dashboard/driver",
+  ADMIN: "/dashboard/admin",
+};
+
 const RoleRoute = ({ children, role }: RoleRouteProps) => {
   const activeRole = useAuthStore((s) => s.activeRole);
 
   if (activeRole !== roleMap[role]) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={activeRole ? activeRoleHome[activeRole] : "/auth/login"} replace />;
   }
 
   return children;

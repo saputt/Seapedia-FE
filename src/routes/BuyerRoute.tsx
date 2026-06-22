@@ -12,6 +12,8 @@ const BuyerRoute = ({ children }: BuyerRouteProps) => {
     return <Navigate to="/dashboard/seller" replace />;
   } else if (activeRole === "DRIVER") {
     return <Navigate to="/dashboard/driver" replace />;
+  } else if (activeRole === "ADMIN") {
+    return <Navigate to="/dashboard/admin" replace />;
   }
 
   return children;
