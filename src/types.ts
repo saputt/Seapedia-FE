@@ -72,6 +72,7 @@ export interface Product {
   category: ProductCategory;
   storeId: string;
   store?: Store;
+  isHidden?: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: {

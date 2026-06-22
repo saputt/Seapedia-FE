@@ -9,8 +9,17 @@ const AdminProductsPage: React.FC = () => {
   const { data, isLoading, error } = useAdminProducts(page);
   const toggleHidden = useToggleProductHidden();
 
+  const [confirmTarget, setConfirmTarget] = useState<{ id: string; currentHidden: boolean } | null>(null);
+
   const products: any[] = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
+
+  const handleConfirm = () => {
+    if (!confirmTarget) return;
+    toggleHidden.mutate(confirmTarget.id, {
+      onSettled: () => setConfirmTarget(null),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -57,22 +66,18 @@ const AdminProductsPage: React.FC = () => {
                     <td className="py-2.5 pr-3 text-text-secondary">{p.stock}</td>
                     <td className="py-2.5 pr-3 text-text-secondary">{p._count?.orderItems ?? 0}</td>
                     <td className="py-2.5 pr-3">
-                      <span className={`text-xs font-bold ${p.isHidden ? "text-danger" : "text-success"}`}>
+                      <span className={`text-xs font-semibold ${p.isHidden ? "text-warning" : "text-success"}`}>
                         {p.isHidden ? "Tersembunyi" : "Tampil"}
                       </span>
                     </td>
                     <td className="py-2.5">
-                      <button
-                        onClick={() => toggleHidden.mutate(p.id)}
-                        disabled={toggleHidden.isPending}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border-2 transition-colors ${
-                          p.isHidden
-                            ? "border-success text-success hover:bg-success hover:text-white"
-                            : "border-warning text-warning hover:bg-warning hover:text-white"
-                        }`}
+                      <Button
+                        onClick={() => setConfirmTarget({ id: p.id, currentHidden: p.isHidden })}
+                        variant={p.isHidden ? "primary" : "ghost"}
+                        size="sm"
                       >
                         {p.isHidden ? "Tampilkan" : "Sembunyikan"}
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -93,6 +98,38 @@ const AdminProductsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {confirmTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setConfirmTarget(null)}>
+          <div className="card max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+            {confirmTarget.currentHidden ? (
+              <>
+                <div className="text-5xl mb-4">✅</div>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Tampilkan Produk</h3>
+                <p className="text-text-secondary mb-6 leading-relaxed">
+                  Produk ini akan tampil kembali dan bisa dilihat oleh pembeli.
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button onClick={() => setConfirmTarget(null)} variant="ghost" size="sm">Batal</Button>
+                  <Button onClick={handleConfirm} variant="primary" size="sm" loading={toggleHidden.isPending}>Tampilkan</Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl mb-4">🙈</div>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Sembunyikan Produk</h3>
+                <p className="text-text-secondary mb-6 leading-relaxed">
+                  Produk ini akan disembunyikan dari semua pembeli.
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button onClick={() => setConfirmTarget(null)} variant="ghost" size="sm">Batal</Button>
+                  <Button onClick={handleConfirm} variant="ghost" size="sm" loading={toggleHidden.isPending}>Sembunyikan</Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

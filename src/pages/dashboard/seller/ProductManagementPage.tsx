@@ -108,6 +108,7 @@ const ProductManagementPage: React.FC = () => {
                   <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4">Kategori</th>
                   <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4">Harga</th>
                   <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4">Stok</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide pb-3 pr-4">Status</th>
                   <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide pb-3">Aksi</th>
                 </tr>
               </thead>
@@ -145,6 +146,15 @@ const ProductManagementPage: React.FC = () => {
                       <span className={`text-sm font-medium ${product.stock > 0 ? "text-success" : "text-danger"}`}>
                         {product.stock}
                       </span>
+                    </td>
+                    <td className="py-3 pr-4">
+                      {(product as any).isHidden ? (
+                        <span className="text-xs font-bold text-warning bg-bg-tertiary px-2 py-0.5 rounded">
+                          Disuspen
+                        </span>
+                      ) : (
+                        <span className="text-xs text-text-muted">-</span>
+                      )}
                     </td>
                     <td className="py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -188,9 +198,16 @@ const ProductManagementPage: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-text-primary truncate">{product.name}</p>
-                    <span className="text-[10px] bg-brand-subtle text-text-primary px-1.5 py-0.5 rounded font-medium">
-                      {CATEGORY_SHORT[product.category] || product.category}
-                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] bg-brand-subtle text-text-primary px-1.5 py-0.5 rounded font-medium">
+                        {CATEGORY_SHORT[product.category] || product.category}
+                      </span>
+                      {(product as any).isHidden && (
+                        <span className="text-[10px] font-bold text-warning bg-bg-tertiary px-1.5 py-0.5 rounded">
+                          Disuspen
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-bold text-text-primary">Rp{product.price?.toLocaleString("id-ID")}</p>

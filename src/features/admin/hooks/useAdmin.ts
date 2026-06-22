@@ -38,7 +38,7 @@ export const useAdminOrders = (page = 1) =>
 export const useToggleStoreActive = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => toggleStoreActive(id),
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) => toggleStoreActive(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "stores"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });

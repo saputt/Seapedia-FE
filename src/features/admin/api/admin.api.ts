@@ -12,8 +12,11 @@ export const getAdminStores = (page = 1, limit = 20): Promise<PaginatedResponse<
 export const getAdminProducts = (page = 1, limit = 20): Promise<PaginatedResponse<any>> =>
   apiFetch(`admin/products?page=${page}&limit=${limit}`);
 
-export const toggleStoreActive = (id: string): Promise<any> =>
-  apiFetch(`admin/stores/${id}/toggle-active`, { method: "PATCH" });
+export const toggleStoreActive = (id: string, reason?: string): Promise<any> =>
+  apiFetch(`admin/stores/${id}/toggle-active`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason }),
+  });
 
 export const toggleProductHidden = (id: string): Promise<any> =>
   apiFetch(`admin/products/${id}/toggle-hidden`, { method: "PATCH" });

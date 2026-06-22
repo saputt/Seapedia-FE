@@ -9,8 +9,19 @@ const AdminStoresPage: React.FC = () => {
   const { data, isLoading, error } = useAdminStores(page);
   const toggleActive = useToggleStoreActive();
 
+  const [confirmTarget, setConfirmTarget] = useState<{ id: string; currentActive: boolean } | null>(null);
+  const [reason, setReason] = useState("");
+
   const stores: any[] = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
+
+  const handleConfirm = () => {
+    if (!confirmTarget) return;
+    toggleActive.mutate(
+      { id: confirmTarget.id, reason: confirmTarget.currentActive ? reason : undefined },
+      { onSettled: () => { setConfirmTarget(null); setReason(""); } },
+    );
+  };
 
   if (isLoading) {
     return (
@@ -55,22 +66,18 @@ const AdminStoresPage: React.FC = () => {
                     <td className="py-2.5 pr-3 text-text-secondary">{s._count?.products ?? 0}</td>
                     <td className="py-2.5 pr-3 text-text-secondary">{s._count?.orders ?? 0}</td>
                     <td className="py-2.5 pr-3">
-                      <span className={`text-xs font-bold ${s.isActive ? "text-success" : "text-danger"}`}>
+                      <span className={`text-xs font-semibold ${s.isActive ? "text-success" : "text-danger"}`}>
                         {s.isActive ? "Aktif" : "Nonaktif"}
                       </span>
                     </td>
                     <td className="py-2.5">
-                      <button
-                        onClick={() => toggleActive.mutate(s.id)}
-                        disabled={toggleActive.isPending}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border-2 transition-colors ${
-                          s.isActive
-                            ? "border-danger text-danger hover:bg-danger hover:text-white"
-                            : "border-success text-success hover:bg-success hover:text-white"
-                        }`}
+                      <Button
+                        onClick={() => setConfirmTarget({ id: s.id, currentActive: s.isActive })}
+                        variant={s.isActive ? "danger" : "primary"}
+                        size="sm"
                       >
                         {s.isActive ? "Nonaktifkan" : "Aktifkan"}
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -91,6 +98,52 @@ const AdminStoresPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {confirmTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setConfirmTarget(null)}>
+          <div className="card max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+            {confirmTarget.currentActive ? (
+              <>
+                <div className="text-5xl mb-4">⛔</div>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Nonaktifkan Toko</h3>
+                <p className="text-text-secondary mb-4 leading-relaxed">
+                  Yakin ingin menonaktifkan toko ini? Produk dari toko ini tidak akan tampil di pembeli.
+                </p>
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Alasan penonaktifan (opsional)"
+                  className="input-neo w-full mb-4 min-h-[80px] resize-y text-sm"
+                />
+                <div className="flex items-center justify-center gap-3">
+                  <Button onClick={() => { setConfirmTarget(null); setReason(""); }} variant="ghost" size="sm">
+                    Batal
+                  </Button>
+                  <Button onClick={handleConfirm} variant="danger" size="sm" loading={toggleActive.isPending}>
+                    Nonaktifkan
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl mb-4">✅</div>
+                <h3 className="text-xl font-bold text-text-primary mb-2">Aktifkan Toko</h3>
+                <p className="text-text-secondary mb-6 leading-relaxed">
+                  Toko ini akan aktif kembali dan produknya akan tampil di pembeli.
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button onClick={() => setConfirmTarget(null)} variant="ghost" size="sm">
+                    Batal
+                  </Button>
+                  <Button onClick={handleConfirm} variant="primary" size="sm" loading={toggleActive.isPending}>
+                    Aktifkan
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };
