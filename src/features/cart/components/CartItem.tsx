@@ -55,12 +55,15 @@ const CartItem = ({ item, busy, onUpdateQty, onRemove }: CartItemProps) => {
     </button>
   );
 
+  const stock = product?.stock ?? 0;
+  const isAtMax = quantity >= stock;
+
   const QuantityControl = () => (
     <div className="flex items-center gap-2">
       <button
         onClick={() => onUpdateQty(item.productId, quantity - 1)}
         disabled={busy || quantity <= 1}
-        className="w-8 h-8 border-[2px] border-brand-deep rounded text-brand-deep font-bold text-lg flex items-center justify-center hover:bg-brand-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-8 h-8 border-[2px] border-brand-deep rounded font-bold text-lg flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 hover:bg-brand-subtle"
       >
         &minus;
       </button>
@@ -69,8 +72,12 @@ const CartItem = ({ item, busy, onUpdateQty, onRemove }: CartItemProps) => {
       </span>
       <button
         onClick={() => onUpdateQty(item.productId, quantity + 1)}
-        disabled={busy}
-        className="w-8 h-8 border-[2px] border-brand-deep rounded text-brand-deep font-bold text-lg flex items-center justify-center hover:bg-brand-subtle transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled={busy || isAtMax}
+        className={`w-8 h-8 border-[2px] rounded font-bold text-lg flex items-center justify-center transition-all disabled:cursor-not-allowed hover:bg-brand-subtle ${
+          isAtMax
+            ? "border-gray-300 text-gray-400 bg-gray-100 opacity-60"
+            : "border-brand-deep text-brand-deep"
+        }`}
       >
         +
       </button>

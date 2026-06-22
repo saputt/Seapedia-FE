@@ -24,15 +24,21 @@ export const useUpdateCartItem = () => {
   return useMutation({
     mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
       updateCartItem(productId, quantity),
-    onSuccess: (updated, { productId }) => {
-      const currentItems = useCartStore.getState().items;
+    onMutate: async ({ productId, quantity }) => {
+      const previous = useCartStore.getState().items;
       setItems(
-        currentItems.map((item) =>
+        previous.map((item) =>
           item.productId === productId
-            ? { ...item, quantity: updated.quantity }
+            ? { ...item, quantity }
             : item
         )
       );
+      return { previous };
+    },
+    onError: (_err, { productId }, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -42,9 +48,15 @@ export const useRemoveCartItem = () => {
 
   return useMutation({
     mutationFn: (productId: string) => removeCartItem(productId),
-    onSuccess: (_data, productId) => {
-      const currentItems = useCartStore.getState().items;
-      setItems(currentItems.filter((item) => item.productId !== productId));
+    onMutate: async (productId) => {
+      const previous = useCartStore.getState().items;
+      setItems(previous.filter((item) => item.productId !== productId));
+      return { previous };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -54,8 +66,15 @@ export const useClearCart = () => {
 
   return useMutation({
     mutationFn: () => clearCart(),
-    onSuccess: () => {
+    onMutate: async () => {
+      const previous = useCartStore.getState().items;
       setItems([]);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -66,9 +85,9 @@ export const useClearAndAddToCart = () => {
   const hideBadge = useCartStore((s) => s.hideBadge);
 
   return useMutation({
-    mutationFn: async (productId: string) => {
+    mutationFn: async ({ productId, quantity = 1 }: { productId: string; quantity?: number }) => {
       await clearCart();
-      return addToCart(productId, 1);
+      return addToCart(productId, quantity);
     },
     onSuccess: async () => {
       try {
