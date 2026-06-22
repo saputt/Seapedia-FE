@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useAdminStores, useToggleStoreActive } from "../../../features/admin/hooks/useAdmin";
+import useDebounce from "../../../shared/hooks/useDebounce";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
@@ -11,9 +12,21 @@ const AdminStoresPage: React.FC = () => {
 
   const [confirmTarget, setConfirmTarget] = useState<{ id: string; currentActive: boolean } | null>(null);
   const [reason, setReason] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
 
   const stores: any[] = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
+
+  const filteredStores = useMemo(() => {
+    if (!debouncedSearch.trim()) return stores;
+    const q = debouncedSearch.toLowerCase();
+    return stores.filter(
+      (s) =>
+        s.storeName?.toLowerCase().includes(q) ||
+        s.user?.username?.toLowerCase().includes(q),
+    );
+  }, [stores, debouncedSearch]);
 
   const handleConfirm = () => {
     if (!confirmTarget) return;
@@ -42,9 +55,19 @@ const AdminStoresPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Toko</h1>
       <p className="text-sm text-text-muted mb-6">Daftar seluruh toko di Seapedia</p>
 
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Cari berdasarkan nama toko atau pemilik..."
+        className="input-neo w-full max-w-sm mb-4"
+      />
+
       <div className="card">
-        {stores.length === 0 ? (
-          <p className="text-sm text-text-secondary text-center py-6">Belum ada toko.</p>
+        {filteredStores.length === 0 ? (
+          <p className="text-sm text-text-secondary text-center py-6">
+            {search ? "Tidak ditemukan toko." : "Belum ada toko."}
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -59,7 +82,7 @@ const AdminStoresPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {stores.map((s: any) => (
+                {filteredStores.map((s: any) => (
                   <tr key={s.id} className="border-b border-border hover:bg-brand-subtle transition-colors">
                     <td className="py-2.5 pr-3 font-medium text-text-primary">{s.storeName}</td>
                     <td className="py-2.5 pr-3 text-text-secondary">{s.user?.username || "-"}</td>
@@ -86,7 +109,7 @@ const AdminStoresPage: React.FC = () => {
           </div>
         )}
 
-        {totalPages > 1 && (
+        {!search && totalPages > 1 && (
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
             <Button onClick={() => setPage((p) => Math.max(1, p - 1))} variant="ghost" disabled={page <= 1}>
               Sebelumnya
