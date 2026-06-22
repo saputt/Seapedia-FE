@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useAdminUsers } from "../../../features/admin/hooks/useAdmin";
+import useDebounce from "../../../shared/hooks/useDebounce";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
@@ -7,20 +8,21 @@ import Button from "../../../shared/components/ui/Button";
 const AdminUsersPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const { data, isLoading, error } = useAdminUsers(page);
 
   const users: any[] = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
 
   const filteredUsers = useMemo(() => {
-    if (!search.trim()) return users;
-    const q = search.toLowerCase();
+    if (!debouncedSearch.trim()) return users;
+    const q = debouncedSearch.toLowerCase();
     return users.filter(
       (u) =>
         u.username?.toLowerCase().includes(q) ||
         u.email?.toLowerCase().includes(q),
     );
-  }, [users, search]);
+  }, [users, debouncedSearch]);
 
   if (isLoading) {
     return (
