@@ -7,7 +7,7 @@ import Button from "./Button";
 const StoreDeactivatedModal = () => {
   const navigate = useNavigate();
   const activeRole = useAuthStore((s) => s.activeRole);
-  const { data: store } = useMyStore() as any;
+  const { data: store } = useMyStore({ refetchInterval: 8000 }) as any;
   const switchRole = useSwitchRole();
 
   if (activeRole !== "SELLER") return null;
