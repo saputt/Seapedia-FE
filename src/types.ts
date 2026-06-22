@@ -86,10 +86,11 @@ export interface ProductFilters {
   limit?: number;
   search?: string;
   storeId?: string;
-  category?: ProductCategory;
-  minPrice?: number;
-  maxPrice?: number;
+  category?: string;
+  minPrice?: number | string;
+  maxPrice?: number | string;
   sortBy?: string;
+  showHidden?: boolean;
 }
 
 export interface ProductInput {

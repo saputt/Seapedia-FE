@@ -10,6 +10,7 @@ export const getAllProducts = ({
   minPrice,
   maxPrice,
   sortBy,
+  showHidden,
 }: ProductFilters = {}): Promise<PaginatedResponse<Product>> => {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (search) params.set("search", search);
@@ -18,6 +19,7 @@ export const getAllProducts = ({
   if (minPrice !== undefined) params.set("minPrice", String(minPrice));
   if (maxPrice !== undefined) params.set("maxPrice", String(maxPrice));
   if (sortBy) params.set("sortBy", sortBy);
+  if (showHidden) params.set("showHidden", "true");
   return apiFetch(`products?${params.toString()}`);
 };
 

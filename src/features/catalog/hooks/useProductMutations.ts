@@ -5,7 +5,7 @@ import { apiFetch } from "../../../api/client";
 export const useSellerProducts = (storeId: string, search = "") =>
   useQuery({
     queryKey: ["sellerProducts", storeId, search],
-    queryFn: () => getAllProducts({ storeId, limit: 100, search }),
+    queryFn: () => getAllProducts({ storeId, limit: 100, search, showHidden: true }),
     enabled: !!storeId,
   });
 
