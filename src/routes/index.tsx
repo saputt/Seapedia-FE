@@ -9,6 +9,7 @@ import ComingSoon from "../shared/components/ui/ComingSoon";
 import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayout";
 import SellerRoute from "./SellerRoute";
+import DriverRoute from "./DriverRoute";
 import Spinner from "../shared/components/ui/Spinner";
 import ScrollToTop from "../shared/utils/ScrollToTop";
 import { sellerSidebarLinks, driverSidebarLinks, adminSidebarLinks } from "../shared/constants/sidebarLinks";
@@ -59,6 +60,7 @@ const DriverIncomePage = lazyLoad(() => import("../pages/dashboard/driver/Driver
 const AdminDashboardPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDashboardPage"));
 const AdminUsersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminUsersPage"));
 const AdminStoresPage = lazyLoad(() => import("../pages/dashboard/admin/AdminStoresPage"));
+const AdminDriversPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDriversPage"));
 const AdminProductsPage = lazyLoad(() => import("../pages/dashboard/admin/AdminProductsPage"));
 const AdminOrdersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminOrdersPage"));
 const AdminDiscountsPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDiscountsPage"));
@@ -227,7 +229,7 @@ const AppRoutes = () => {
         path="/dashboard/driver"
         element={
           <PrivateRoute>
-            <RoleRoute role="driver">
+            <DriverRoute>
               <DashboardLayout
                 navbarVariant="seller"
                 sidebarTitle="Driver"
@@ -235,7 +237,7 @@ const AppRoutes = () => {
                 sidebarLinks={driverSidebarLinks}
                 mobileNav="bottom-tabs"
               />
-            </RoleRoute>
+            </DriverRoute>
           </PrivateRoute>
         }
       >
@@ -264,6 +266,7 @@ const AppRoutes = () => {
         <Route index element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
         <Route path="stores" element={<AdminStoresPage />} />
+        <Route path="drivers" element={<AdminDriversPage />} />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="discounts" element={<AdminDiscountsPage />} />
