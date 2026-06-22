@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addToCart, updateCartItem, removeCartItem, clearCart } from "../api/cart.api";
+import { addToCart, updateCartItem, removeCartItem } from "../api/cart.api";
 import useCartStore from "../store/cartStore";
 
 const CART_QUERY_KEY = ["cart"];
@@ -9,8 +9,22 @@ export const useAddToCart = () => {
   const refreshCart = useCartStore((s) => s.refreshCart);
 
   return useMutation({
+    mutationFn: ({ productId, quantity = 1, force = false }: { productId: string; quantity?: number; force?: boolean }) =>
+      addToCart(productId, quantity, force),
+    onSuccess: () => {
+      refreshCart();
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+    },
+  });
+};
+
+export const useAddToCartWithForce = () => {
+  const queryClient = useQueryClient();
+  const refreshCart = useCartStore((s) => s.refreshCart);
+
+  return useMutation({
     mutationFn: ({ productId, quantity = 1 }: { productId: string; quantity?: number }) =>
-      addToCart(productId, quantity),
+      addToCart(productId, quantity, true),
     onSuccess: () => {
       refreshCart();
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
@@ -85,16 +99,12 @@ export const useClearAndAddToCart = () => {
   const hideBadge = useCartStore((s) => s.hideBadge);
 
   return useMutation({
+    // Force add clears the cart on the backend before adding the new item
     mutationFn: async ({ productId, quantity = 1 }: { productId: string; quantity?: number }) => {
-      await clearCart();
-      return addToCart(productId, quantity);
+      return addToCart(productId, quantity, true);
     },
     onSuccess: async () => {
-      try {
-        await refreshCart();
-      } catch {
-        // refreshCart already returns empty array on failure
-      }
+      await refreshCart();
       hideBadge();
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
     },

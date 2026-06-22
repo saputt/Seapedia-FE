@@ -1,10 +1,10 @@
 import { apiFetch } from "../../../api/client";
 import type { CartItem } from "../../../types";
 
-export const addToCart = (productId: string, quantity = 1): Promise<CartItem> =>
+export const addToCart = (productId: string, quantity = 1, force = false): Promise<CartItem> =>
   apiFetch(`cart/${productId}`, {
     method: "POST",
-    body: JSON.stringify({ quantity }),
+    body: JSON.stringify({ quantity, force }),
   });
 
 export const fetchCart = (): Promise<CartItem[]> => apiFetch("cart");
