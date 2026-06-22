@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
-import Spinner from "../../shared/components/ui/Spinner";
 import AddressSelector from "../../features/order/components/AddressSelector";
+import CheckoutShippingSelector from "../../features/checkout/components/CheckoutShippingSelector";
+import CheckoutSummaryCard from "../../features/checkout/components/CheckoutSummaryCard";
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
 import { useCheckoutOrder } from "../../features/order/hooks/useOrders";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
-import { SHIPPING_LIST } from "../../shared/constants/order";
 import type { Address } from "../../types";
 
 const CheckoutPage: React.FC = () => {
@@ -242,89 +242,19 @@ const CheckoutPage: React.FC = () => {
               )}
             </div>
 
-            {/* Shipping */}
-            <div className="card relative">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Metode Pengiriman
-              </h2>
-              <div className="space-y-2">
-                {SHIPPING_LIST.map((s: { id: string; name: string; desc: string; price: number }) => (
-                  <label
-                    key={s.id}
-                    className={`flex items-center gap-3 px-3 py-2 rounded border-[2px] cursor-pointer transition-colors ${
-                      shippingMethod === s.id
-                        ? "border-brand-deep bg-brand-subtle"
-                        : "border-bg-tertiary hover:border-brand-light"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="shipping"
-                      value={s.id}
-                      checked={shippingMethod === s.id}
-                      onChange={() => setShippingMethod(s.id)}
-                      className="accent-brand-deep shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-primary">
-                        {s.name}
-                      </p>
-                      <p className="text-xs text-text-secondary">{s.desc}</p>
-                    </div>
-                    <p className="text-sm font-semibold text-text-primary shrink-0">
-                      Rp{s.price.toLocaleString("id-ID")}
-                    </p>
-                  </label>
-                ))}
-              </div>
+            <CheckoutShippingSelector
+              shippingMethod={shippingMethod}
+              isFetching={isFetching}
+              onChange={setShippingMethod}
+            />
 
-              {isFetching && (
-                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded">
-                  <Spinner />
-                </div>
-              )}
-            </div>
-
-            {/* Price Summary */}
-            <div className="card">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Ringkasan Pembayaran
-              </h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Subtotal</span>
-                  <span className="font-medium">
-                    Rp{subtotal.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                {discountValue > 0 && (
-                  <div className="flex justify-between text-success">
-                    <span>Diskon</span>
-                    <span className="font-medium">
-                      -Rp{discountValue.toLocaleString("id-ID")}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Ongkos Kirim</span>
-                  <span className="font-medium">
-                    Rp{shippingFee.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Pajak (12%)</span>
-                  <span className="font-medium">
-                    Rp{taxFee.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                <div className="border-t-[2px] border-bg-tertiary pt-2 flex justify-between text-base font-bold">
-                  <span>Total</span>
-                  <span className="text-brand-deep">
-                    Rp{totalPrice.toLocaleString("id-ID")}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <CheckoutSummaryCard
+              subtotal={subtotal}
+              discountValue={discountValue}
+              shippingFee={shippingFee}
+              taxFee={taxFee}
+              totalPrice={totalPrice}
+            />
 
             {/* Checkout Button */}
             {checkoutError && (
