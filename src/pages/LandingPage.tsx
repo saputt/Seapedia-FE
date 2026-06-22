@@ -11,8 +11,8 @@ const LandingPage: React.FC = () => {
     <MainLayout navbarVariant="default">
       <HeroSection />
       <AboutSection />
-      <WhySeaPediaSection />
       <HowItWorksSection />
+      <WhySeaPediaSection />
       <TestimonialSection />
     </MainLayout>
   );

@@ -27,12 +27,18 @@ const FaqAccordion = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border border-border-primary rounded-xl overflow-hidden">
+    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-200 ${
+      open ? "border-brand-deep" : "border-border-primary"
+    }`}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left bg-white hover:bg-bg-secondary transition-colors duration-200"
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left bg-white hover:bg-brand-subtle/30 transition-colors duration-200"
       >
-        <span className="font-semibold text-text-primary text-sm leading-snug">{q}</span>
+        <span className={`font-semibold text-sm leading-snug transition-colors duration-200 ${
+          open ? "text-brand-deep" : "text-text-primary"
+        }`}>
+          {q}
+        </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
@@ -49,7 +55,7 @@ const FaqAccordion = ({ q, a }: { q: string; a: string }) => {
         </svg>
       </button>
       {open && (
-        <div className="px-5 pb-4 pt-0 text-text-secondary text-sm leading-relaxed">
+        <div className="px-5 pb-4 pt-0 text-text-secondary text-sm leading-relaxed border-t-2 border-brand-deep/20">
           {a}
         </div>
       )}
@@ -58,21 +64,35 @@ const FaqAccordion = ({ q, a }: { q: string; a: string }) => {
 };
 
 const WhySeaPediaSection = () => (
-  <section className="py-16 md:py-20 bg-bg-secondary">
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
-      <div className="text-center mb-12">
-        <h2 className="text-[2rem] font-bold text-text-primary">
-          Kenapa <span className="text-brand-deep">SEAPEDIA</span>?
-        </h2>
-        <p className="mt-3 text-text-secondary text-lg">
-          Jawaban untuk pertanyaan yang mungkin kamu cari
-        </p>
-      </div>
+  <section className="py-16 md:py-20 relative overflow-hidden">
+    <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-subtle rounded-full opacity-40 pointer-events-none" />
 
-      <div className="max-w-2xl mx-auto space-y-3">
-        {faqItems.map((item, i) => (
-          <FaqAccordion key={i} q={item.q} a={item.a} />
-        ))}
+    <div className="max-w-[1280px] mx-auto px-6 lg:px-8 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
+        <div className="lg:col-span-2">
+          <div className="w-12 h-1.5 bg-brand-deep rounded-full mb-5" />
+          <h2 className="text-[2rem] font-bold text-text-primary leading-tight">
+            Kenapa{" "}
+            <span className="text-brand-deep">SEAPEDIA</span>?
+          </h2>
+          <p className="mt-4 text-text-secondary leading-relaxed">
+            Jawaban untuk pertanyaan yang mungkin kamu cari sebelum
+            memulai pengalaman belanja bersama kami.
+          </p>
+          <div className="mt-6 p-4 bg-brand-subtle/40 rounded-xl border border-brand-deep/10">
+            <p className="text-sm text-text-secondary leading-relaxed">
+              <span className="font-semibold text-brand-deep">Masih punya pertanyaan?</span>
+              <br />
+              Jangan ragu untuk menghubungi tim kami. Kami siap membantu kamu.
+            </p>
+          </div>
+        </div>
+
+        <div className="lg:col-span-3 space-y-3">
+          {faqItems.map((item, i) => (
+            <FaqAccordion key={i} q={item.q} a={item.a} />
+          ))}
+        </div>
       </div>
     </div>
   </section>
