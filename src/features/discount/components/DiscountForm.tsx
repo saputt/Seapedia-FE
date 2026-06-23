@@ -1,14 +1,8 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/components/ui/Button";
-
-interface DiscountFormState {
-  code: string;
-  type: string;
-  value: string;
-  isPercent: boolean;
-  maxUses: string;
-  expiredAt: string;
-}
+import Input from "../../../shared/components/ui/Input";
+import { discountSchema, type DiscountInput } from "@/shared/validations";
 
 interface DiscountSubmitData {
   code: string;
@@ -25,79 +19,91 @@ interface DiscountFormProps {
   onCancel: () => void;
 }
 
-const formInitial: DiscountFormState = { code: "", type: "PROMO", value: "", isPercent: false, maxUses: "", expiredAt: "" };
-
 const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
-  const [form, setForm] = useState<DiscountFormState>(formInitial);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<DiscountInput>({
+    resolver: zodResolver(discountSchema),
+    defaultValues: {
+      code: "",
+      type: "PROMO",
+      value: 0,
+      isPercent: false,
+      usageLimit: undefined,
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      userLimit: undefined,
+      applicableStores: [],
+      applicableProducts: [],
+    },
+  });
 
-  const handleSubmit = () => {
-    if (!form.code || !form.value || !form.expiredAt) return;
+  const onSubmitForm = (data: DiscountInput) => {
     onSubmit({
-      code: form.code,
-      type: form.type,
-      value: parseInt(form.value, 10),
-      isPercent: form.isPercent,
-      maxUses: form.maxUses ? parseInt(form.maxUses, 10) : null,
-      expiredAt: new Date(form.expiredAt).toISOString(),
+      code: data.code,
+      type: data.type,
+      value: data.value,
+      isPercent: data.isPercent,
+      maxUses: data.usageLimit ?? null,
+      expiredAt: data.endDate,
     });
   };
 
   return (
     <div className="card mb-6">
       <h3 className="text-sm font-bold text-text-primary mb-3">Buat Diskon Baru</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <input
-          type="text"
-          placeholder="Kode diskon"
-          value={form.code}
-          onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+      <form onSubmit={handleSubmit(onSubmitForm)} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Input
+          {...register("code")}
           className="input-neo w-full !text-sm !py-2"
+          placeholder="Kode diskon"
+          error={errors.code?.message}
         />
         <select
-          value={form.type}
-          onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+          {...register("type")}
           className="input-neo w-full !text-sm !py-2"
         >
           <option value="PROMO">Promo</option>
           <option value="VOUCHER">Voucher</option>
         </select>
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="Nilai diskon"
-          value={form.value}
-          onChange={(e) => setForm((f) => ({ ...f, value: e.target.value.replace(/[^0-9]/g, "") }))}
+        <Input
+          type="number"
+          {...register("value", { valueAsNumber: true })}
           className="input-neo w-full !text-sm !py-2"
+          placeholder="Nilai diskon"
+          min="1"
+          error={errors.value?.message}
         />
         <label className="flex items-center gap-2 text-sm text-text-secondary">
           <input
             type="checkbox"
-            checked={form.isPercent}
-            onChange={(e) => setForm((f) => ({ ...f, isPercent: e.target.checked }))}
+            {...register("isPercent")}
             className="accent-brand-deep"
           />
           Persentase
         </label>
-        <input
-          type="text"
-          inputMode="numeric"
+        <Input
+          type="number"
+          {...register("usageLimit", { valueAsNumber: true })}
+          className="input-neo w-full !text-sm !py-2"
           placeholder="Maks penggunaan (opsional)"
-          value={form.maxUses}
-          onChange={(e) => setForm((f) => ({ ...f, maxUses: e.target.value.replace(/[^0-9]/g, "") }))}
-          className="input-neo w-full !text-sm !py-2"
+          min="1"
         />
-        <input
+        <Input
           type="date"
-          value={form.expiredAt}
-          onChange={(e) => setForm((f) => ({ ...f, expiredAt: e.target.value }))}
+          {...register("endDate")}
           className="input-neo w-full !text-sm !py-2"
+          error={errors.endDate?.message}
         />
-      </div>
+      </form>
       <div className="flex items-center gap-3 mt-4">
-        <Button onClick={handleSubmit} variant="primary" loading={isPending}>
+        <Button type="submit" variant="primary" loading={isPending}>
           {isPending ? "Menyimpan..." : "Simpan"}
         </Button>
-        <Button onClick={onCancel} variant="ghost">
+        <Button type="button" onClick={onCancel} variant="ghost">
           Batal
         </Button>
       </div>

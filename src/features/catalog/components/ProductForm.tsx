@@ -1,8 +1,11 @@
 import { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
+import Input from "../../../shared/components/ui/Input";
 import ImageUpload from "../../../shared/components/ui/ImageUpload";
 import CategoryPicker from "../../../shared/components/ui/CategoryPicker";
 import type { ProductInput, ProductCategory } from "../../../types";
+import { useZodForm } from "@/shared/hooks/useZodForm";
+import { productSchema, type ProductInput as ProductInputType } from "@/shared/validations";
 
 interface ProductFormProps {
   initialData?: ProductInput | null;
@@ -21,27 +24,38 @@ const ProductForm = ({
   pendingLabel = "Menyimpan...",
   onCancel,
 }: ProductFormProps) => {
-  const [name, setName] = useState<string>(initialData?.name || "");
-  const [description, setDescription] = useState<string>(initialData?.description || "");
-  const [price, setPrice] = useState<string>(initialData?.price?.toString() || "");
-  const [stock, setStock] = useState<string>(initialData?.stock?.toString() || "");
-  const [category, setCategory] = useState<ProductCategory>(initialData?.category || "HOBBY");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.imageUrl || null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useZodForm(productSchema, {
+    name: initialData?.name || "",
+    description: initialData?.description || "",
+    price: initialData?.price?.toString() || "",
+    stock: initialData?.stock?.toString() || "",
+    category: initialData?.category || "HOBBY",
+    images: initialData?.imageUrl ? [initialData.imageUrl] : [],
+  });
 
   const handleImageChange = (file: File) => {
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    // Update images array in form
+    setValue("images", [URL.createObjectURL(file)]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmitForm = (data: ProductInputType) => {
     const payload: ProductInput = {
-      name: name.trim(),
-      description: description.trim(),
-      price: parseInt(price, 10),
-      stock: parseInt(stock, 10),
-      category,
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      stock: data.stock,
+      category: data.category,
     };
 
     if (imageFile) {
@@ -55,61 +69,60 @@ const ProductForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmitForm)}>
       <div className="flex gap-8 flex-col md:flex-row">
         <ImageUpload preview={imagePreview} onChange={handleImageChange} />
 
         <div className="flex-1 space-y-4">
           <div>
             <label className="block text-text-secondary font-medium text-sm mb-1">Nama Produk</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+            <Input
+              {...register("name")}
               className="input-neo w-full"
               placeholder="Nama produk"
-              required
+              error={errors.name?.message}
             />
           </div>
           <div>
             <label className="block text-text-secondary font-medium text-sm mb-1">Deskripsi</label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register("description")}
               className="input-neo w-full resize-none h-20"
               placeholder="Deskripsi produk"
-              required
             />
+            {errors.description && <p className="text-danger text-sm mt-1">{errors.description.message}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-text-secondary font-medium text-sm mb-1">Harga (Rp)</label>
-              <input
+              <Input
                 type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                {...register("price", { valueAsNumber: true })}
                 className="input-neo w-full"
                 placeholder="50000"
-                min="0"
-                required
+                min="100"
+                error={errors.price?.message}
               />
             </div>
             <div>
               <label className="block text-text-secondary font-medium text-sm mb-1">Stok</label>
-              <input
+              <Input
                 type="number"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                {...register("stock", { valueAsNumber: true })}
                 className="input-neo w-full"
                 placeholder="10"
                 min="0"
-                required
+                error={errors.stock?.message}
               />
             </div>
           </div>
           <div>
             <label className="block text-text-secondary font-medium text-sm mb-1">Kategori</label>
-            <CategoryPicker value={category} onChange={setCategory} />
+            <CategoryPicker
+              value={watch("category")}
+              onChange={(val) => setValue("category", val)}
+            />
+            {errors.category && <p className="text-danger text-sm mt-1">{errors.category.message}</p>}
           </div>
 
           <div className="flex gap-3 pt-2">
