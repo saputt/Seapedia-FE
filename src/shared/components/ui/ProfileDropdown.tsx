@@ -5,6 +5,7 @@ import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./SwitchRoleModal";
 import AlertModal from "./AlertModal";
+import Avatar from "./Avatar";
 import type { RoleName } from "../../../types";
 
 const ProfileDropdown = () => {
@@ -90,9 +91,7 @@ const ProfileDropdown = () => {
           onClick={() => setDropdownOpen((prev) => !prev)}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-full bg-brand-deep text-white flex items-center justify-center text-sm font-bold">
-            {initial}
-          </div>
+          <Avatar src={user?.imageUrl} name={displayName} size="sm" />
           <span className="hidden sm:inline text-sm font-medium text-text-primary">
             {displayName}
           </span>

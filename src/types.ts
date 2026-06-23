@@ -6,6 +6,7 @@ export interface AuthUser {
   id: string;
   email: string;
   username: string;
+  imageUrl?: string | null;
 }
 
 export interface LoginResponse {
@@ -38,10 +39,15 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string;
+  imageUrl?: string | null;
   isSuspended?: boolean;
   suspensionReason?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UploadResponse {
+  url: string;
 }
 
 // ==================== Store ====================

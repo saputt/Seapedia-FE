@@ -9,6 +9,15 @@ export const updateProfile = (username: string): Promise<UserProfile> =>
     body: JSON.stringify({ username }),
   });
 
+export const uploadProfileImage = (file: File): Promise<UserProfile> => {
+  const fd = new FormData();
+  fd.append("file", file);
+  return apiFetch("user/profile/image", {
+    method: "PUT",
+    body: fd,
+  });
+};
+
 export const changePassword = (oldPassword: string, newPassword: string): Promise<void> =>
   apiFetch("user/password", {
     method: "PATCH",
