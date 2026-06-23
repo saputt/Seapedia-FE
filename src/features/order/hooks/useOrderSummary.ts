@@ -11,4 +11,5 @@ export const useOrderSummary = (
     queryFn: () => getOrderSummary({ items, discountCode, shippingMethod } as any),
     placeholderData: keepPreviousData,
     retry: false,
+    staleTime: 0,
   });

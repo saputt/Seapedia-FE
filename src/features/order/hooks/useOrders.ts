@@ -5,6 +5,7 @@ export const useBuyerOrders = () =>
   useQuery({
     queryKey: ["buyer-orders"],
     queryFn: getBuyerOrders,
+    staleTime: 0,
   });
 
 export const useCancelOrder = () => {
@@ -42,6 +43,7 @@ export const useSellerOrders = (params = {}) =>
   useQuery({
     queryKey: ["sellerOrders", params],
     queryFn: () => getSellerOrders(params),
+    staleTime: 0,
   });
 
 export const useUpdateOrderStatus = () => {
