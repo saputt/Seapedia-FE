@@ -77,13 +77,7 @@ const ProductDetailPage: React.FC = () => {
       return;
     }
     
-    clearAndAddMutation.mutate({ productId: productId!, quantity }, {
-      onSuccess: () => {
-        setShowStoreAlert(false);
-        navigate("/checkout");
-      },
-      onError: () => setAddError("Gagal menambahkan ke keranjang."),
-    });
+    navigate(`/checkout?buyNow=1&productId=${productId}&quantity=${quantity}`);
   };
 
   return (
@@ -235,7 +229,6 @@ const ProductDetailPage: React.FC = () => {
                     <QuantitySelector
                       quantity={quantity}
                       stock={product.stock}
-                      disabled={clearAndAddMutation.isPending}
                       onIncrease={() => setQuantity((prev) => Math.min(product.stock, prev + 1))}
                       onDecrease={() => setQuantity((prev) => Math.max(1, prev - 1))}
                     />
@@ -281,9 +274,9 @@ const ProductDetailPage: React.FC = () => {
                     size="lg"
                     fullWidth
                     onClick={handleBuyNow}
-                    disabled={!isLoggedIn || product.stock < 1 || quantity < 1 || clearAndAddMutation.isPending}
+                    disabled={!isLoggedIn || product.stock < 1 || quantity < 1}
                   >
-                    {clearAndAddMutation.isPending ? "Memproses..." : `Beli Sekarang (${quantity})`}
+                    {`Beli Sekarang (${quantity})`}
                   </Button>
                 </div>
               </div>

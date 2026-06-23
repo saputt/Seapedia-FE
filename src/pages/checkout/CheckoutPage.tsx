@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
@@ -15,6 +15,17 @@ import type { Address } from "../../types";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const directBuyItems = useMemo(() => {
+    const buyNow = searchParams.get("buyNow");
+    const productId = searchParams.get("productId");
+    const quantity = searchParams.get("quantity");
+    if (buyNow === "1" && productId) {
+      return [{ productId, quantity: Number(quantity) || 1 }];
+    }
+    return undefined;
+  }, [searchParams]);
 
   const [shippingMethod, setShippingMethod] = useState("REGULAR");
   const [discountCode, setDiscountCode] = useState("");
@@ -27,7 +38,7 @@ const CheckoutPage: React.FC = () => {
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  const { data: summaryData, isLoading, isFetching, error: summaryError, refetch } = useOrderSummary(appliedCode, shippingMethod);
+  const { data: summaryData, isLoading, isFetching, error: summaryError, refetch } = useOrderSummary(appliedCode, shippingMethod, directBuyItems);
   const summary = (summaryData as any)?.order ?? null;
   const orderToken = (summaryData as any)?.orderToken ?? null;
 
