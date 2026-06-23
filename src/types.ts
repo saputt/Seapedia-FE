@@ -272,6 +272,26 @@ export interface ReviewInput {
   comment: string;
 }
 
+export interface StoreReview {
+  id: string;
+  rating: number;
+  comment: string;
+  buyer: { id: string; username: string };
+  product: { id: string; name: string; imageUrl: string | null };
+  createdAt: string;
+}
+
+export interface StoreReviewStats {
+  reviewCount: number;
+  averageRating: number;
+}
+
+export interface StoreReviewsResponse {
+  reviews: StoreReview[];
+  total: number;
+  stats: StoreReviewStats;
+}
+
 // ==================== Driver ====================
 
 export interface DriverJob {
