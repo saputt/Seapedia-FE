@@ -21,7 +21,7 @@ const CreateStorePage: React.FC = () => {
   const createStoreMutation = useCreateStore();
 
   const onSubmitForm = (data: StoreInput) => {
-    createStoreMutation.mutate({ storeName: data.name.trim(), description: data.description.trim(), address: data.address?.trim() });
+    createStoreMutation.mutate({ storeName: data.name.trim(), description: data.description.trim(), address: data.address?.trim(), imageUrl: data.imageUrl || undefined });
   };
 
   if (isLoading) {

@@ -116,6 +116,7 @@ export const storeSchema = z.object({
   name: z.string().min(3, "Nama toko minimal 3 karakter").max(100),
   description: z.string().min(10, "Deskripsi minimal 10 karakter").max(1000),
   address: z.string().min(1, "Alamat toko wajib diisi").max(500).optional(),
+  imageUrl: z.string().optional(),
 });
 
 export type StoreInput = z.infer<typeof storeSchema>;

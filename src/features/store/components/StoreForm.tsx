@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
 import Input from "@/shared/components/ui/Input";
+import Avatar from "@/shared/components/ui/Avatar";
+import { uploadImage } from "@/api/upload";
 import { storeSchema, type StoreInput } from "@/shared/validations";
 
 interface StoreFormProps {
@@ -12,9 +15,13 @@ interface StoreFormProps {
 }
 
 export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel }: StoreFormProps) => {
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<StoreInput>({
     resolver: zodResolver(storeSchema),
@@ -22,12 +29,42 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
       name: "",
       description: "",
       address: "",
+      imageUrl: "",
       ...defaultValues,
     },
   });
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const result = await uploadImage(file);
+      setValue("imageUrl", result.url);
+      setImagePreview(result.url);
+    } catch {
+      /* ignore */
+    }
+    setUploading(false);
+  };
+
+  const handleFormSubmit = (data: StoreInput) => {
+    onSubmit(data);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+      <div className="flex items-center gap-4 mb-4">
+        <Avatar src={imagePreview} name={defaultValues?.name || "Toko"} size="lg" />
+        <div>
+          <label className="cursor-pointer text-sm text-brand-deep font-medium hover:underline">
+            {imagePreview ? "Ganti Foto" : "Tambah Foto"}
+            <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+          </label>
+          {uploading && <p className="text-xs text-text-muted mt-1">Mengupload...</p>}
+        </div>
+      </div>
+
       <Input
         {...register("name")}
         label="Nama Toko"

@@ -3,13 +3,14 @@ import Button from "../../../shared/components/ui/Button";
 import Input from "../../../shared/components/ui/Input";
 import ImageUpload from "../../../shared/components/ui/ImageUpload";
 import CategoryPicker from "../../../shared/components/ui/CategoryPicker";
+import { uploadImage } from "../../../api/upload";
 import type { ProductInput, ProductCategory } from "../../../types";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { productSchema, type ProductInput as ProductInputType } from "@/shared/validations";
 
 interface ProductFormProps {
   initialData?: ProductInput | null;
-  onSubmit: (data: ProductInput | FormData) => Promise<void>;
+  onSubmit: (data: ProductInput) => Promise<void>;
   isPending?: boolean;
   submitLabel?: string;
   pendingLabel?: string;
@@ -26,6 +27,7 @@ const ProductForm = ({
 }: ProductFormProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.imageUrl || null);
+  const [uploading, setUploading] = useState(false);
 
   const {
     register,
@@ -49,7 +51,7 @@ const ProductForm = ({
     setValue("images", [URL.createObjectURL(file)]);
   };
 
-  const onSubmitForm = (data: ProductInputType) => {
+  const onSubmitForm = async (data: ProductInputType) => {
     const payload: ProductInput = {
       name: data.name,
       description: data.description,
@@ -59,13 +61,16 @@ const ProductForm = ({
     };
 
     if (imageFile) {
-      const fd = new FormData();
-      Object.entries(payload).forEach(([key, val]) => fd.append(key, String(val)));
-      fd.append("image", imageFile);
-      onSubmit(fd);
-    } else {
-      onSubmit(payload);
+      setUploading(true);
+      const result = await uploadImage(imageFile);
+      payload.imageUrl = result.url;
     }
+
+    if (initialData?.imageUrl && !imageFile) {
+      payload.imageUrl = initialData.imageUrl;
+    }
+
+    await onSubmit(payload);
   };
 
   return (
@@ -129,8 +134,8 @@ const ProductForm = ({
             <Button type="button" onClick={onCancel} variant="ghost" fullWidth>
               Batal
             </Button>
-            <Button type="submit" variant="primary" fullWidth loading={isPending}>
-              {isPending ? pendingLabel : submitLabel}
+            <Button type="submit" variant="primary" fullWidth loading={isPending || uploading}>
+              {uploading ? "Mengupload..." : isPending ? pendingLabel : submitLabel}
             </Button>
           </div>
         </div>

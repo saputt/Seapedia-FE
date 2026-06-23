@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../api/catalog.api";
-import { apiFetch } from "../../../api/client";
 
 export const useSellerProducts = (storeId: string, search = "") =>
   useQuery({
@@ -12,15 +11,8 @@ export const useSellerProducts = (storeId: string, search = "") =>
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ storeId, data }: { storeId: string; data: any }) => {
-      if (data instanceof FormData) {
-        return apiFetch(`products/${storeId}`, {
-          method: "POST",
-          body: data,
-        });
-      }
-      return createProduct(storeId, data);
-    },
+    mutationFn: ({ storeId, data }: { storeId: string; data: any }) =>
+      createProduct(storeId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
     },
@@ -30,15 +22,7 @@ export const useCreateProduct = () => {
 export const useUpdateProduct = (productId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      if (data instanceof FormData) {
-        return apiFetch(`products/${productId}`, {
-          method: "PUT",
-          body: data,
-        });
-      }
-      return updateProduct(productId, data);
-    },
+    mutationFn: (data: any) => updateProduct(productId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
