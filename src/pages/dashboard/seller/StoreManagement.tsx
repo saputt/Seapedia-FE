@@ -11,6 +11,7 @@ const StoreManagement: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
 
   const { data: store, isLoading, isFetching } = useMyStore() as any;
 
@@ -25,6 +26,7 @@ const StoreManagement: React.FC = () => {
   const startEditing = () => {
     setStoreName(store.storeName);
     setDescription(store.description);
+    setAddress(store.address || "");
     setIsEditing(true);
   };
 
@@ -32,7 +34,7 @@ const StoreManagement: React.FC = () => {
     e.preventDefault();
     if (!storeName.trim() || !description.trim()) return;
     updateMutation.mutate(
-      { storeId: store.id, data: { storeName: storeName.trim(), description: description.trim() } as any },
+      { storeId: store.id, data: { storeName: storeName.trim(), description: description.trim(), address: address.trim() || undefined } as any },
       { onSuccess: () => setIsEditing(false) }
     );
   };
@@ -95,6 +97,14 @@ const StoreManagement: React.FC = () => {
                 required
               />
             </div>
+            <div>
+              <label className="block text-text-secondary font-medium text-sm mb-1.5">Alamat Toko</label>
+              <textarea
+                value={address}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
+                className="input-neo w-full resize-none h-24"
+              />
+            </div>
             <div className="flex gap-3">
               <Button type="button" onClick={() => setIsEditing(false)} variant="ghost" size="lg" fullWidth>
                 Batal
@@ -121,6 +131,10 @@ const StoreManagement: React.FC = () => {
             <div>
               <p className="text-sm text-text-muted">Deskripsi</p>
               <p className="text-text-secondary">{store.description}</p>
+            </div>
+            <div>
+              <p className="text-sm text-text-muted">Alamat Toko</p>
+              <p className="text-text-secondary">{store.address ?? '--'}</p>
             </div>
           </div>
         </div>
