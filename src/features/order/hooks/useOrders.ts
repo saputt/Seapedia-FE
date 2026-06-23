@@ -33,6 +33,7 @@ export const useCancelOrder = () => {
     onSettled: (_data, _err, orderId) => {
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 };
@@ -99,8 +100,12 @@ export const useBuyerConfirmOrder = () => {
 };
 
 export const useCheckoutOrder = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ orderToken, addressId }: { orderToken: string; addressId: string }) =>
       checkoutOrder({ orderToken, addressId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+    },
   });
 };
