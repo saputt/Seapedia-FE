@@ -106,6 +106,9 @@ export const useCheckoutOrder = () => {
       checkoutOrder({ orderToken, addressId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product"] });
+      queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 };
