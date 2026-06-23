@@ -145,15 +145,24 @@ const OrderDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {order.address && (
+        {order.addressSnapshot && (
           <div className="card">
             <h2 className="text-sm font-bold text-text-primary mb-2">Alamat Pengiriman</h2>
             <p className="text-sm text-text-secondary leading-relaxed">
-              {order.address.label && (
-                <span className="font-semibold text-text-primary">{order.address.label}</span>
+              {order.addressLabel && (
+                <span className="font-semibold text-text-primary">{order.addressLabel}</span>
               )}
-              {order.address.label && <br />}
-              {(order.address as any).completeAddress}
+              {order.addressLabel && <br />}
+              {order.addressSnapshot}
+            </p>
+          </div>
+        )}
+
+        {order.storeAddress && (
+          <div className="card">
+            <h2 className="text-sm font-bold text-text-primary mb-2">Alamat Toko</h2>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {order.storeAddress}
             </p>
           </div>
         )}

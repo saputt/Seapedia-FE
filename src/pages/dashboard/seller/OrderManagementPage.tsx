@@ -179,14 +179,21 @@ const OrderManagementPage: React.FC = () => {
 
             {expandedId === order.id && (
               <div className="border-t border-border px-5 py-4 space-y-4 bg-brand-subtle/20">
-                {order.address && (
+                {order.addressSnapshot && (
                   <div>
                     <p className="text-xs font-semibold text-text-muted mb-1">Alamat Pengiriman</p>
                     <p className="text-sm text-text-secondary">
-                      {order.address.label && <span className="font-medium text-text-primary">{order.address.label}</span>}
-                      {order.address.label && <br />}
-                      {order.address.completeAddress}
+                      {order.addressLabel && <span className="font-medium text-text-primary">{order.addressLabel}</span>}
+                      {order.addressLabel && <br />}
+                      {order.addressSnapshot}
                     </p>
+                  </div>
+                )}
+
+                {order.storeAddress && (
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted mb-1">Alamat Toko</p>
+                    <p className="text-sm text-text-secondary">{order.storeAddress}</p>
                   </div>
                 )}
 

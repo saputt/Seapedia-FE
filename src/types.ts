@@ -50,6 +50,7 @@ export interface Store {
   id: string;
   name: string;
   imageUrl: string | null;
+  address?: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -58,6 +59,7 @@ export interface Store {
 export interface StoreInput {
   name: string;
   imageUrl?: string;
+  address?: string;
 }
 
 // ==================== Product ====================
@@ -127,10 +129,6 @@ export interface Address {
   id: string;
   label: string;
   fullAddress: string;
-  phone: string;
-  notes?: string;
-  lat?: number;
-  lng?: number;
   isDefault?: boolean;
   lastUsed?: boolean;
   userId: string;
@@ -140,10 +138,6 @@ export interface Address {
 export interface AddressInput {
   label: string;
   fullAddress: string;
-  phone: string;
-  notes?: string;
-  lat?: number;
-  lng?: number;
 }
 
 // ==================== Order ====================
@@ -169,7 +163,9 @@ export interface Order {
   discountAmount: number;
   total: number;
   shippingMethod: ShippingMethod;
-  addressSnapshot: Address;
+  addressLabel: string;
+  addressSnapshot: string;
+  storeAddress?: string;
   orderToken: string;
   notes?: string;
   driverId?: string;
