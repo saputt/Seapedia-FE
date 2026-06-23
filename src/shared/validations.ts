@@ -52,8 +52,8 @@ export const productSchema = z.object({
   description: z.string().min(10, "Deskripsi minimal 10 karakter").max(5000),
   price: z.number().int().min(100, "Harga minimal Rp100"),
   stock: z.number().int().min(0, "Stok tidak boleh negatif"),
-  categoryId: z.string().uuid("Kategori tidak valid"),
-  images: z.array(z.string().url("URL gambar tidak valid")).min(1, "Minimal 1 gambar"),
+  category: z.enum(["ELECTRONICS", "FASHION", "HOME", "FOOD", "HOBBY"]),
+  images: z.array(z.string()).optional(),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;
