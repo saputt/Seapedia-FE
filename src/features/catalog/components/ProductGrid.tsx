@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
+import Spinner from "../../shared/components/ui/Spinner";
 import useAuthStore from "../../../features/auth/store/authStore";
 
 interface ProductGridProps {
@@ -91,9 +92,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
           <div ref={loadMoreRef} className="mt-8 flex justify-center">
             {isFetchingNextPage && (
-              <div className="flex items-center gap-2 text-text-secondary">
-                <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-                Memuat produk lainnya...
+              <div className="flex justify-center">
+                <Spinner size="sm" />
               </div>
             )}
             {showLoginPrompt && !isFetchingNextPage && (

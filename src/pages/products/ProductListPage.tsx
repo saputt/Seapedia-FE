@@ -14,6 +14,7 @@ import { PROMO_BANNERS } from "../../shared/constants/promoBanners";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
 import { SORT_OPTIONS } from "../../shared/constants/productIcons";
 import CustomSelect from "../../shared/components/ui/CustomSelect";
+import Spinner from "../../shared/components/ui/Spinner";
 import useDebounce from "../../shared/hooks/useDebounce";
 import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
@@ -167,10 +168,7 @@ const ProductListPage: React.FC = () => {
           <div ref={loadMoreRef} className="mt-8">
             {isFetchingNextPage && (
               <div className="flex justify-center">
-                <div className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-                  Memuat produk lainnya...
-                </div>
+                <Spinner size="sm" />
               </div>
             )}
             {showLoginPrompt && !isFetchingNextPage && (
