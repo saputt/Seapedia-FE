@@ -11,8 +11,15 @@ import { useWallet } from "../../features/wallet/hooks/useWallet";
 import type { ProductCategory } from "../../types";
 import PromoBannerCarousel from "../../features/catalog/components/PromoBannerCarousel";
 import { PROMO_BANNERS } from "../../shared/constants/promoBanners";
+import { CATEGORY_LABEL } from "../../shared/constants/product";
+import { SORT_OPTIONS } from "../../shared/constants/productIcons";
+import CustomSelect from "../../shared/components/ui/CustomSelect";
 import useDebounce from "../../shared/hooks/useDebounce";
 import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
+
+const GRID_CONFIG = { cols: { default: 2, md: 4, xl: 5 } } as const;
+const MAX_GRID_COLS = GRID_CONFIG.cols.xl;
+const PRODUCTS_PER_PAGE = MAX_GRID_COLS * 2;
 
 const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -53,6 +60,7 @@ const ProductListPage: React.FC = () => {
     minPrice: minPriceParam || undefined as any,
     maxPrice: maxPriceParam || undefined as any,
     sortBy: sortByParam,
+    limit: PRODUCTS_PER_PAGE,
   });
 
   const allProducts = data?.pages.flatMap((page: any) => page.products ?? page.data ?? []) ?? [];
@@ -98,11 +106,21 @@ const ProductListPage: React.FC = () => {
     setFilterMaxPrice("");
   };
 
+  const totalProducts = data?.pages[0]?.total ?? allProducts.length;
+
+  const resultLabel = debouncedSearch && categoryFilter
+    ? `Kategori ${CATEGORY_LABEL[categoryFilter]} — "${debouncedSearch}"`
+    : debouncedSearch
+      ? `Pencarian "${debouncedSearch}"`
+      : categoryFilter
+        ? `Kategori ${CATEGORY_LABEL[categoryFilter]}`
+        : "Semua Produk";
+
   const renderProductGrid = () => (
     <>
       {isLoading && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="card animate-pulse">
               <div className="aspect-square bg-bg-tertiary mb-4" />
               <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
@@ -131,7 +149,7 @@ const ProductListPage: React.FC = () => {
 
       {!isLoading && !isError && allProducts.length > 0 && (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
             {allProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -157,7 +175,7 @@ const ProductListPage: React.FC = () => {
             )}
             {showLoginPrompt && !isFetchingNextPage && (
               <div className="relative">
-                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 opacity-50 pointer-events-none select-none">
+                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5 opacity-50 pointer-events-none select-none">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="card animate-pulse">
                       <div className="aspect-square bg-bg-tertiary mb-4" />
@@ -203,7 +221,7 @@ const ProductListPage: React.FC = () => {
 
   return (
     <MainLayout navbarVariant="products">
-      <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
+      <div className="max-w-[1280px] mx-auto w-full px-3 lg:px-8 py-8">
 
         {showHero && (
           <div className="mb-6">
@@ -256,12 +274,10 @@ const ProductListPage: React.FC = () => {
             <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6 sticky top-[88px] self-start`}>
               <ProductFilterSidebar
                 categoryFilter={categoryFilter}
-                sortByParam={sortByParam}
                 filterMinPrice={filterMinPrice}
                 filterMaxPrice={filterMaxPrice}
                 onCategoryClick={handleCategoryClick}
                 onApplyPriceFilter={handleApplyPriceFilter}
-                onSortChange={(val: string) => updateParams({ sortBy: val, page: "" })}
                 onClearAll={handleClearAll}
                 onMinPriceChange={setFilterMinPrice}
                 onMaxPriceChange={setFilterMaxPrice}
@@ -269,13 +285,27 @@ const ProductListPage: React.FC = () => {
             </aside>
 
             <div className="flex-1 min-w-0">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden flex items-center gap-1 text-sm font-semibold text-brand-deep mb-4"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
-                {showFilters ? "Sembunyikan Filter" : "Tampilkan Filter"}
-              </button>
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="lg:hidden flex items-center gap-1 text-sm font-semibold text-brand-deep shrink-0"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+                    {showFilters ? "Sembunyikan Filter" : "Filter"}
+                  </button>
+                  <p className="text-sm text-text-secondary truncate">
+                    {resultLabel} — <span className="font-semibold text-text-primary">{totalProducts}</span> produk
+                  </p>
+                </div>
+                <div className="w-44 shrink-0">
+                  <CustomSelect
+                    value={sortByParam}
+                    options={SORT_OPTIONS.map((o) => [o.value, o.label])}
+                    onChange={(val) => updateParams({ sortBy: val, page: "" })}
+                  />
+                </div>
+              </div>
               {renderProductGrid()}
             </div>
           </div>

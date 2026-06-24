@@ -8,12 +8,13 @@ export const useProducts = ({
   minPrice,
   maxPrice,
   sortBy,
-}: ProductFilters = {}) => {
-  const queryKey = ["products", search, category, minPrice, maxPrice, sortBy];
+  limit = 12,
+}: ProductFilters & { limit?: number } = {}) => {
+  const queryKey = ["products", search, category, minPrice, maxPrice, sortBy, limit];
   return useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam = 1 }) =>
-      getAllProducts({ page: pageParam, limit: 12, search, category, minPrice, maxPrice, sortBy }),
+      getAllProducts({ page: pageParam, limit, search, category, minPrice, maxPrice, sortBy }),
     getNextPageParam: (lastPage) => {
       if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
       return undefined;

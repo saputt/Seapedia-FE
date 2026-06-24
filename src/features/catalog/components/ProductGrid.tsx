@@ -53,8 +53,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   return (
     <>
       {isLoading && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="card animate-pulse">
               <div className="aspect-square bg-bg-tertiary mb-4" />
               <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
