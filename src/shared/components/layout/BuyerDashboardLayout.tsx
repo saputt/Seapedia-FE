@@ -1,5 +1,6 @@
 import { Outlet, useLocation, Link } from "react-router-dom";
 import Navbar from "./Navbar";
+import BuyerBottomNav from "./BuyerBottomNav";
 import { SidebarLink } from "../../../types";
 
 const NavIcon = ({ path }: { path: string }) => (
@@ -48,10 +49,11 @@ const BuyerDashboardLayout = () => {
           </nav>
         </aside>
 
-        <div className="flex-1 p-6 lg:p-8 overflow-auto">
+        <div className="flex-1 p-6 lg:p-8 overflow-auto pb-20 md:pb-8">
           <Outlet />
         </div>
       </div>
+      <BuyerBottomNav />
     </div>
   );
 };
