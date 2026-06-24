@@ -43,9 +43,11 @@ const useAuthStore = create<AuthStore>((set) => ({
   },
 
   setUser: (userData: Partial<AuthUser>) => {
-    const merged = { ...getStored<AuthUser>("user")!, ...userData };
-    localStorage.setItem("user", JSON.stringify(merged));
-    set({ user: merged });
+    set((state) => {
+      const merged = { ...state.user!, ...userData };
+      localStorage.setItem("user", JSON.stringify(merged));
+      return { user: merged };
+    });
   },
 
   logout: () => {
