@@ -73,7 +73,7 @@ const CheckoutPage: React.FC = () => {
     }
     setCheckoutError("");
     checkoutMutation.mutate(
-      { orderToken, addressId: selectedAddress.id },
+      { orderToken, addressId: selectedAddress.id, totalPrice },
       {
         onSuccess: () => {
           navigate("/checkout/success");
@@ -326,7 +326,7 @@ const CheckoutPage: React.FC = () => {
         title="Saldo Tidak Cukup"
         message="Saldo dompet Anda tidak mencukupi untuk melakukan checkout. Silakan top up terlebih dahulu."
         actionLabel="Top Up"
-        onAction={() => navigate("/dashboard/buyer/wallet")}
+        onAction={() => navigate("/wallet")}
       />
     </MainLayout>
   );

@@ -1,5 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getBuyerOrders, cancelOrder, getSellerOrders, updateOrderStatus, checkoutOrder } from "../api/order.api";
+import type { WalletTransaction } from "../../types";
+
+const prependTransaction = (queryClient: ReturnType<typeof useQueryClient>, tx: WalletTransaction) => {
+  const all = queryClient.getQueriesData({ queryKey: ["transactions"] });
+  const prev: Record<string, unknown> = {};
+  all.forEach(([key, old]) => {
+    if (!old) return;
+    const k = JSON.stringify(key);
+    prev[k] = old;
+    queryClient.setQueryData(key, (data: any) => {
+      if (!data?.pages?.length) return data;
+      const [first, ...rest] = data.pages;
+      return { ...data, pages: [{ ...first, data: [tx, ...first.data] }, ...rest] };
+    });
+  });
+  return prev;
+};
+
+const restoreTransactions = (queryClient: ReturnType<typeof useQueryClient>, prev: Record<string, unknown>) => {
+  Object.entries(prev).forEach(([key, data]) => queryClient.setQueryData(JSON.parse(key), data));
+};
 
 export const useBuyerOrders = () =>
   useQuery({
@@ -15,8 +36,10 @@ export const useCancelOrder = () => {
     onMutate: async (orderId) => {
       await queryClient.cancelQueries({ queryKey: ["buyer-orders"] });
       await queryClient.cancelQueries({ queryKey: ["order", orderId] });
+      await queryClient.cancelQueries({ queryKey: ["wallet"] });
       const prevBuyerOrders = queryClient.getQueryData(["buyer-orders"]);
       const prevOrder = queryClient.getQueryData(["order", orderId]);
+      const prevWallet = queryClient.getQueryData(["wallet"]);
       queryClient.setQueryData(["order", orderId], (old: any) =>
         old ? { ...old, status: "CANCELLED" } : old
       );
@@ -25,16 +48,33 @@ export const useCancelOrder = () => {
         if (Array.isArray(old)) return old.map((o: any) => o.id === orderId ? { ...o, status: "CANCELLED" } : o);
         return old;
       });
-      return { prevBuyerOrders, prevOrder, orderId };
+      if (prevOrder?.totalPrice && prevWallet) {
+        queryClient.setQueryData(["wallet"], (old: any) => ({
+          ...old,
+          balance: (old.balance || 0) + prevOrder.totalPrice,
+        }));
+      }
+      const prevTxns = prependTransaction(queryClient, {
+        id: `opt-refund-${Date.now()}`,
+        amount: prevOrder?.totalPrice ?? 0,
+        type: "REFUND",
+        description: "Refund Pembatalan Pesanan",
+        createdAt: new Date().toISOString(),
+      });
+      return { prevBuyerOrders, prevOrder, prevWallet, prevTxns, orderId };
     },
     onError: (_err, _id, context) => {
       if (context?.prevBuyerOrders) queryClient.setQueryData(["buyer-orders"], context.prevBuyerOrders);
       if (context?.prevOrder) queryClient.setQueryData(["order", context.orderId], context.prevOrder);
+      if (context?.prevWallet) queryClient.setQueryData(["wallet"], context.prevWallet);
+      if (context?.prevTxns) restoreTransactions(queryClient, context.prevTxns);
     },
     onSettled: (_data, _err, orderId) => {
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
   });
 };
@@ -104,13 +144,39 @@ export const useBuyerConfirmOrder = () => {
 export const useCheckoutOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ orderToken, addressId }: { orderToken: string; addressId: string }) =>
+    mutationFn: ({ orderToken, addressId }: { orderToken: string; addressId: string; totalPrice?: number }) =>
       checkoutOrder({ orderToken, addressId }),
+    onMutate: async ({ totalPrice }) => {
+      await queryClient.cancelQueries({ queryKey: ["wallet"] });
+      const prevWallet = queryClient.getQueryData(["wallet"]);
+      if (totalPrice && prevWallet) {
+        queryClient.setQueryData(["wallet"], (old: any) => ({
+          ...old,
+          balance: (old.balance || 0) - totalPrice,
+        }));
+      }
+      const prevTxns = prependTransaction(queryClient, {
+        id: `opt-payment-${Date.now()}`,
+        amount: totalPrice ?? 0,
+        type: "PAYMENT",
+        description: "Pembayaran Pesanan",
+        createdAt: new Date().toISOString(),
+      });
+      return { prevWallet, prevTxns };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prevWallet) queryClient.setQueryData(["wallet"], context.prevWallet);
+      if (context?.prevTxns) restoreTransactions(queryClient, context.prevTxns);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product"] });
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order-summary"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallet"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
   });
 };
