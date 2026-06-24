@@ -1,5 +1,6 @@
 import React from "react";
 import Spinner from "../../../shared/components/ui/Spinner";
+import StarRating from "../../../shared/components/ui/StarRating";
 import type { StoreReview } from "../../../types";
 
 interface StoreReviewsProps {
@@ -35,21 +36,23 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({
   }
 
   return (
-    <div>
+    <div className="mt-12">
+      <h2 className="text-xl font-bold text-text-primary mb-6">
+        Ulasan Pembeli{total > 0 ? ` (${total})` : ""}
+      </h2>
+
       <div className="card p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row gap-8 py-4 px-3">
           {/* Left — rating summary */}
           <div className="flex flex-col items-center md:items-start justify-center min-w-[180px]">
             <div className="flex items-center gap-3">
               <span className="text-yellow-400 text-5xl">★</span>
-              <div className="flex flex-col">
-                <span className="text-4xl font-bold text-text-primary leading-none">
-                  {averageRating > 0 ? averageRating.toFixed(1) : "—"}
-                </span>
-                <span className="text-xs text-text-secondary mt-0.5">/ 5.0</span>
+              <div className="flex items-center">
+                <span className="text-2xl font-bold text-text-primary leading-none">{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
+                <span className="text-2xl text-text-secondary mt-0.5">/ 5.0</span>
               </div>
             </div>
-            <p className="text-sm font-semibold text-success mt-2">
+            <p className="text-sm font-semibold text-brand-deep mt-2">
               {satisfaction}% pembeli merasa puas
             </p>
             <p className="text-xs text-text-muted mt-1">
@@ -92,28 +95,28 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({
       </div>
 
       {total === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-text-secondary">Belum ada ulasan untuk toko ini.</p>
+        <div className="card text-center py-10">
+          <p className="text-text-muted">Belum ada ulasan untuk toko ini.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div key={review.id} className="border border-border rounded-lg p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">{review.buyer.username}</p>
-                  <p className="text-xs text-text-muted">
-                    {new Date(review.createdAt).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
-                <span className="text-yellow-400 text-lg">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span>
+            <div key={review.id} className="card">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-text-primary">
+                  {review.buyer.username}
+                </span>
+                <span className="text-xs text-text-muted">
+                  {new Date(review.createdAt).toLocaleDateString("id-ID", {
+                    day: "numeric", month: "long", year: "numeric",
+                  })}
+                </span>
               </div>
-              <p className="text-xs text-text-muted mb-1">Produk: {review.product.name}</p>
-              <p className="text-sm text-text-secondary">{review.comment}</p>
+              <StarRating value={review.rating} size="sm" readonly />
+              <p className="text-xs text-text-muted mt-1">Produk: {review.product.name}</p>
+              <p className="text-sm text-text-secondary mt-2">
+                {review.comment}
+              </p>
             </div>
           ))}
         </div>

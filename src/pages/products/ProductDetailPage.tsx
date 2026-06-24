@@ -9,6 +9,7 @@ import QuantitySelector from "../../features/catalog/components/QuantitySelector
 import ProductReviews from "../../features/catalog/components/ProductReviews";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import MobileBuyBar from "../../features/catalog/components/MobileBuyBar";
+import BuyBottomSheet from "../../features/catalog/components/BuyBottomSheet";
 import { useProductDetail } from "../../features/catalog/hooks/useProductDetail";
 import { useProductReviews } from "../../features/review/hooks/useReviews";
 import { getAllProducts } from "../../features/catalog/api/catalog.api";
@@ -52,6 +53,7 @@ const ProductDetailPage: React.FC = () => {
 
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [showStoreAlert, setShowStoreAlert] = useState(false);
+  const [showBuySheet, setShowBuySheet] = useState(false);
   const [addError, setAddError] = useState("");
 
   const isLoggedIn = !!token;
@@ -100,11 +102,19 @@ const ProductDetailPage: React.FC = () => {
     navigate(`/checkout?buyNow=1&productId=${productId}&quantity=${quantity}`);
   };
 
+  const handleMobileBuyNow = () => {
+    if (!isLoggedIn) {
+      setShowLoginAlert(true);
+      return;
+    }
+    setShowBuySheet(true);
+  };
+
   return (
     <MainLayout>
         <div className="max-w-[1280px] mx-auto w-full px-3 lg:px-8 py-8 pb-24 md:pb-8">
         {!isLoading && !isError && product && (
-          <nav className="flex items-center gap-1 text-sm text-text-secondary mb-6" aria-label="Breadcrumb">
+          <nav className="hidden md:flex items-center gap-1 text-sm text-text-secondary mb-6" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-brand-deep transition-colors font-medium">Home</Link>
             <span className="text-text-muted">/</span>
             {product.category && (
@@ -167,7 +177,7 @@ const ProductDetailPage: React.FC = () => {
             {/* Left Column - Image and Product Info */}
             <div className="flex-1">
                 <div className="flex flex-col md:flex-row gap-10">
-                <div className="aspect-square bg-bg-tertiary flex items-center justify-center overflow-hidden w-full md:w-[40%] xl:mb-20">
+                <div className="aspect-square bg-bg-tertiary flex items-center justify-center overflow-hidden w-[100vw] relative left-[50%] -translate-x-1/2 -mt-8 md:w-[40%] md:left-0 md:translate-x-0 md:relative md:aspect-square md:-mt-0">
                   {product.imageUrl ? (
                     <img
                       src={product.imageUrl}
@@ -363,7 +373,18 @@ const ProductDetailPage: React.FC = () => {
           addPending={addMutation.isPending}
           clearPending={clearAndAddMutation.isPending}
           onAddToCart={handleAddToCart}
+          onBuyNow={handleMobileBuyNow}
+          onLoginClick={() => setShowLoginAlert(true)}
+        />
+
+        <BuyBottomSheet
+          isOpen={showBuySheet}
+          onClose={() => setShowBuySheet(false)}
+          product={product ? { name: product.name, price: product.price, imageUrl: product.imageUrl, stock: product.stock } : null}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
           onBuyNow={handleBuyNow}
+          isLoggedIn={isLoggedIn}
           onLoginClick={() => setShowLoginAlert(true)}
         />
       </div>

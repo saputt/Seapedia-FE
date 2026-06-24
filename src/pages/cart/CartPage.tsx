@@ -66,7 +66,7 @@ const CartPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
+      <div className="max-w-[960px] mx-auto w-full px-3 lg:px-8 py-8">
         <h1 className="text-[1.75rem] font-bold text-text-primary mb-8">
           Keranjang
         </h1>

@@ -27,7 +27,7 @@ const OrderHistoryPage: React.FC = () => {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
 
-  const statuses = ["ALL", ...new Set(orders.map((o: any) => o.status))];
+  const statuses = ["ALL", "PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"];
 
   const filtered =
     filter === "ALL"

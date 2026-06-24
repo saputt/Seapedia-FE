@@ -132,7 +132,7 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <MainLayout navbarVariant="checkout">
-      <div className="max-w-[960px] mx-auto w-full px-6 lg:px-8 py-8">
+      <div className="max-w-[960px] mx-auto w-full px-3 lg:px-8 py-8">
         {isLoading && (
           <div className="space-y-6 animate-pulse">
             <div className="card h-24 bg-bg-tertiary" />

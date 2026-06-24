@@ -206,10 +206,7 @@ const StoreDetailPage: React.FC = () => {
 
                 <div ref={loadMoreRef} className="mt-8 flex justify-center">
                   {isFetchingNextPage && (
-                    <div className="flex items-center gap-2 text-text-secondary">
-                      <Spinner size="sm" />
-                      Memuat produk lainnya...
-                    </div>
+                    <Spinner size="sm" />
                   )}
                   {!hasNextPage && allProducts.length > 0 && (
                     <p className="text-text-muted text-sm">Semua produk telah ditampilkan</p>

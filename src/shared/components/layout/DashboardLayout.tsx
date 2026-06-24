@@ -4,6 +4,8 @@ import Navbar from "./Navbar";
 import DashboardSidebar from "./DashboardSidebar";
 import BottomTabBar from "./BottomTabBar";
 import MobileSidebar from "./MobileSidebar";
+import SellerBottomNav from "./SellerBottomNav";
+import DriverBottomNav from "./DriverBottomNav";
 import { SidebarLink } from "../../../types";
 import { useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 
@@ -47,7 +49,7 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
           subtitle={sidebarSubtitle}
           links={sidebarLinks}
         />
-        <div className={`flex-1 p-6 lg:p-8 overflow-auto ${mobileNav === "bottom-tabs" ? "pb-24 lg:pb-8" : ""}`}>
+        <div className={`flex-1 p-6 lg:p-8 overflow-auto ${mobileNav === "bottom-tabs" || mobileNav === "hamburger" ? "pb-24 lg:pb-8" : ""}`}>
           <Outlet />
         </div>
       </div>
@@ -63,6 +65,8 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
           links={sidebarLinks}
         />
       )}
+      <SellerBottomNav />
+      <DriverBottomNav />
     </div>
   );
 };
