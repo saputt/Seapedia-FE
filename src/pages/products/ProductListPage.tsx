@@ -102,9 +102,15 @@ const ProductListPage: React.FC = () => {
   };
 
   const handleClearAll = () => {
-    setSearchParams({});
+    const next = new URLSearchParams(searchParams);
+    next.delete("sortBy");
+    next.delete("minPrice");
+    next.delete("maxPrice");
+    next.delete("page");
+    setSearchParams(next);
     setFilterMinPrice("");
     setFilterMaxPrice("");
+    setShowFilters(false);
   };
 
   const totalProducts = data?.pages[0]?.total ?? allProducts.length;

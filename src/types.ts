@@ -95,6 +95,7 @@ export interface Product {
     reviews: number;
   };
   reviews?: ProductReview[];
+  soldCount?: number;
 }
 
 export interface ProductFilters {
