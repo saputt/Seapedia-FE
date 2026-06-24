@@ -24,12 +24,6 @@ const ProfileDropdown = () => {
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
   const initial = displayName[0].toUpperCase();
 
-  const dashboardRoute = activeRole
-    ? `/dashboard/${activeRole.toLowerCase()}`
-    : userRoles.length > 0
-      ? `/dashboard/${userRoles[0].toLowerCase()}`
-      : "/";
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -100,7 +94,7 @@ const ProfileDropdown = () => {
         {dropdownOpen && (
           <div className="absolute right-0 top-full mt-2 card !p-2 min-w-[200px] z-50">
             <Link
-              to="/dashboard/buyer/profile"
+                  to="/profile"
               onClick={() => setDropdownOpen(false)}
               className="block px-3 py-2 border-b-[2px] border-bg-tertiary hover:bg-brand-subtle rounded transition-colors"
             >
@@ -112,32 +106,24 @@ const ProfileDropdown = () => {
               </p>
             </Link>
 
-            <Link
-              to={dashboardRoute}
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-            >
-              Dashboard
-            </Link>
-
             {activeRole === "BUYER" && (
               <>
                 <Link
-                  to="/dashboard/buyer/wallet"
+                  to="/wallet"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
                   Wallet
                 </Link>
                 <Link
-                  to="/dashboard/buyer/orders"
+                  to="/orders"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
                   Pesanan
                 </Link>
                 <Link
-                  to="/dashboard/buyer/profile"
+              to="/profile"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >

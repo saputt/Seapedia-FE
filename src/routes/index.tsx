@@ -5,7 +5,7 @@ import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
 import BuyerRoute from "./BuyerRoute";
 import LandingPage from "../pages/LandingPage";
-import ComingSoon from "../shared/components/ui/ComingSoon";
+
 import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayout";
 import SellerRoute from "./SellerRoute";
@@ -171,7 +171,6 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="/dashboard/buyer"
         element={
           <PrivateRoute>
             <RoleRoute role="buyer">
@@ -180,8 +179,6 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       >
-        <Route index element={<ComingSoon title="Dashboard Pembeli" />} />
-        <Route path="checkout" element={<CheckoutMainPage />} />
         <Route path="orders" element={<OrderHistoryPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
         <Route path="wallet" element={<WalletPage />} />

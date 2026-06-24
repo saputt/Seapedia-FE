@@ -73,7 +73,7 @@ export const ProductListHero: React.FC<ProductListHeroProps> = ({
 
       {token && (
         <Link
-          to="/dashboard/buyer/wallet"
+          to="/wallet"
           className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
         >
           <div className="flex items-center gap-2">

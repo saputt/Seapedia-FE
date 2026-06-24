@@ -116,7 +116,7 @@ const OrderHistoryPage: React.FC = () => {
           {filtered.map((order: any) => (
             <Link
               key={order.id}
-              to={`/dashboard/buyer/orders/${order.id}`}
+              to={`/orders/${order.id}`}
               className="card block hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start justify-between mb-2">

@@ -19,7 +19,7 @@ const CheckoutSuccessPage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
-              onClick={() => navigate("/dashboard/buyer/orders")}
+              onClick={() => navigate("/orders")}
               variant="primary"
               size="sm"
             >

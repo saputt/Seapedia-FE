@@ -149,7 +149,7 @@ const WalletPage: React.FC = () => {
                 <div className="mt-3 pt-3 border-t-[2px] border-bg-tertiary text-center">
                   <Button
                     variant="ghost"
-                    onClick={() => navigate("/dashboard/buyer/wallet/history")}
+                    onClick={() => navigate("/wallet/history")}
                   >
                     Lihat Semua Transaksi
                   </Button>
