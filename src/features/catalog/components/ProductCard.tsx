@@ -17,10 +17,10 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
   const price = product.price?.toLocaleString("id-ID");
 
   return (
-    <Link to={`/products/${product.id}`} className="card group block">
+    <Link to={`/products/${product.id}`} className="card group block p-0">
       <div className="aspect-square bg-bg-tertiary flex items-center justify-center mb-3 overflow-hidden">
         {product.imageUrl ? (
-          <img
+          <img 
             src={product.imageUrl}
             alt={product.name}
             loading="lazy"
@@ -34,26 +34,28 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
           </svg>
         )}
       </div>
-      <h3 className="font-semibold text-text-primary text-sm truncate">
-        {product.name}
-      </h3>
-      <p className="text-brand-deep font-bold text-base mt-0.5">
-        Rp{price}
-      </p>
-      <div className="flex items-center gap-2 mt-1">
-        {product.averageRating !== undefined && product.averageRating > 0 && (
-          <div className="flex items-center gap-0.5">
-            <StarRating value={Math.round(product.averageRating)} size="sm" readonly />
-            <span className="text-xs text-text-muted">{product.averageRating}</span>
-          </div>
+      <div className="p-2">
+        <h3 className="font-semibold text-text-primary text-sm truncate">
+          {product.name}
+        </h3>
+        <p className="text-brand-deep font-bold text-base mt-0.5">
+          Rp{price}
+        </p>
+        <div className="flex items-center gap-2 mt-1">
+          {product.averageRating !== undefined && product.averageRating > 0 && (
+            <div className="flex items-center gap-0.5">
+              <StarRating value={Math.round(product.averageRating)} size="sm" readonly />
+              <span className="text-xs text-text-muted">{product.averageRating}</span>
+            </div>
+          )}
+          <span className="text-xs text-text-muted">{product.soldCount ?? 0} terjual</span>
+        </div>
+        {product.category && (
+          <span className="inline-block mt-1.5 text-[11px] font-semibold text-brand-deep bg-brand-subtle px-1.5 py-0.5">
+            {CATEGORY_SHORT[product.category] || product.category}
+          </span>
         )}
-        <span className="text-xs text-text-muted">{product.soldCount ?? 0} terjual</span>
       </div>
-      {product.category && (
-        <span className="inline-block mt-1.5 text-[11px] font-semibold text-brand-deep bg-brand-subtle px-1.5 py-0.5">
-          {CATEGORY_SHORT[product.category] || product.category}
-        </span>
-      )}
     </Link>
   );
 });
