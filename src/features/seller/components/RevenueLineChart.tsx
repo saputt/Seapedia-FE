@@ -41,9 +41,6 @@ const RevenueLineChart = ({ orders }: RevenueLineChartProps) => {
     return days;
   }, [orders]);
 
-  const hasData = data.some((d) => d.revenue > 0);
-  if (!hasData) return null;
-
   const maxRevenue = Math.max(...data.map((d) => d.revenue));
   const yMax = maxRevenue > 0 ? Math.ceil(maxRevenue * 1.2 / 10000) * 10000 : 10000;
 
