@@ -253,14 +253,14 @@ const ProductListPage: React.FC = () => {
 
         {showHero && (
           <div className="mb-8">
-            <div className="bg-brand-deep border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] px-0 lg:px-6 py-6 flex gap-6">
+            <div className="bg-brand-deep border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] px-0 lg:px-6 py-4 flex gap-6">
               <div className="flex-col justify-center shrink-0 pr-6 border-r-[3px] border-white/30 hidden lg:flex">
                 <h2 className="text-white text-2xl font-bold leading-tight">Produk<br/>Terlaris</h2>
                 <p className="text-white/70 text-sm mt-2">Pilihan favorit pembeli</p>
               </div>
               <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 flex-1 min-w-0 [&::-webkit-scrollbar]:hidden">
-                <div className="flex-col justify-center shrink-0 lg:hidden snap-start">
-                  <h2 className="text-white text-lg font-bold leading-tight">Produk<br/>Terlaris</h2>
+                <div className="flex-col justify-center shrink-0 lg:hidden snap-start pl-3">
+                  <h2 className="text-white text-2xl font-bold leading-tight">Produk<br/>Terlaris</h2>
                   <p className="text-white/70 text-[10px] mt-1">Pilihan favorit pembeli</p>
                 </div>
                 {topSellingLoading
