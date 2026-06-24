@@ -68,7 +68,7 @@ const ProductListPage: React.FC = () => {
   const canLoadMore = isLoggedIn;
   const showLoginPrompt = !isLoggedIn && hasNextPage && allProducts.length > 0;
 
-  const { data: topSellingProducts = [] } = useTopSellingProducts(4);
+  const { data: topSellingProducts = [], isLoading: topSellingLoading } = useTopSellingProducts(4);
 
   const loadMoreRef = useInfiniteScroll(
     () => {
@@ -231,8 +231,8 @@ const ProductListPage: React.FC = () => {
 
         {showHero && !!token && (
           <button
-            onClick={() => navigate("/dashboard/buyer/wallet")}
-            className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
+            onClick={() => navigate("/wallet")}
+            className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left p-2"
           >
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
@@ -251,19 +251,33 @@ const ProductListPage: React.FC = () => {
           <CategoryGrid categoryFilter={categoryFilter} onCategoryClick={handleCategoryClick} />
         )}
 
-        {showHero && topSellingProducts.length > 0 && (
+        {showHero && (
           <div className="mb-8">
-            <div className="bg-brand-deep border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] p-6 flex gap-6">
-              <div className="hidden sm:flex flex-col justify-center shrink-0 pr-6 border-r-[3px] border-white/30">
+            <div className="bg-brand-deep border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] px-0 lg:px-6 py-6 flex gap-6">
+              <div className="flex-col justify-center shrink-0 pr-6 border-r-[3px] border-white/30 hidden lg:flex">
                 <h2 className="text-white text-2xl font-bold leading-tight">Produk<br/>Terlaris</h2>
                 <p className="text-white/70 text-sm mt-2">Pilihan favorit pembeli</p>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-1 min-w-0">
-                {topSellingProducts.slice(0, 4).map((product: any) => (
-                  <div key={product.id} className="bg-white border-[3px] border-brand-deep">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 flex-1 min-w-0 [&::-webkit-scrollbar]:hidden">
+                <div className="flex-col justify-center shrink-0 lg:hidden snap-start">
+                  <h2 className="text-white text-lg font-bold leading-tight">Produk<br/>Terlaris</h2>
+                  <p className="text-white/70 text-[10px] mt-1">Pilihan favorit pembeli</p>
+                </div>
+                {topSellingLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="bg-white border-[3px] border-brand-deep card animate-pulse shrink-0 w-[45vw] sm:w-auto snap-start">
+                        <div className="aspect-square bg-bg-tertiary" />
+                        <div className="p-3 space-y-2">
+                          <div className="h-4 bg-bg-tertiary rounded w-3/4" />
+                          <div className="h-5 bg-bg-tertiary rounded w-1/3" />
+                        </div>
+                      </div>
+                    ))
+                  : topSellingProducts.slice(0, 4).map((product: any) => (
+                      <div key={product.id} className="bg-white border-[3px] border-brand-deep shrink-0 w-[45vw] sm:w-auto snap-start">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
               </div>
             </div>
           </div>
