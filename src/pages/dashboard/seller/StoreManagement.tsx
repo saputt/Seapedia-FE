@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useUpdateStore } from "../../../features/store/hooks/useUpdateStore";
 import Button from "../../../shared/components/ui/Button";
+import Avatar from "../../../shared/components/ui/Avatar";
+import { uploadStoreImage } from "../../../api/upload";
 import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
 
@@ -11,6 +13,10 @@ const StoreManagement: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploadingStoreImg, setUploadingStoreImg] = useState(false);
+  const storeImgInputRef = useRef<HTMLInputElement>(null);
 
   const { data: store, isLoading, isFetching } = useMyStore() as any;
 
@@ -25,14 +31,29 @@ const StoreManagement: React.FC = () => {
   const startEditing = () => {
     setStoreName(store.storeName);
     setDescription(store.description);
+    setAddress(store.address || "");
+    setImageUrl(store.imageUrl || "");
     setIsEditing(true);
+  };
+
+  const handleStoreImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingStoreImg(true);
+    try {
+      const result = await uploadStoreImage(file);
+      setImageUrl(result.url);
+    } catch {
+      /* ignore */
+    }
+    setUploadingStoreImg(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!storeName.trim() || !description.trim()) return;
     updateMutation.mutate(
-      { storeId: store.id, data: { storeName: storeName.trim(), description: description.trim() } as any },
+      { storeId: store.id, data: { storeName: storeName.trim(), description: description.trim(), address: address.trim() || undefined, imageUrl: imageUrl || undefined } as any },
       { onSuccess: () => setIsEditing(false) }
     );
   };
@@ -48,7 +69,7 @@ const StoreManagement: React.FC = () => {
   if (!store) return null;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Manajemen Toko</h1>
@@ -95,6 +116,35 @@ const StoreManagement: React.FC = () => {
                 required
               />
             </div>
+            <div>
+              <label className="block text-text-secondary font-medium text-sm mb-1.5">Alamat Toko</label>
+              <textarea
+                value={address}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAddress(e.target.value)}
+                className="input-neo w-full resize-none h-24"
+              />
+            </div>
+            <div>
+              <label className="block text-text-secondary font-medium text-sm mb-1.5">Foto Toko</label>
+              <div className="flex items-center gap-3">
+                <Avatar src={imageUrl || store?.imageUrl} name={storeName || store?.storeName || "Toko"} size="md" />
+                <input
+                  ref={storeImgInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleStoreImageUpload}
+                />
+                <button
+                  type="button"
+                  onClick={() => storeImgInputRef.current?.click()}
+                  className="text-sm text-brand-deep font-medium hover:underline"
+                >
+                  {imageUrl || store?.imageUrl ? "Ganti Foto" : "Tambah Foto"}
+                </button>
+                {uploadingStoreImg && <Spinner size="sm" />}
+              </div>
+            </div>
             <div className="flex gap-3">
               <Button type="button" onClick={() => setIsEditing(false)} variant="ghost" size="lg" fullWidth>
                 Batal
@@ -114,14 +164,22 @@ const StoreManagement: React.FC = () => {
       ) : (
         <div className="card !p-8">
           <div className="space-y-5">
-            <div>
-              <p className="text-sm text-text-muted">Nama Toko</p>
-              <p className="text-lg font-semibold text-text-primary">{store.storeName}</p>
+            <div className="flex items-center gap-4">
+              <Avatar src={store.imageUrl} name={store.storeName || "Toko"} size="lg" />
+              <div>
+                <p className="text-lg font-semibold text-text-primary">{store.storeName}</p>
+              </div>
             </div>
             <div>
               <p className="text-sm text-text-muted">Deskripsi</p>
               <p className="text-text-secondary">{store.description}</p>
             </div>
+            {store.address && (
+              <div>
+                <p className="text-sm text-text-muted">Alamat Toko</p>
+                <p className="text-text-secondary">{store.address}</p>
+              </div>
+            )}
           </div>
         </div>
       )}

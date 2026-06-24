@@ -1,8 +1,5 @@
 import { apiFetch } from "../../../api/client";
-import type { AppReview, PaginatedResponse, Product, ReviewInput } from "../../../types";
-
-export const getFeaturedProducts = (limit = 6): Promise<PaginatedResponse<Product>> =>
-  apiFetch(`products?limit=${limit}`);
+import type { AppReview, ReviewInput } from "../../../types";
 
 export const getAppReviews = (): Promise<AppReview[]> =>
   apiFetch("reviews");

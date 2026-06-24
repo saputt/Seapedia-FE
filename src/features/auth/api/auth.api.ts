@@ -18,3 +18,9 @@ export const switchUserRole = (role: RoleName): Promise<SwitchRoleResponse> =>
     method: "POST",
     body: JSON.stringify({ role }),
   });
+
+export const addUserRole = (role: RoleName): Promise<{ message: string }> =>
+  apiFetch("auth/roles", {
+    method: "POST",
+    body: JSON.stringify({ role }),
+  });

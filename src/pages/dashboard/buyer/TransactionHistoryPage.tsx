@@ -9,42 +9,32 @@ import CustomSelect from "../../../shared/components/ui/CustomSelect";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
 import { WALLET_TYPE_LABEL } from "../../../shared/constants/wallet";
 
+const ALL_LIMIT = 1000;
+
 const TransactionHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet();
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError } = useTransactions();
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const loading = walletLoading || txLoading;
+  const hasFilter = !!startDate || !!endDate || typeFilter !== "ALL";
+
+  const apiFilters = useMemo(() => ({
+    ...(startDate ? { startDate: startDate.toISOString().split("T")[0] } : {}),
+    ...(endDate ? { endDate: endDate.toISOString().split("T")[0] } : {}),
+    ...(typeFilter !== "ALL" ? { type: typeFilter } : {}),
+  }), [startDate, endDate, typeFilter]);
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError, isFetching } = useTransactions(apiFilters, hasFilter ? ALL_LIMIT : undefined);
+
   const error = walletError || txError;
-  const filtered = useMemo(() => {
-    const all = data?.pages.flatMap((p: any) => p.data) ?? [];
-    let result = all;
+  const initialLoading = (walletLoading || txLoading) && !data;
+  const transactions = useMemo(() => data?.pages.flatMap((p: any) => p.data) ?? [], [data]);
 
-    if (startDate) {
-      const s = new Date(startDate);
-      s.setHours(0, 0, 0, 0);
-      result = result.filter((tx: any) => new Date(tx.createdAt) >= s);
-    }
-    if (endDate) {
-      const e = new Date(endDate);
-      e.setHours(23, 59, 59, 999);
-      result = result.filter((tx: any) => new Date(tx.createdAt) <= e);
-    }
-
-    if (typeFilter !== "ALL") {
-      result = result.filter((tx: any) => tx.type === typeFilter);
-    }
-
-    result.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    return result;
-  }, [data, startDate, endDate, typeFilter]);
-
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Spinner size="lg" />
@@ -53,7 +43,7 @@ const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-[720px] mx-auto w-full space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-text-primary">Riwayat Transaksi</h1>
@@ -61,7 +51,7 @@ const TransactionHistoryPage: React.FC = () => {
               Saldo: Rp{wallet?.balance?.toLocaleString("id-ID") ?? 0}
             </p>
           </div>
-          <Button variant="ghost" onClick={() => navigate("/dashboard/buyer/wallet")}>
+          <Button variant="ghost" onClick={() => navigate("/wallet")}>
             &larr; Kembali
           </Button>
         </div>
@@ -116,14 +106,14 @@ const TransactionHistoryPage: React.FC = () => {
                 <h2 className="text-sm font-bold text-text-primary">
                   {typeFilter === "ALL" ? "Semua Transaksi" : WALLET_TYPE_LABEL[typeFilter]}
                 </h2>
-                <span className="text-xs text-text-muted">{filtered.length} transaksi</span>
+                <span className="text-xs text-text-muted">{transactions.length} transaksi</span>
               </div>
 
-              {filtered.length === 0 ? (
+              {transactions.length === 0 ? (
                 <p className="text-sm text-text-secondary text-center py-6">Tidak ada transaksi.</p>
               ) : (
                 <div className="space-y-2">
-                  {filtered.map((tx: any) => (
+                  {transactions.map((tx: any) => (
                     <div
                       key={tx.id}
                       className="flex items-center justify-between px-3 py-2 rounded hover:bg-brand-subtle transition-colors"
@@ -155,16 +145,21 @@ const TransactionHistoryPage: React.FC = () => {
                       </p>
                     </div>
                   ))}
-                  {isFetchingNextPage && (
+                  {!hasFilter && isFetchingNextPage && (
                     <div className="flex justify-center py-3">
                       <Spinner />
                     </div>
                   )}
-                  {hasNextPage && !isFetchingNextPage && (
+                  {!hasFilter && hasNextPage && !isFetchingNextPage && (
                     <div className="flex justify-center pt-2">
                       <Button variant="ghost" onClick={() => fetchNextPage()} loading={isFetchingNextPage}>
                         Muat Lebih Banyak
                       </Button>
+                    </div>
+                  )}
+                  {hasFilter && isFetching && (
+                    <div className="flex justify-center py-3">
+                      <Spinner />
                     </div>
                   )}
                 </div>

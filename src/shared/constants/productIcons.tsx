@@ -1,7 +1,7 @@
 import React from "react";
 import type { ProductCategory } from "../../types";
 
-export const CATEGORY_ICONS: Record<ProductCategory, React.ReactNode> = {
+export const CATEGORY_ICONS: Record<ProductCategory, React.ReactNode> & { [key: string]: React.ReactNode } = {
   ELECTRONICS: (
     <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
       <rect x="6" y="5" width="28" height="22" rx="3" stroke="currentColor" strokeWidth="2.5" fill="none" />

@@ -7,6 +7,8 @@ import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import { getReadableError } from "../../../shared/utils/errorMapper";
+import { AddressForm } from "@/features/address/components/AddressForm";
+import type { AddressInput } from "@/shared/validations";
 
 interface AddressFormModalProps {
   address: Address | null;
@@ -16,15 +18,11 @@ interface AddressFormModalProps {
 
 const AddressFormModal = ({ address, onClose, onSuccess }: AddressFormModalProps) => {
   const isEdit = !!address;
-  const [label, setLabel] = useState(address?.label || "");
-  const [completeAddress, setCompleteAddress] = useState((address as any)?.completeAddress || "");
-
   const mutation = useSaveAddress();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveAddress = (data: AddressInput) => {
     mutation.mutate(
-      { id: address?.id, data: { label: label.trim(), completeAddress: completeAddress.trim() } as any },
+      { id: address?.id, data: { label: data.label.trim(), completeAddress: data.detail.trim() } as any },
       { onSuccess }
     );
   };
@@ -43,22 +41,15 @@ const AddressFormModal = ({ address, onClose, onSuccess }: AddressFormModalProps
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">Label</label>
-            <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} className="input-neo w-full" placeholder="Rumah, Kantor, dll" required />
-          </div>
-          <div>
-            <label className="block text-text-secondary font-medium text-sm mb-1">Alamat Lengkap</label>
-            <textarea value={completeAddress} onChange={(e) => setCompleteAddress(e.target.value)} className="input-neo w-full resize-none h-24" placeholder="Jl. Contoh No. 123, Kecamatan, Kota, Provinsi, Kode Pos" required />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="button" onClick={onClose} variant="ghost" fullWidth>Batal</Button>
-            <Button type="submit" variant="primary" fullWidth loading={mutation.isPending}>
-              {mutation.isPending ? "Menyimpan..." : (isEdit ? "Simpan" : "Tambah")}
-            </Button>
-          </div>
-        </form>
+        <AddressForm
+          onSubmit={handleSaveAddress}
+          isPending={mutation.isPending}
+          defaultValues={address ? {
+            label: address.label,
+            detail: (address as any)?.completeAddress,
+          } : undefined}
+          onCancel={onClose}
+        />
       </div>
     </div>
   );
@@ -80,7 +71,7 @@ const AddressPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Alamat Saya</h1>
         <Button onClick={() => { setEditingAddress(null); setShowForm(true); }} variant="primary">
@@ -177,7 +168,7 @@ const AddressPage: React.FC = () => {
         actionLabel="Hapus"
         onAction={handleDelete}
       />
-    </>
+    </div>
   );
 };
 

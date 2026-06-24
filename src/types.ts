@@ -6,6 +6,7 @@ export interface AuthUser {
   id: string;
   email: string;
   username: string;
+  imageUrl?: string | null;
 }
 
 export interface LoginResponse {
@@ -29,6 +30,7 @@ export interface LoginData {
 export interface SwitchRoleResponse {
   activeRole: RoleName;
   accessToken: string;
+  userRoles: RoleName[];
 }
 
 // ==================== User/Profile ====================
@@ -37,8 +39,15 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string;
+  imageUrl?: string | null;
+  isSuspended?: boolean;
+  suspensionReason?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UploadResponse {
+  url: string;
 }
 
 // ==================== Store ====================
@@ -47,14 +56,22 @@ export interface Store {
   id: string;
   name: string;
   imageUrl: string | null;
+  address?: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
+  _count?: {
+    reviews: number;
+    products?: number;
+  };
+  reviews?: { rating: number }[];
+  products?: { id: string }[];
 }
 
 export interface StoreInput {
   name: string;
   imageUrl?: string;
+  address?: string;
 }
 
 // ==================== Product ====================
@@ -71,6 +88,7 @@ export interface Product {
   category: ProductCategory;
   storeId: string;
   store?: Store;
+  isHidden?: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -84,10 +102,11 @@ export interface ProductFilters {
   limit?: number;
   search?: string;
   storeId?: string;
-  category?: ProductCategory;
-  minPrice?: number;
-  maxPrice?: number;
+  category?: string;
+  minPrice?: number | string;
+  maxPrice?: number | string;
   sortBy?: string;
+  showHidden?: boolean;
 }
 
 export interface ProductInput {
@@ -122,10 +141,6 @@ export interface Address {
   id: string;
   label: string;
   fullAddress: string;
-  phone: string;
-  notes?: string;
-  lat?: number;
-  lng?: number;
   isDefault?: boolean;
   lastUsed?: boolean;
   userId: string;
@@ -135,10 +150,6 @@ export interface Address {
 export interface AddressInput {
   label: string;
   fullAddress: string;
-  phone: string;
-  notes?: string;
-  lat?: number;
-  lng?: number;
 }
 
 // ==================== Order ====================
@@ -164,7 +175,9 @@ export interface Order {
   discountAmount: number;
   total: number;
   shippingMethod: ShippingMethod;
-  addressSnapshot: Address;
+  addressLabel: string;
+  addressSnapshot: string;
+  storeAddress?: string;
   orderToken: string;
   notes?: string;
   driverId?: string;
@@ -271,6 +284,26 @@ export interface ReviewInput {
   comment: string;
 }
 
+export interface StoreReview {
+  id: string;
+  rating: number;
+  comment: string;
+  buyer: { id: string; username: string };
+  product: { id: string; name: string; imageUrl: string | null };
+  createdAt: string;
+}
+
+export interface StoreReviewStats {
+  reviewCount: number;
+  averageRating: number;
+}
+
+export interface StoreReviewsResponse {
+  reviews: StoreReview[];
+  total: number;
+  stats: StoreReviewStats;
+}
+
 // ==================== Driver ====================
 
 export interface DriverJob {
@@ -288,6 +321,7 @@ export interface AdminDashboard {
   totalOrders: number;
   totalRevenue: number;
   activeUsers: number;
+  totalDrivers: number;
 }
 
 export interface SimulationStatus {

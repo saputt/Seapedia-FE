@@ -11,7 +11,7 @@ export const useSwitchRole = () => {
   return useMutation({
     mutationFn: (role: RoleName) => switchUserRole(role),
     onSuccess: (data) => {
-      switchRole(data.activeRole, data.accessToken);
+      switchRole(data.activeRole, data.accessToken, data.userRoles);
       const redirectPath =
         data.activeRole === "BUYER" ? "/" : `/dashboard/${data.activeRole.toLowerCase()}`;
       navigate(redirectPath, { replace: true });

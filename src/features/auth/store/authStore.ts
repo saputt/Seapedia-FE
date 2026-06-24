@@ -12,7 +12,7 @@ interface AuthActions {
   login: (data: { token: string; user: AuthUser; roles: RoleName[]; activeRole: RoleName }) => void;
   setUser: (userData: Partial<AuthUser>) => void;
   logout: () => void;
-  switchRole: (role: RoleName, newToken?: string) => void;
+  switchRole: (role: RoleName, newToken?: string, roles?: RoleName[]) => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -31,7 +31,7 @@ const getStored = <T>(key: string, fallback: T | null = null): T | null => {
 const useAuthStore = create<AuthStore>((set) => ({
   token: getStored<string>("token"),
   user: getStored<AuthUser>("user"),
-  userRoles: getStored<RoleName[]>("userRoles", []),
+  userRoles: getStored<RoleName[]>("userRoles", []) ?? [],
   activeRole: getStored<RoleName>("activeRole"),
 
   login: ({ token, user, roles, activeRole }: { token: string; user: AuthUser; roles: RoleName[]; activeRole: RoleName }) => {
@@ -43,9 +43,11 @@ const useAuthStore = create<AuthStore>((set) => ({
   },
 
   setUser: (userData: Partial<AuthUser>) => {
-    const merged = { ...getStored<AuthUser>("user")!, ...userData };
-    localStorage.setItem("user", JSON.stringify(merged));
-    set({ user: merged });
+    set((state) => {
+      const merged = { ...state.user!, ...userData };
+      localStorage.setItem("user", JSON.stringify(merged));
+      return { user: merged };
+    });
   },
 
   logout: () => {
@@ -56,10 +58,15 @@ const useAuthStore = create<AuthStore>((set) => ({
     set({ token: null, user: null, userRoles: [], activeRole: null });
   },
 
-  switchRole: (role: RoleName, newToken?: string) => {
+  switchRole: (role: RoleName, newToken?: string, roles?: RoleName[]) => {
     localStorage.setItem("activeRole", role);
     if (newToken) localStorage.setItem("token", newToken);
-    set({ activeRole: role, ...(newToken ? { token: newToken } : {}) });
+    if (roles) localStorage.setItem("userRoles", JSON.stringify(roles));
+    set({
+      activeRole: role,
+      ...(newToken ? { token: newToken } : {}),
+      ...(roles ? { userRoles: roles } : {}),
+    });
   },
 }));
 

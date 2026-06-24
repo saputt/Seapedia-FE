@@ -87,6 +87,7 @@ const DriverHistoryPage: React.FC = () => {
                       <img
                         src={item.product?.imageUrl || "/placeholder.png"}
                         alt={item.product?.name || "Product"}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     </div>

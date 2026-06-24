@@ -1,6 +1,6 @@
 import type { WalletTransactionType } from "../../types";
 
-export const WALLET_TYPE_LABEL: Record<WalletTransactionType, string> = {
+export const WALLET_TYPE_LABEL: Record<WalletTransactionType, string> & { [key: string]: string } = {
   TOP_UP: "Top Up",
   PAYMENT: "Pembayaran",
   REFUND: "Refund",

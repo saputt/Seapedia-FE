@@ -11,17 +11,32 @@ const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const refreshCart = useCartStore((s) => s.refreshCart);
+  const setItems = useCartStore((s) => s.setItems);
   const [loading, setLoading] = useState(true);
   const [busyItems, setBusyItems] = useState<Record<string, boolean>>({});
   const [confirmClear, setConfirmClear] = useState(false);
+  const [removedHidden, setRemovedHidden] = useState<string[]>([]);
 
   const updateMutation = useUpdateCartItem();
   const removeMutation = useRemoveCartItem();
+
   const clearMutation = useClearCart();
 
   useEffect(() => {
     refreshCart().finally(() => setLoading(false));
   }, [refreshCart]);
+
+  useEffect(() => {
+    if (loading) return;
+    const hiddenItems = items.filter((item) => (item.product as any).isHidden);
+    if (hiddenItems.length > 0) {
+      setRemovedHidden(hiddenItems.map((i) => i.product.name));
+      hiddenItems.forEach((item) => {
+        removeMutation.mutate(item.productId);
+      });
+      setItems(items.filter((item) => !(item.product as any).isHidden));
+    }
+  }, [loading]);
 
   const handleUpdateQty = (productId: string, newQty: number) => {
     if (newQty < 1) return;
@@ -71,7 +86,7 @@ const CartPage: React.FC = () => {
           </div>
         )}
 
-        {!loading && items.length === 0 && (
+        {!loading && items.length === 0 && removedHidden.length === 0 && (
           <div className="text-center py-20">
             <p className="text-text-secondary text-lg mb-4">
               Keranjang belanja Anda masih kosong.
@@ -85,8 +100,30 @@ const CartPage: React.FC = () => {
           </div>
         )}
 
+        {!loading && items.length === 0 && removedHidden.length > 0 && (
+          <div className="text-center py-20">
+            <p className="text-text-secondary text-lg mb-4">
+              Keranjang belanja Anda masih kosong.
+            </p>
+            <p className="text-text-muted text-sm mb-6">
+              {removedHidden.length} produk telah dihapus karena disembunyikan oleh admin.
+            </p>
+            <Link
+              to="/"
+              className="btn-primary text-sm !py-2 !px-6 inline-block"
+            >
+              Mulai Belanja
+            </Link>
+          </div>
+        )}
+
         {!loading && items.length > 0 && (
           <>
+            {removedHidden.length > 0 && (
+              <div className="mb-4 p-3 bg-danger/10 border-2 border-danger rounded-lg text-sm text-danger font-medium">
+                {removedHidden.length} produk telah disembunyikan oleh admin dan dihapus dari keranjang.
+              </div>
+            )}
             <div className="space-y-4">
               {items.map((item) => (
                 <CartItem

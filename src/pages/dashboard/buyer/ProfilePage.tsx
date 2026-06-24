@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
+import Avatar from "../../../shared/components/ui/Avatar";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import PasswordForm from "../../../features/user/components/PasswordForm";
-import { useProfile, useUpdateProfile, useChangePassword } from "../../../features/user/hooks/useUser";
+import { useProfile, useUpdateProfile, useUpdateProfileImage, useChangePassword } from "../../../features/user/hooks/useUser";
 
 const ProfilePage: React.FC = () => {
   const { data: profile, isLoading, error } = useProfile();
   const updateProfileMutation = useUpdateProfile();
+  const updateImageMutation = useUpdateProfileImage();
   const changePasswordMutation = useChangePassword();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [username, setUsername] = useState("");
   const [editing, setEditing] = useState(false);
@@ -34,9 +37,40 @@ const ProfilePage: React.FC = () => {
     } catch { /* handled */ }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    updateImageMutation.mutate(file);
+  };
+
   return (
     <div className="max-w-[600px] mx-auto space-y-6">
       <h1 className="text-xl font-bold text-text-primary">Profil Saya</h1>
+
+      <div className="card flex items-center gap-4">
+        <div className="relative">
+          <Avatar src={profile?.imageUrl} name={profile?.username || "User"} size="lg" />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute bottom-0 right-0 w-5 h-5 bg-brand-deep text-white rounded-full flex items-center justify-center text-xs"
+          >
+            +
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageChange}
+          />
+        </div>
+        <div>
+          <p className="text-lg font-bold text-text-primary">{profile?.username}</p>
+          <p className="text-sm text-text-muted">{profile?.email}</p>
+        </div>
+        {updateImageMutation.isPending && <Spinner size="sm" />}
+      </div>
 
       <div className="card">
         <h2 className="text-sm font-bold text-text-primary mb-4">Informasi Akun</h2>

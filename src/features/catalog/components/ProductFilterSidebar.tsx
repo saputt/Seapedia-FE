@@ -1,14 +1,11 @@
 import { CATEGORY_LABEL } from "../../../shared/constants/product";
-import { CATEGORY_ICONS, SORT_OPTIONS } from "../../../shared/constants/productIcons";
 
 interface ProductFilterSidebarProps {
   categoryFilter: string;
-  sortByParam: string;
   filterMinPrice: string;
   filterMaxPrice: string;
   onCategoryClick: (key: string) => void;
   onApplyPriceFilter: () => void;
-  onSortChange: (value: string) => void;
   onClearAll: () => void;
   onMinPriceChange: (value: string) => void;
   onMaxPriceChange: (value: string) => void;
@@ -16,12 +13,10 @@ interface ProductFilterSidebarProps {
 
 const ProductFilterSidebar = ({
   categoryFilter,
-  sortByParam,
   filterMinPrice,
   filterMaxPrice,
   onCategoryClick,
   onApplyPriceFilter,
-  onSortChange,
   onClearAll,
   onMinPriceChange,
   onMaxPriceChange,
@@ -77,19 +72,6 @@ const ProductFilterSidebar = ({
       <button onClick={onApplyPriceFilter} className="mt-2 text-xs font-semibold text-brand-deep hover:underline">
         Terapkan
       </button>
-    </div>
-
-    <div>
-      <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">Urutkan</h4>
-      <select
-        value={sortByParam}
-        onChange={(e) => onSortChange(e.target.value)}
-        className="input-neo w-full text-sm !py-1.5"
-      >
-        {SORT_OPTIONS.map((opt: { value: string; label: string }) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
     </div>
   </div>
 );

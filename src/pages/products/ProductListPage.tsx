@@ -1,36 +1,51 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import ProductFilterSidebar from "../../features/catalog/components/ProductFilterSidebar";
+import CategoryGrid from "../../features/catalog/components/CategoryGrid";
 import { useProducts } from "../../features/catalog/hooks/useProducts";
+import { useTopSellingProducts } from "../../features/catalog/hooks/useTopSellingProducts";
+import useAuthStore from "../../features/auth/store/authStore";
 import { useWallet } from "../../features/wallet/hooks/useWallet";
-import { CATEGORY_LABEL } from "../../shared/constants/product";
-import { CATEGORY_ICONS } from "../../shared/constants/productIcons";
 import type { ProductCategory } from "../../types";
+import PromoBannerCarousel from "../../features/catalog/components/PromoBannerCarousel";
+import { PROMO_BANNERS } from "../../shared/constants/promoBanners";
+import { CATEGORY_LABEL } from "../../shared/constants/product";
+import { SORT_OPTIONS } from "../../shared/constants/productIcons";
+import CustomSelect from "../../shared/components/ui/CustomSelect";
+import useDebounce from "../../shared/hooks/useDebounce";
+import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
+
+const GRID_CONFIG = { cols: { default: 2, md: 4, xl: 5 } } as const;
+const MAX_GRID_COLS = GRID_CONFIG.cols.xl;
+const PRODUCTS_PER_PAGE = MAX_GRID_COLS * 2;
 
 const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const token = useAuthStore((s) => s.token);
   const { data: wallet } = useWallet();
   const rawQuery = searchParams.get("q") || "";
-  const [debouncedSearch, setDebouncedSearch] = useState(rawQuery);
+  const debouncedSearch = useDebounce(rawQuery, 400);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const categoryFilter = searchParams.get("category") || "";
   const minPriceParam = searchParams.get("minPrice") || "";
   const maxPriceParam = searchParams.get("maxPrice") || "";
   const sortByParam = searchParams.get("sortBy") || "newest";
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const [showFilters, setShowFilters] = useState(false);
   const [filterMinPrice, setFilterMinPrice] = useState(minPriceParam);
   const [filterMaxPrice, setFilterMaxPrice] = useState(maxPriceParam);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(rawQuery), 400);
-    return () => clearTimeout(timer);
-  }, [rawQuery]);
+  const showHero = !debouncedSearch && !categoryFilter && !minPriceParam && !maxPriceParam;
+  const hasActiveFilter = !!debouncedSearch || !!categoryFilter || !!minPriceParam || !!maxPriceParam;
 
-  const showHero = !debouncedSearch;
+  const isLoggedIn = !!token;
 
   const {
     data,
@@ -45,30 +60,24 @@ const ProductListPage: React.FC = () => {
     minPrice: minPriceParam || undefined as any,
     maxPrice: maxPriceParam || undefined as any,
     sortBy: sortByParam,
+    limit: PRODUCTS_PER_PAGE,
   });
 
   const allProducts = data?.pages.flatMap((page: any) => page.products ?? page.data ?? []) ?? [];
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+  const canLoadMore = isLoggedIn;
+  const showLoginPrompt = !isLoggedIn && hasNextPage && allProducts.length > 0;
+
+  const { data: topSellingProducts = [], isLoading: topSellingLoading } = useTopSellingProducts(4);
+
+  const loadMoreRef = useInfiniteScroll(
+    () => {
+      if (hasNextPage && !isFetchingNextPage && canLoadMore) {
         fetchNextPage();
       }
     },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
+    { enabled: canLoadMore && hasNextPage && !isFetchingNextPage }
   );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      rootMargin: "100px",
-    });
-    const el = loadMoreRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-    };
-  }, [handleObserver]);
 
   const updateParams = (updates: Record<string, string>) => {
     const next = new URLSearchParams(searchParams);
@@ -97,11 +106,21 @@ const ProductListPage: React.FC = () => {
     setFilterMaxPrice("");
   };
 
+  const totalProducts = data?.pages[0]?.total ?? allProducts.length;
+
+  const resultLabel = debouncedSearch && categoryFilter
+    ? `Kategori ${CATEGORY_LABEL[categoryFilter]} — "${debouncedSearch}"`
+    : debouncedSearch
+      ? `Pencarian "${debouncedSearch}"`
+      : categoryFilter
+        ? `Kategori ${CATEGORY_LABEL[categoryFilter]}`
+        : "Semua Produk";
+
   const renderProductGrid = () => (
     <>
       {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="card animate-pulse">
               <div className="aspect-square bg-bg-tertiary mb-4" />
               <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
@@ -130,21 +149,69 @@ const ProductListPage: React.FC = () => {
 
       {!isLoading && !isError && allProducts.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
             {allProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+            {showLoginPrompt &&
+              Array.from({ length: 5 - (allProducts.length % 5 === 0 ? 5 : allProducts.length % 5) }).map((_, i) => (
+                <div key={`filler-${i}`} className="card animate-pulse opacity-50">
+                  <div className="aspect-square bg-bg-tertiary mb-4" />
+                  <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
+                  <div className="h-6 bg-bg-tertiary rounded w-1/3 mb-2" />
+                  <div className="h-4 bg-bg-tertiary rounded w-1/2" />
+                </div>
+              ))}
           </div>
 
-          <div ref={loadMoreRef} className="mt-8 flex justify-center">
+          <div ref={loadMoreRef} className="mt-8">
             {isFetchingNextPage && (
-              <div className="flex items-center gap-2 text-text-secondary">
-                <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
-                Memuat produk lainnya...
+              <div className="flex justify-center">
+                <div className="flex items-center gap-2 text-text-secondary">
+                  <span className="w-5 h-5 border-[3px] border-brand-deep border-t-transparent rounded-full animate-spin" />
+                  Memuat produk lainnya...
+                </div>
               </div>
             )}
-            {!hasNextPage && allProducts.length > 0 && (
-              <p className="text-text-muted text-sm">Semua produk telah ditampilkan</p>
+            {showLoginPrompt && !isFetchingNextPage && (
+              <div className="relative">
+                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5 opacity-50 pointer-events-none select-none">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="card animate-pulse">
+                      <div className="aspect-square bg-bg-tertiary mb-4" />
+                      <div className="h-5 bg-bg-tertiary rounded w-3/4 mb-2" />
+                      <div className="h-6 bg-bg-tertiary rounded w-1/3 mb-2" />
+                      <div className="h-4 bg-bg-tertiary rounded w-1/2" />
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="card text-center py-6 px-4 border-border-primary max-w-md w-full mx-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-brand-deep mb-3">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <p className="text-text-primary font-medium mb-1">Silakan login terlebih dahulu</p>
+                    <p className="text-text-secondary text-sm mb-4">Untuk memuat lebih banyak produk, Anda harus login terlebih dahulu.</p>
+                    <button
+                      onClick={() => navigate("/auth/login")}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand-deep text-white font-semibold rounded-lg hover:bg-brand-subtle hover:text-brand-deep transition-colors border-[3px] border-brand-deep shadow-[4px_4px_0_0_var(--color-brand-deep)] hover:shadow-[6px_6px_0_0_var(--color-brand-deep)] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      Login Sekarang
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {!hasNextPage && allProducts.length > 0 && !showLoginPrompt && (
+              <div className="flex justify-center">
+                <p className="text-text-muted text-sm">Semua produk telah ditampilkan</p>
+              </div>
             )}
           </div>
         </>
@@ -154,12 +221,18 @@ const ProductListPage: React.FC = () => {
 
   return (
     <MainLayout navbarVariant="products">
-      <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
+      <div className="max-w-[1280px] mx-auto w-full px-3 lg:px-8 py-8">
 
         {showHero && (
+          <div className="mb-6">
+            <PromoBannerCarousel banners={PROMO_BANNERS} />
+          </div>
+        )}
+
+        {showHero && !!token && (
           <button
-            onClick={() => navigate("/dashboard/buyer/wallet")}
-            className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left"
+            onClick={() => navigate("/wallet")}
+            className="card w-full flex items-center justify-between mb-6 hover:bg-brand-subtle transition-colors cursor-pointer text-left p-2"
           >
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-deep">
@@ -175,43 +248,50 @@ const ProductListPage: React.FC = () => {
         )}
 
         {showHero && (
-          <div className="grid grid-cols-5 gap-3 mb-8">
-            {Object.entries(CATEGORY_LABEL).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => handleCategoryClick(key)}
-                className="flex flex-col items-center justify-center gap-2 py-5 px-2 bg-brand-deep text-white border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] hover:shadow-[8px_8px_0_0_var(--color-brand-deep)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all cursor-pointer"
-              >
-                <span className="w-8 h-8 flex items-center justify-center text-white">
-                  {CATEGORY_ICONS[key]}
-                </span>
-                <span className="text-[11px] font-semibold text-white text-center leading-tight">
-                  {label}
-                </span>
-              </button>
-            ))}
+          <CategoryGrid categoryFilter={categoryFilter} onCategoryClick={handleCategoryClick} />
+        )}
+
+        {showHero && (
+          <div className="mb-8">
+            <div className="bg-brand-deep border-[3px] border-brand-deep shadow-[6px_6px_0_0_var(--color-brand-deep)] px-0 lg:px-6 py-6 flex gap-6">
+              <div className="flex-col justify-center shrink-0 pr-6 border-r-[3px] border-white/30 hidden lg:flex">
+                <h2 className="text-white text-2xl font-bold leading-tight">Produk<br/>Terlaris</h2>
+                <p className="text-white/70 text-sm mt-2">Pilihan favorit pembeli</p>
+              </div>
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-4 flex-1 min-w-0 [&::-webkit-scrollbar]:hidden">
+                <div className="flex-col justify-center shrink-0 lg:hidden snap-start">
+                  <h2 className="text-white text-lg font-bold leading-tight">Produk<br/>Terlaris</h2>
+                  <p className="text-white/70 text-[10px] mt-1">Pilihan favorit pembeli</p>
+                </div>
+                {topSellingLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="bg-white border-[3px] border-brand-deep card animate-pulse shrink-0 w-[45vw] sm:w-auto snap-start">
+                        <div className="aspect-square bg-bg-tertiary" />
+                        <div className="p-3 space-y-2">
+                          <div className="h-4 bg-bg-tertiary rounded w-3/4" />
+                          <div className="h-5 bg-bg-tertiary rounded w-1/3" />
+                        </div>
+                      </div>
+                    ))
+                  : topSellingProducts.slice(0, 4).map((product: any) => (
+                      <div key={product.id} className="bg-white border-[3px] border-brand-deep shrink-0 w-[45vw] sm:w-auto snap-start">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
+              </div>
+            </div>
           </div>
         )}
 
-        {debouncedSearch ? (
+        {hasActiveFilter && (
           <div className="flex gap-8">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center gap-1 text-sm font-semibold text-brand-deep"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
-              Filter
-            </button>
-
-            <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6`}>
+            <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-56 shrink-0 space-y-6 sticky top-[88px] self-start`}>
               <ProductFilterSidebar
                 categoryFilter={categoryFilter}
-                sortByParam={sortByParam}
                 filterMinPrice={filterMinPrice}
                 filterMaxPrice={filterMaxPrice}
                 onCategoryClick={handleCategoryClick}
                 onApplyPriceFilter={handleApplyPriceFilter}
-                onSortChange={(val: string) => updateParams({ sortBy: val, page: "" })}
                 onClearAll={handleClearAll}
                 onMinPriceChange={setFilterMinPrice}
                 onMaxPriceChange={setFilterMaxPrice}
@@ -219,12 +299,33 @@ const ProductListPage: React.FC = () => {
             </aside>
 
             <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="lg:hidden flex items-center gap-1 text-sm font-semibold text-brand-deep shrink-0"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+                    {showFilters ? "Sembunyikan Filter" : "Filter"}
+                  </button>
+                  <p className="text-sm text-text-secondary truncate">
+                    {resultLabel} — <span className="font-semibold text-text-primary">{totalProducts}</span> produk
+                  </p>
+                </div>
+                <div className="w-44 shrink-0">
+                  <CustomSelect
+                    value={sortByParam}
+                    options={SORT_OPTIONS.map((o) => [o.value, o.label])}
+                    onChange={(val) => updateParams({ sortBy: val, page: "" })}
+                  />
+                </div>
+              </div>
               {renderProductGrid()}
             </div>
           </div>
-        ) : (
-          renderProductGrid()
         )}
+
+        {!hasActiveFilter && renderProductGrid()}
       </div>
     </MainLayout>
   );

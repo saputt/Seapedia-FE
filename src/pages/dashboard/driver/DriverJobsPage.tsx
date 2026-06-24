@@ -41,7 +41,7 @@ const DriverJobsPage: React.FC = () => {
         </span>
       </div>
 
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-1">
         <span className="text-sm font-medium text-text-primary">{job.store?.storeName || "Toko"}</span>
         {job.shippingMethod && (
           <span className="text-xs bg-brand-subtle text-text-secondary px-2 py-0.5 rounded">
@@ -49,6 +49,9 @@ const DriverJobsPage: React.FC = () => {
           </span>
         )}
       </div>
+      {job.store?.address && (
+        <p className="text-xs text-text-muted mb-3">{job.store.address}</p>
+      )}
 
       <div className="space-y-2 mb-4">
         {job.orderItems?.slice(0, 3).map((item: any) => (
@@ -57,6 +60,7 @@ const DriverJobsPage: React.FC = () => {
               <img
                 src={item.product?.imageUrl || "/placeholder.png"}
                 alt={item.product?.name || "Product"}
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -75,13 +79,13 @@ const DriverJobsPage: React.FC = () => {
         )}
       </div>
 
-      {job.address && (
+      {job.addressSnapshot && (
         <div className="mb-4 p-3 bg-brand-subtle/30 rounded-lg">
           <p className="text-xs font-semibold text-text-muted mb-1">Alamat Pengiriman</p>
           <p className="text-sm text-text-secondary">
-            {job.address.label && <span className="font-medium text-text-primary">{job.address.label}</span>}
-            {job.address.label && <br />}
-            {job.address.completeAddress}
+            {job.addressLabel && <span className="font-medium text-text-primary">{job.addressLabel}</span>}
+            {job.addressLabel && <br />}
+            {job.addressSnapshot}
           </p>
         </div>
       )}

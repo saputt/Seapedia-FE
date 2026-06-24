@@ -25,7 +25,7 @@ const OrderManagementPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
         <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
         <ErrorState message="Gagal memuat pesanan." onRetry={() => window.location.reload()} />
@@ -34,7 +34,7 @@ const OrderManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
       <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
 
@@ -133,6 +133,7 @@ const OrderManagementPage: React.FC = () => {
                       <img
                         src={item.product?.imageUrl || "/placeholder.png"}
                         alt={item.product?.name || "Product"}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -178,14 +179,21 @@ const OrderManagementPage: React.FC = () => {
 
             {expandedId === order.id && (
               <div className="border-t border-border px-5 py-4 space-y-4 bg-brand-subtle/20">
-                {order.address && (
+                {order.addressSnapshot && (
                   <div>
                     <p className="text-xs font-semibold text-text-muted mb-1">Alamat Pengiriman</p>
                     <p className="text-sm text-text-secondary">
-                      {order.address.label && <span className="font-medium text-text-primary">{order.address.label}</span>}
-                      {order.address.label && <br />}
-                      {order.address.completeAddress}
+                      {order.addressLabel && <span className="font-medium text-text-primary">{order.addressLabel}</span>}
+                      {order.addressLabel && <br />}
+                      {order.addressSnapshot}
                     </p>
+                  </div>
+                )}
+
+                {order.storeAddress && (
+                  <div>
+                    <p className="text-xs font-semibold text-text-muted mb-1">Alamat Toko</p>
+                    <p className="text-sm text-text-secondary">{order.storeAddress}</p>
                   </div>
                 )}
 

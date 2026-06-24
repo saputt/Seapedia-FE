@@ -9,8 +9,22 @@ export const useAddToCart = () => {
   const refreshCart = useCartStore((s) => s.refreshCart);
 
   return useMutation({
+    mutationFn: (input: { productId: string; quantity?: number; force?: boolean }) =>
+      addToCart(input),
+    onSuccess: () => {
+      refreshCart();
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+    },
+  });
+};
+
+export const useAddToCartWithForce = () => {
+  const queryClient = useQueryClient();
+  const refreshCart = useCartStore((s) => s.refreshCart);
+
+  return useMutation({
     mutationFn: ({ productId, quantity = 1 }: { productId: string; quantity?: number }) =>
-      addToCart(productId, quantity),
+      addToCart({ productId, quantity, force: true }),
     onSuccess: () => {
       refreshCart();
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
@@ -24,15 +38,21 @@ export const useUpdateCartItem = () => {
   return useMutation({
     mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
       updateCartItem(productId, quantity),
-    onSuccess: (updated, { productId }) => {
-      const currentItems = useCartStore.getState().items;
+    onMutate: async ({ productId, quantity }) => {
+      const previous = useCartStore.getState().items;
       setItems(
-        currentItems.map((item) =>
+        previous.map((item) =>
           item.productId === productId
-            ? { ...item, quantity: updated.quantity }
+            ? { ...item, quantity }
             : item
         )
       );
+      return { previous };
+    },
+    onError: (_err, { productId }, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -42,9 +62,15 @@ export const useRemoveCartItem = () => {
 
   return useMutation({
     mutationFn: (productId: string) => removeCartItem(productId),
-    onSuccess: (_data, productId) => {
-      const currentItems = useCartStore.getState().items;
-      setItems(currentItems.filter((item) => item.productId !== productId));
+    onMutate: async (productId) => {
+      const previous = useCartStore.getState().items;
+      setItems(previous.filter((item) => item.productId !== productId));
+      return { previous };
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -54,8 +80,15 @@ export const useClearCart = () => {
 
   return useMutation({
     mutationFn: () => clearCart(),
-    onSuccess: () => {
+    onMutate: async () => {
+      const previous = useCartStore.getState().items;
       setItems([]);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        setItems(context.previous);
+      }
     },
   });
 };
@@ -66,14 +99,18 @@ export const useClearAndAddToCart = () => {
   const hideBadge = useCartStore((s) => s.hideBadge);
 
   return useMutation({
-    mutationFn: async (productId: string) => {
-      await clearCart();
-      return addToCart(productId, 1);
+    // Force add clears the cart on the backend before adding the new item
+    mutationFn: async ({ productId, quantity = 1 }: { productId: string; quantity?: number }) => {
+      return addToCart({ productId, quantity, force: true });
     },
     onSuccess: async () => {
       await refreshCart();
       hideBadge();
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["order-summary"] });
+    },
+    onError: () => {
+      refreshCart();
     },
   });
 };

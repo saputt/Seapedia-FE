@@ -1,9 +1,12 @@
 import { apiFetch } from "../../../api/client";
-import type { Store, StoreInput } from "../../../types";
+import type { Store, StoreInput, StoreReviewsResponse } from "../../../types";
 
 export const getStoreById = (storeId: string): Promise<Store> => apiFetch(`stores/${storeId}`);
 
 export const getMyStore = (): Promise<Store> => apiFetch("stores/my");
+
+export const getStoreReviews = (storeId: string): Promise<StoreReviewsResponse> =>
+  apiFetch(`stores/${storeId}/reviews`);
 
 export const createStore = (dto: StoreInput): Promise<Store> =>
   apiFetch("stores", {

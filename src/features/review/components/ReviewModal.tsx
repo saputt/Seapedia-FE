@@ -128,6 +128,7 @@ const ReviewModal = ({
                     <img
                       src={product.imageUrl || "/placeholder.png"}
                       alt={product.name}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </div>

@@ -13,7 +13,7 @@ import Spinner from "../../../shared/components/ui/Spinner";
 
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const { data: raw, isLoading, error } = useOrderDetail(orderId);
+  const { data: raw, isLoading, error } = useOrderDetail(orderId!);
   const order = (raw as any)?.order ?? raw;
   const cancelMutation = useCancelOrder();
   const confirmMutation = useBuyerConfirmOrder();
@@ -79,7 +79,7 @@ const OrderDetailPage: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-[720px] mx-auto w-full px-6 lg:px-8 py-8 space-y-6">
+      <div className="max-w-[720px] mx-auto w-full space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Detail Pesanan</h1>
           <span className={`text-xs font-bold ${STATUS_COLOR[order.status] || "text-text-secondary"}`}>
@@ -117,6 +117,7 @@ const OrderDetailPage: React.FC = () => {
                   <img
                     src={item.product?.imageUrl || "/placeholder.png"}
                     alt={item.product?.name || "Product"}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -144,15 +145,24 @@ const OrderDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {order.address && (
+        {order.addressSnapshot && (
           <div className="card">
             <h2 className="text-sm font-bold text-text-primary mb-2">Alamat Pengiriman</h2>
             <p className="text-sm text-text-secondary leading-relaxed">
-              {order.address.label && (
-                <span className="font-semibold text-text-primary">{order.address.label}</span>
+              {order.addressLabel && (
+                <span className="font-semibold text-text-primary">{order.addressLabel}</span>
               )}
-              {order.address.label && <br />}
-              {(order.address as any).completeAddress}
+              {order.addressLabel && <br />}
+              {order.addressSnapshot}
+            </p>
+          </div>
+        )}
+
+        {order.storeAddress && (
+          <div className="card">
+            <h2 className="text-sm font-bold text-text-primary mb-2">Alamat Toko</h2>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {order.storeAddress}
             </p>
           </div>
         )}
@@ -265,7 +275,7 @@ const OrderDetailPage: React.FC = () => {
       {reviewModal && (
         <ReviewModal
           order={{
-            id: orderId,
+            id: orderId!,
             product: reviewModal.product,
             productId: reviewModal.productId,
             alreadyReviewed: order.reviews?.some(

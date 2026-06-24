@@ -9,3 +9,6 @@ export const createProductReview = (productId: string, data: ReviewInput): Promi
 
 export const getProductReviews = (productId: string): Promise<ProductReview[]> =>
   apiFetch(`products/${productId}/reviews`);
+
+export const getSellerReviews = (): Promise<any> =>
+  apiFetch(`reviews/seller`);

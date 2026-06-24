@@ -1,22 +1,36 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";
-import Spinner from "../../shared/components/ui/Spinner";
 import AddressSelector from "../../features/order/components/AddressSelector";
+import CheckoutShippingSelector from "../../features/checkout/components/CheckoutShippingSelector";
+import CheckoutSummaryCard from "../../features/checkout/components/CheckoutSummaryCard";
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
 import { useCheckoutOrder } from "../../features/order/hooks/useOrders";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
-import { SHIPPING_LIST } from "../../shared/constants/order";
+import { checkDiscount } from "../../features/discount/api/discount.api";
 import type { Address } from "../../types";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const directBuyItems = useMemo(() => {
+    const buyNow = searchParams.get("buyNow");
+    const productId = searchParams.get("productId");
+    const quantity = searchParams.get("quantity");
+    if (buyNow === "1" && productId) {
+      return [{ productId, quantity: Number(quantity) || 1 }];
+    }
+    return undefined;
+  }, [searchParams]);
 
   const [shippingMethod, setShippingMethod] = useState("REGULAR");
   const [discountCode, setDiscountCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
+  const [discountCheckError, setDiscountCheckError] = useState("");
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
@@ -24,7 +38,7 @@ const CheckoutPage: React.FC = () => {
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  const { data: summaryData, isLoading, isFetching, error: summaryError, refetch } = useOrderSummary(appliedCode, shippingMethod);
+  const { data: summaryData, isLoading, isFetching, error: summaryError, refetch } = useOrderSummary(appliedCode, shippingMethod, directBuyItems);
   const summary = (summaryData as any)?.order ?? null;
   const orderToken = (summaryData as any)?.orderToken ?? null;
 
@@ -41,10 +55,10 @@ const CheckoutPage: React.FC = () => {
   }, [isLoading, addressesData]);
 
   const summaryErrorMessage = summaryError?.message || "";
-  const discountErrorMsg = !appliedCode ? "" :
+  const discountErrorMsg = !appliedCode || !summaryError ? "" :
     summaryErrorMessage.toLowerCase().includes("not found") ? "Kode diskon tidak ditemukan." :
     (summaryErrorMessage.toLowerCase().includes("expired") || summaryErrorMessage.toLowerCase().includes("not available")) ? "Kode diskon sudah tidak berlaku." :
-    summaryErrorMessage || "Gagal menerapkan diskon.";
+    summaryErrorMessage;
 
   const checkoutMutation = useCheckoutOrder();
 
@@ -59,7 +73,7 @@ const CheckoutPage: React.FC = () => {
     }
     setCheckoutError("");
     checkoutMutation.mutate(
-      { orderToken, addressId: selectedAddress.id },
+      { orderToken, addressId: selectedAddress.id, totalPrice },
       {
         onSuccess: () => {
           navigate("/checkout/success");
@@ -77,15 +91,37 @@ const CheckoutPage: React.FC = () => {
     );
   };
 
+  const checkDiscountMutation = useMutation({
+    mutationFn: (code: string) => checkDiscount(code),
+    retry: false,
+  });
+
   const handleApplyDiscount = () => {
     const trimmed = discountCode.trim().toUpperCase();
     if (!trimmed) return;
-    setAppliedCode(trimmed);
+    setDiscountCheckError("");
+    checkDiscountMutation.mutate(trimmed, {
+      onSuccess: () => {
+        setAppliedCode(trimmed);
+        setDiscountCode(""); // Clear input after successful application
+      },
+      onError: (err: Error) => {
+        const msg = err?.message || "";
+        if (msg.toLowerCase().includes("not found")) {
+          setDiscountCheckError("Kode diskon tidak ditemukan.");
+        } else if (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("not available")) {
+          setDiscountCheckError("Kode diskon sudah tidak berlaku.");
+        } else {
+          setDiscountCheckError("Gagal memvalidasi diskon. Silakan coba lagi.");
+        }
+      },
+    });
   };
 
   const handleRemoveDiscount = () => {
     setDiscountCode("");
     setAppliedCode("");
+    setDiscountCheckError("");
   };
 
   const subtotal = summary?.subtotal ?? 0;
@@ -105,7 +141,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        {summaryError && !isLoading && (
+        {!summary && summaryError && !isLoading && (
           <div className="text-center py-20">
             <p className="text-danger font-semibold text-lg mb-4">
               {(summaryError as Error)?.message || "Gagal memuat ringkasan pesanan."}
@@ -116,7 +152,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && !summaryError && summary && (
+        {summary && (
           <div className="space-y-6">
             {/* Address */}
             <div className="card">
@@ -169,6 +205,7 @@ const CheckoutPage: React.FC = () => {
                         <img
                           src={item.imageUrl}
                           alt={item.name}
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -227,103 +264,33 @@ const CheckoutPage: React.FC = () => {
                     onClick={handleApplyDiscount}
                     variant="primary"
                     size="sm"
-                    disabled={!discountCode.trim()}
+                    disabled={!discountCode.trim() || checkDiscountMutation.isPending}
                   >
-                    Pakai
+                    {checkDiscountMutation.isPending ? "Memvalidasi..." : "Pakai"}
                   </Button>
                 </div>
               )}
-              {discountErrorMsg && (
-                <p className="text-danger text-xs mt-1">{discountErrorMsg}</p>
+              {(discountCheckError || discountErrorMsg) && (
+                <p className="text-danger text-xs mt-1">{discountCheckError || discountErrorMsg}</p>
               )}
-              {appliedCode && !discountErrorMsg && (
+              {appliedCode && !discountCheckError && !discountErrorMsg && (
                 <p className="text-success text-xs mt-1">Diskon {appliedCode} berhasil diterapkan!</p>
               )}
             </div>
 
-            {/* Shipping */}
-            <div className="card relative">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Metode Pengiriman
-              </h2>
-              <div className="space-y-2">
-                {SHIPPING_LIST.map((s: { id: string; name: string; desc: string; price: number }) => (
-                  <label
-                    key={s.id}
-                    className={`flex items-center gap-3 px-3 py-2 rounded border-[2px] cursor-pointer transition-colors ${
-                      shippingMethod === s.id
-                        ? "border-brand-deep bg-brand-subtle"
-                        : "border-bg-tertiary hover:border-brand-light"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="shipping"
-                      value={s.id}
-                      checked={shippingMethod === s.id}
-                      onChange={() => setShippingMethod(s.id)}
-                      className="accent-brand-deep shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-primary">
-                        {s.name}
-                      </p>
-                      <p className="text-xs text-text-secondary">{s.desc}</p>
-                    </div>
-                    <p className="text-sm font-semibold text-text-primary shrink-0">
-                      Rp{s.price.toLocaleString("id-ID")}
-                    </p>
-                  </label>
-                ))}
-              </div>
+            <CheckoutShippingSelector
+              shippingMethod={shippingMethod}
+              isFetching={isFetching}
+              onChange={setShippingMethod}
+            />
 
-              {isFetching && (
-                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded">
-                  <Spinner />
-                </div>
-              )}
-            </div>
-
-            {/* Price Summary */}
-            <div className="card">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Ringkasan Pembayaran
-              </h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Subtotal</span>
-                  <span className="font-medium">
-                    Rp{subtotal.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                {discountValue > 0 && (
-                  <div className="flex justify-between text-success">
-                    <span>Diskon</span>
-                    <span className="font-medium">
-                      -Rp{discountValue.toLocaleString("id-ID")}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Ongkos Kirim</span>
-                  <span className="font-medium">
-                    Rp{shippingFee.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Pajak (12%)</span>
-                  <span className="font-medium">
-                    Rp{taxFee.toLocaleString("id-ID")}
-                  </span>
-                </div>
-                <div className="border-t-[2px] border-bg-tertiary pt-2 flex justify-between text-base font-bold">
-                  <span>Total</span>
-                  <span className="text-brand-deep">
-                    Rp{totalPrice.toLocaleString("id-ID")}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <CheckoutSummaryCard
+              subtotal={subtotal}
+              discountValue={discountValue}
+              shippingFee={shippingFee}
+              taxFee={taxFee}
+              totalPrice={totalPrice}
+            />
 
             {/* Checkout Button */}
             {checkoutError && (
@@ -350,7 +317,7 @@ const CheckoutPage: React.FC = () => {
           setSelectedAddress(addr);
           setShowAddressSelector(false);
         }}
-        selectedId={selectedAddress?.id}
+        selectedId={selectedAddress?.id ?? ""}
       />
 
       <AlertModal
@@ -359,7 +326,7 @@ const CheckoutPage: React.FC = () => {
         title="Saldo Tidak Cukup"
         message="Saldo dompet Anda tidak mencukupi untuk melakukan checkout. Silakan top up terlebih dahulu."
         actionLabel="Top Up"
-        onAction={() => navigate("/dashboard/buyer/wallet")}
+        onAction={() => navigate("/wallet")}
       />
     </MainLayout>
   );

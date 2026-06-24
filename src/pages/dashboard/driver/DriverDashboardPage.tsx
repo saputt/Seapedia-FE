@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useMyDriverJobs } from "../../../features/driver/hooks/useDriverJobs";
+import { useMyDriverJobs, useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { useWallet } from "../../../features/wallet/hooks/useWallet";
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
@@ -8,16 +8,39 @@ import StatCard from "../../../shared/components/ui/StatCard";
 const DriverDashboardPage: React.FC = () => {
   const { data: jobs = [], isLoading } = useMyDriverJobs() as any;
   const { data: wallet } = useWallet() as any;
+  const { data: availableJobs } = useAvailableJobs() as any;
 
   const stats = useMemo(() => {
-    const onDelivery = jobs.filter((j: any) => j.status === "ON_DELIVERY").length;
-    const delivered = jobs.filter((j: any) => j.status === "DELIVERED").length;
-    const totalEarnings = jobs
-      .filter((j: any) => j.status === "DELIVERED")
-      .reduce((sum: number, j: any) => sum + (j.driverJob?.earning || 0), 0);
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()).getTime();
 
-    return { onDelivery, delivered, totalEarnings, activeJob: jobs.find((j: any) => j.status === "ON_DELIVERY") };
-  }, [jobs]);
+    const onDelivery = jobs.filter((j: any) => j.status === "ON_DELIVERY");
+    const delivered = jobs.filter((j: any) => j.status === "DELIVERED");
+
+    const todayDelivered = delivered.filter((j: any) => {
+      const doneAt = j.driverJob?.doneAt ? new Date(j.driverJob.doneAt).getTime() : 0;
+      return doneAt >= todayStart;
+    });
+
+    const weekDelivered = delivered.filter((j: any) => {
+      const doneAt = j.driverJob?.doneAt ? new Date(j.driverJob.doneAt).getTime() : 0;
+      return doneAt >= weekStart;
+    });
+
+    const todayEarnings = todayDelivered.reduce((sum: number, j: any) => sum + (j.driverJob?.earning || 0), 0);
+    const weekEarnings = weekDelivered.reduce((sum: number, j: any) => sum + (j.driverJob?.earning || 0), 0);
+
+    return {
+      onDelivery: onDelivery.length,
+      delivered: delivered.length,
+      todayDelivered: todayDelivered.length,
+      todayEarnings,
+      weekEarnings,
+      activeJob: onDelivery[0] ?? null,
+      availableCount: availableJobs?.length ?? 0,
+    };
+  }, [jobs, availableJobs]);
 
   if (isLoading) {
     return (
@@ -30,45 +53,79 @@ const DriverDashboardPage: React.FC = () => {
   return (
     <>
       <h1 className="text-2xl font-bold text-text-primary mb-1">Dashboard</h1>
-      <p className="text-sm text-text-muted mb-8">Ringkasan aktivitas kurir Anda</p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Pengiriman Aktif" value={stats.onDelivery} variant="badge" color="bg-info" />
-        <StatCard label="Pesanan Selesai" value={stats.delivered} variant="badge" color="bg-success" />
-        <StatCard label="Saldo Dompet" value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`} variant="badge" color="bg-brand-deep" />
-      </div>
+      <p className="text-sm text-text-muted mb-6">Ringkasan aktivitas kurir Anda</p>
 
       {stats.activeJob && (
-        <div className="card !p-5 border-l-[4px] border-info">
+        <div className="card !p-5 border-l-[4px] border-info mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-text-primary">Pengiriman Aktif</p>
+              <p className="text-sm font-semibold text-info uppercase tracking-wide mb-1">Pengiriman Aktif</p>
+              <p className="font-bold text-text-primary text-lg">
+                #{stats.activeJob.id.slice(0, 8)}
+              </p>
               <p className="text-sm text-text-muted mt-1">
-                Pesanan #{stats.activeJob.id.slice(0, 8)} sedang dalam pengiriman
+                {stats.activeJob.store?.storeName ?? "Toko"} · Rp{stats.activeJob.shippingFee?.toLocaleString("id-ID") ?? 0}
               </p>
             </div>
-            <Link to="/dashboard/driver/history" className="btn-primary text-sm !py-2 !px-4 inline-block">
+            <Link
+              to="/dashboard/driver/jobs"
+              className="btn-primary text-sm !py-2 !px-4 inline-block shrink-0"
+            >
               Lihat Detail
             </Link>
           </div>
         </div>
       )}
 
-      {stats.onDelivery === 0 && (
-        <div className="card !p-5 border-l-[4px] border-warning">
+      {!stats.activeJob && (
+        <div className="card !p-5 border-l-[4px] border-warning mb-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-text-primary">Tidak Ada Pengiriman Aktif</p>
               <p className="text-sm text-text-muted mt-1">
-                Ambil pekerjaan baru yang tersedia
+                {stats.availableCount > 0
+                  ? `Ada ${stats.availableCount} pekerjaan tersedia untuk Anda`
+                  : "Belum ada pekerjaan tersedia saat ini"}
               </p>
             </div>
-            <Link to="/dashboard/driver/jobs" className="btn-primary text-sm !py-2 !px-4 inline-block">
+            <Link
+              to="/dashboard/driver/jobs"
+              className="btn-primary text-sm !py-2 !px-4 inline-block shrink-0"
+            >
               Cari Pekerjaan
             </Link>
           </div>
         </div>
       )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <StatCard label="Saldo Dompet" value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`} variant="badge" color="bg-brand-deep" />
+        <StatCard label="Pendapatan Hari Ini" value={`Rp${stats.todayEarnings.toLocaleString("id-ID")}`} variant="badge" color="bg-success" />
+        <StatCard label="Pengiriman Hari Ini" value={stats.todayDelivered} variant="badge" color="bg-info" />
+      </div>
+
+      <div className="card !p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-text-primary">Pendapatan Minggu Ini</p>
+            <p className="text-xs text-text-muted mt-0.5">{stats.weekEarnings > 0 ? `${stats.weekEarnings.toLocaleString("id-ID")} dari ${stats.delivered} pengiriman` : "Belum ada pengiriman"}</p>
+          </div>
+          <p className="text-2xl font-bold text-text-primary">
+            Rp{stats.weekEarnings.toLocaleString("id-ID")}
+          </p>
+        </div>
+        {stats.weekEarnings > 0 && stats.todayEarnings > 0 && (
+          <div className="mt-3 pt-3 border-t-2 border-border-default">
+            <div className="w-full bg-bg-tertiary rounded-full h-2">
+              <div
+                className="bg-brand-deep h-2 rounded-full transition-all"
+                style={{ width: `${Math.min((stats.todayEarnings / stats.weekEarnings) * 100, 100)}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-text-muted mt-1">{Math.round((stats.todayEarnings / stats.weekEarnings) * 100)}% dari total minggu ini</p>
+          </div>
+        )}
+      </div>
     </>
   );
 };

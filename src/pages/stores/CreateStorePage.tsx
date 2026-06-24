@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
-import Button from "../../shared/components/ui/Button";
+import Spinner from "../../shared/components/ui/Spinner";
 import { useCreateStore } from "../../features/store/hooks/useCreateStore";
 import { useMyStore } from "../../features/store/hooks/useMyStore";
 import { getReadableError } from "../../shared/utils/errorMapper";
-import Spinner from "../../shared/components/ui/Spinner";
+import { StoreForm } from "@/features/store/components/StoreForm";
+import type { StoreInput } from "@/shared/validations";
 
 const CreateStorePage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,14 +18,10 @@ const CreateStorePage: React.FC = () => {
     }
   }, [store, isLoading, navigate]);
 
-  const [storeName, setStoreName] = useState("");
-  const [description, setDescription] = useState("");
   const createStoreMutation = useCreateStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!storeName.trim() || !description.trim()) return;
-    createStoreMutation.mutate({ storeName: storeName.trim(), description: description.trim() } as any);
+  const onSubmitForm = (data: StoreInput) => {
+    createStoreMutation.mutate({ storeName: data.name.trim(), description: data.description.trim(), address: data.address?.trim(), imageUrl: data.imageUrl || undefined });
   };
 
   if (isLoading) {
@@ -54,63 +51,10 @@ const CreateStorePage: React.FC = () => {
             </div>
           )}
 
-          {createStoreMutation.isSuccess && (
-            <div className="mb-6 p-4 border-[3px] border-success bg-success/5">
-              <p className="text-success text-sm font-semibold">
-                Toko berhasil dibuat! Mengarahkan ke dashboard...
-              </p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-text-secondary font-medium text-sm mb-1.5">
-                Nama Toko
-              </label>
-              <input
-                type="text"
-                value={storeName}
-                onChange={(e) => setStoreName(e.target.value)}
-                className="input-neo w-full"
-                placeholder="cth: Toko Sejahtera"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-text-secondary font-medium text-sm mb-1.5">
-                Deskripsi Toko
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="input-neo w-full resize-none h-28"
-                placeholder="Ceritakan tentang toko Anda..."
-                required
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                onClick={() => navigate(-1)}
-                variant="ghost"
-                size="lg"
-                fullWidth
-              >
-                Batal
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                fullWidth
-                loading={createStoreMutation.isPending}
-              >
-                {createStoreMutation.isPending ? "Membuat..." : "Buat Toko"}
-              </Button>
-            </div>
-          </form>
+          <StoreForm
+            onSubmit={onSubmitForm}
+            isPending={createStoreMutation.isPending}
+          />
         </div>
       </div>
     </MainLayout>

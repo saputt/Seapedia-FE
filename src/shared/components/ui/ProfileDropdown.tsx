@@ -5,6 +5,7 @@ import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./SwitchRoleModal";
 import AlertModal from "./AlertModal";
+import Avatar from "./Avatar";
 import type { RoleName } from "../../../types";
 
 const ProfileDropdown = () => {
@@ -23,12 +24,6 @@ const ProfileDropdown = () => {
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
   const initial = displayName[0].toUpperCase();
 
-  const dashboardRoute = activeRole
-    ? `/dashboard/${activeRole.toLowerCase()}`
-    : userRoles.length > 0
-      ? `/dashboard/${userRoles[0].toLowerCase()}`
-      : "/";
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -46,7 +41,7 @@ const ProfileDropdown = () => {
       if (store) {
         setSwitchingRole("SELLER");
         const res = await switchUserRole("SELLER");
-        switchRole("SELLER", res.accessToken);
+        switchRole("SELLER", res.accessToken, res.userRoles);
         setSwitchingRole(null);
         navigate("/dashboard/seller", { replace: true });
       } else {
@@ -62,7 +57,7 @@ const ProfileDropdown = () => {
     setSwitchingRole("BUYER");
     try {
       const res = await switchUserRole("BUYER");
-      switchRole("BUYER", res.accessToken);
+      switchRole("BUYER", res.accessToken, res.userRoles);
       setSwitchingRole(null);
       navigate("/", { replace: true });
     } catch {
@@ -75,7 +70,7 @@ const ProfileDropdown = () => {
     setSwitchingRole("DRIVER");
     try {
       const res = await switchUserRole("DRIVER");
-      switchRole("DRIVER", res.accessToken);
+      switchRole("DRIVER", res.accessToken, res.userRoles);
       setSwitchingRole(null);
       navigate("/dashboard/driver", { replace: true });
     } catch {
@@ -90,9 +85,7 @@ const ProfileDropdown = () => {
           onClick={() => setDropdownOpen((prev) => !prev)}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-full bg-brand-deep text-white flex items-center justify-center text-sm font-bold">
-            {initial}
-          </div>
+          <Avatar src={user?.imageUrl} name={displayName} size="sm" />
           <span className="hidden sm:inline text-sm font-medium text-text-primary">
             {displayName}
           </span>
@@ -101,7 +94,7 @@ const ProfileDropdown = () => {
         {dropdownOpen && (
           <div className="absolute right-0 top-full mt-2 card !p-2 min-w-[200px] z-50">
             <Link
-              to="/dashboard/buyer/profile"
+                  to="/profile"
               onClick={() => setDropdownOpen(false)}
               className="block px-3 py-2 border-b-[2px] border-bg-tertiary hover:bg-brand-subtle rounded transition-colors"
             >
@@ -113,32 +106,24 @@ const ProfileDropdown = () => {
               </p>
             </Link>
 
-            <Link
-              to={dashboardRoute}
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
-            >
-              Dashboard
-            </Link>
-
             {activeRole === "BUYER" && (
               <>
                 <Link
-                  to="/dashboard/buyer/wallet"
+                  to="/wallet"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
                   Wallet
                 </Link>
                 <Link
-                  to="/dashboard/buyer/orders"
+                  to="/orders"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
                   Pesanan
                 </Link>
                 <Link
-                  to="/dashboard/buyer/profile"
+              to="/profile"
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
                 >
@@ -167,7 +152,25 @@ const ProfileDropdown = () => {
             )}
 
             <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
-              {activeRole !== "BUYER" && (
+              {activeRole === "BUYER" && !userRoles.includes("SELLER") && (
+                <Link
+                  to="/onboarding/seller"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-brand-deep font-medium hover:bg-brand-subtle rounded transition-colors"
+                >
+                  Buka Toko
+                </Link>
+              )}
+              {activeRole === "BUYER" && !userRoles.includes("DRIVER") && (
+                <Link
+                  to="/onboarding/driver"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-brand-deep font-medium hover:bg-brand-subtle rounded transition-colors"
+                >
+                  Jadi Driver
+                </Link>
+              )}
+              {activeRole !== "BUYER" && userRoles.includes("BUYER") && (
                 <button
                   onClick={handleBuyerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -175,7 +178,7 @@ const ProfileDropdown = () => {
                   Buyer
                 </button>
               )}
-              {activeRole !== "SELLER" && (
+              {activeRole !== "SELLER" && userRoles.includes("SELLER") && (
                 <button
                   onClick={handleSellerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -183,7 +186,7 @@ const ProfileDropdown = () => {
                   Seller
                 </button>
               )}
-              {activeRole !== "DRIVER" && (
+              {activeRole !== "DRIVER" && userRoles.includes("DRIVER") && (
                 <button
                   onClick={handleDriverClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
