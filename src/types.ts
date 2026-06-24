@@ -60,6 +60,12 @@ export interface Store {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  _count?: {
+    reviews: number;
+    products?: number;
+  };
+  reviews?: { rating: number }[];
+  products?: { id: string }[];
 }
 
 export interface StoreInput {
