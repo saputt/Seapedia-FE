@@ -196,7 +196,7 @@ const Navbar = ({ variant = "default", onMenuClick }: NavbarProps) => {
             {isLoggedIn && <CartPreview />}
 
             {isLoggedIn ? (
-              <ProfileDropdown />
+              <span className="hidden md:block"><ProfileDropdown /></span>
             ) : (
               <>
                 <Link to="/auth/login" className="btn-primary text-sm !py-2 !px-5">
