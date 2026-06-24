@@ -5,15 +5,23 @@ export type SpinnerProps = {
 
 const Spinner = ({ size = "md", className = "" }: SpinnerProps) => {
   const sizeMap: Record<string, string> = {
-    sm: "w-4 h-4 border-2",
-    md: "w-6 h-6 border-[3px]",
-    lg: "w-8 h-8 border-[3px]",
+    sm: "gap-1",
+    md: "gap-1.5",
+    lg: "gap-2",
+  };
+
+  const dotSizeMap: Record<string, string> = {
+    sm: "w-1.5 h-1.5",
+    md: "w-2 h-2",
+    lg: "w-2.5 h-2.5",
   };
 
   return (
-    <span
-      className={`${sizeMap[size] || sizeMap.md} border-brand-deep border-t-transparent rounded-full animate-spin inline-block ${className}`}
-    />
+    <span className={`inline-flex items-center ${sizeMap[size] || sizeMap.md} ${className}`}>
+      <span className={`${dotSizeMap[size] || dotSizeMap.md} bg-brand-deep rounded-full animate-bounce1`} />
+      <span className={`${dotSizeMap[size] || dotSizeMap.md} bg-brand-deep rounded-full animate-bounce2`} />
+      <span className={`${dotSizeMap[size] || dotSizeMap.md} bg-brand-deep rounded-full animate-bounce3`} />
+    </span>
   );
 };
 
