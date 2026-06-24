@@ -73,6 +73,7 @@ export const useCancelOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
+      queryClient.invalidateQueries({ queryKey: ["topSellingProducts"] });
       queryClient.invalidateQueries({ queryKey: ["wallet"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
@@ -137,6 +138,7 @@ export const useBuyerConfirmOrder = () => {
     onSettled: (_data, _err, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["topSellingProducts"] });
     },
   });
 };
@@ -170,6 +172,7 @@ export const useCheckoutOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product"] });
+      queryClient.invalidateQueries({ queryKey: ["topSellingProducts"] });
       queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
       queryClient.invalidateQueries({ queryKey: ["order-summary"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
