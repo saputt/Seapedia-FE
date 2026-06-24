@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
 import Input from "@/shared/components/ui/Input";
 import Avatar from "@/shared/components/ui/Avatar";
-import { uploadImage } from "@/api/upload";
+import { uploadStoreImage } from "@/api/upload";
 import { storeSchema, type StoreInput } from "@/shared/validations";
 
 interface StoreFormProps {
@@ -39,7 +39,7 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
     if (!file) return;
     setUploading(true);
     try {
-      const result = await uploadImage(file);
+      const result = await uploadStoreImage(file);
       setValue("imageUrl", result.url);
       setImagePreview(result.url);
     } catch {

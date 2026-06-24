@@ -4,7 +4,7 @@ import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useUpdateStore } from "../../../features/store/hooks/useUpdateStore";
 import Button from "../../../shared/components/ui/Button";
 import Avatar from "../../../shared/components/ui/Avatar";
-import { uploadImage } from "../../../api/upload";
+import { uploadStoreImage } from "../../../api/upload";
 import { getReadableError } from "../../../shared/utils/errorMapper";
 import Spinner from "../../../shared/components/ui/Spinner";
 
@@ -41,7 +41,7 @@ const StoreManagement: React.FC = () => {
     if (!file) return;
     setUploadingStoreImg(true);
     try {
-      const result = await uploadImage(file);
+      const result = await uploadStoreImage(file);
       setImageUrl(result.url);
     } catch {
       /* ignore */
