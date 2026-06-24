@@ -1,0 +1,15 @@
+name: Ping HF Spaces
+
+on:
+  schedule:
+    - cron: "*/14 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Frontend
+        run: curl -s -o /dev/null -w "%{http_code}" https://saukiputraa-seapedia-frontend.hf.space || true
+      - name: Ping Backend
+        run: curl -s -o /dev/null -w "%{http_code}" https://saukiputraa-seapedia-backend.hf.space/api/ || true
