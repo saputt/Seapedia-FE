@@ -6,6 +6,7 @@ import SwitchRoleModal from "./SwitchRoleModal";
 import AlertModal from "./AlertModal";
 import Avatar from "./Avatar";
 import { useRoleSwitch } from "../../hooks/useRoleSwitch";
+import { prefetchMyStore, prefetchAdminDashboard } from "@/shared/utils/prefetch";
 import type { RoleName } from "../../../types";
 
 const ProfileDropdown = () => {
@@ -36,6 +37,17 @@ const ProfileDropdown = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (dropdownOpen) {
+      if (userRoles.includes("SELLER") && activeRole !== "SELLER") {
+        prefetchMyStore();
+      }
+      if (userRoles.includes("ADMIN") && activeRole !== "ADMIN") {
+        prefetchAdminDashboard();
+      }
+    }
+  }, [dropdownOpen, userRoles, activeRole]);
 
   const handleSellerClick = useCallback(async () => {
     setDropdownOpen(false);
