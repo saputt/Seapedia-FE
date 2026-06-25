@@ -257,7 +257,7 @@ const AppRoutes = () => {
                 sidebarTitle="Admin Panel"
                 sidebarSubtitle="Manajemen Sistem"
                 sidebarLinks={adminSidebarLinks}
-                mobileNav="hamburger"
+                mobileNav="bottom-tabs"
               />
             </RoleRoute>
           </PrivateRoute>

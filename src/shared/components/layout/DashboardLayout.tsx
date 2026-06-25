@@ -6,6 +6,7 @@ import BottomTabBar from "./BottomTabBar";
 import MobileSidebar from "./MobileSidebar";
 import SellerBottomNav from "./SellerBottomNav";
 import DriverBottomNav from "./DriverBottomNav";
+import AdminBottomNav from "./AdminBottomNav";
 import { SidebarLink } from "../../../types";
 import { useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 
@@ -67,6 +68,7 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
       )}
       <SellerBottomNav />
       <DriverBottomNav />
+      <AdminBottomNav />
     </div>
   );
 };
