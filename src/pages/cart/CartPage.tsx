@@ -6,6 +6,7 @@ import Button from "../../shared/components/ui/Button";
 import CartItem from "../../features/cart/components/CartItem";
 import useCartStore from "../../features/cart/store/cartStore";
 import { useUpdateCartItem, useRemoveCartItem, useClearCart } from "../../features/cart/hooks/useCartMutations";
+import { prefetchOrderSummary } from "@/shared/utils/prefetch";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,19 @@ const CartPage: React.FC = () => {
   useEffect(() => {
     refreshCart().finally(() => setLoading(false));
   }, [refreshCart]);
+
+  useEffect(() => {
+    if (!loading && items.length > 0) {
+      const itemsForSummary = items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
+      prefetchOrderSummary({
+        items: itemsForSummary,
+        shippingMethod: "REGULAR",
+      });
+    }
+  }, [loading, items]);
 
   useEffect(() => {
     if (loading) return;
