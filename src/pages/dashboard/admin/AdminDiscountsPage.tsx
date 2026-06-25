@@ -1,10 +1,10 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
 import Spinner from "../../../shared/components/ui/Spinner";
+import AlertModal from "../../../shared/components/ui/AlertModal";
 import DiscountForm from "../../../features/discount/components/DiscountForm";
 import { useDiscounts, useCreateDiscount, useDeleteDiscount } from "../../../features/discount/hooks/useDiscounts";
-import { Discount } from "../../../types";
+import type { Discount } from "../../../types";
 
 const TABS = [
   { key: "all", label: "Semua" },
@@ -15,6 +15,7 @@ const TABS = [
 const AdminDiscountsPage: React.FC = () => {
   const [tab, setTab] = useState("all");
   const [showCreate, setShowCreate] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: discounts, isLoading, error, refetch } = useDiscounts();
   const createMutation = useCreateDiscount();
@@ -31,9 +32,15 @@ const AdminDiscountsPage: React.FC = () => {
     });
   };
 
-  const handleDelete = (id: string) => {
-    if (!window.confirm("Hapus diskon ini?")) return;
-    deleteMutation.mutate(id);
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteId) {
+      deleteMutation.mutate(deleteId);
+      setDeleteId(null);
+    }
   };
 
   if (isLoading) {
@@ -121,7 +128,7 @@ const AdminDiscountsPage: React.FC = () => {
                     </td>
                     <td className="py-2.5">
                       <button
-                        onClick={() => handleDelete(d.id)}
+                        onClick={() => handleDeleteClick(d.id)}
                         className="text-danger font-semibold text-xs hover:underline"
                       >
                         {deleteMutation.isPending ? "..." : "Hapus"}
@@ -134,6 +141,16 @@ const AdminDiscountsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <AlertModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        icon="🗑️"
+        title="Hapus Diskon"
+        message="Apakah Anda yakin ingin menghapus diskon ini? Tindakan ini tidak dapat dibatalkan."
+        actionLabel="Hapus"
+        onAction={handleConfirmDelete}
+      />
     </>
   );
 };
