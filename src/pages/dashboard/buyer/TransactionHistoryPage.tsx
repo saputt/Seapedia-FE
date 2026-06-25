@@ -22,9 +22,16 @@ const TransactionHistoryPage: React.FC = () => {
 
   const hasFilter = !!startDate || !!endDate || typeFilter !== "ALL";
 
+  const toLocalDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   const apiFilters = useMemo(() => ({
-    ...(startDate ? { startDate: startDate.toISOString().split("T")[0] } : {}),
-    ...(endDate ? { endDate: endDate.toISOString().split("T")[0] } : {}),
+    ...(startDate ? { startDate: toLocalDateStr(startDate) } : {}),
+    ...(endDate ? { endDate: toLocalDateStr(endDate) } : {}),
     ...(typeFilter !== "ALL" ? { type: typeFilter } : {}),
   }), [startDate, endDate, typeFilter]);
 
@@ -84,6 +91,21 @@ const TransactionHistoryPage: React.FC = () => {
                     onChange={setTypeFilter}
                   />
                 </div>
+                {hasFilter && (
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStartDate(null);
+                        setEndDate(null);
+                        setTypeFilter("ALL");
+                      }}
+                      className="text-xs text-danger hover:underline whitespace-nowrap"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

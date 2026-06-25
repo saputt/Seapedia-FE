@@ -1,17 +1,20 @@
+import type { ReactNode } from "react";
+
 export type StatCardProps = {
   label: string;
   value: string | number;
   variant?: "badge" | "simple";
   color?: string;
   prefix?: string;
+  icon?: ReactNode;
 };
 
-const StatCard = ({ label, value, variant = "simple", color, prefix }: StatCardProps) => {
+const StatCard = ({ label, value, variant = "simple", color, prefix, icon }: StatCardProps) => {
   if (variant === "badge") {
     return (
       <div className="card !p-5 flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl ${color || "bg-brand-deep"} flex items-center justify-center`}>
-          <span className="text-white text-lg font-bold">{value}</span>
+        <div className={`w-12 h-12 rounded-xl ${color || "bg-brand-deep"} flex items-center justify-center shrink-0`}>
+          {icon ?? <span className="text-white text-lg font-bold">{value}</span>}
         </div>
         <div>
           <p className="text-sm text-text-muted">{label}</p>

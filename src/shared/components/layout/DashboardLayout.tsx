@@ -50,7 +50,7 @@ const DashboardLayout = ({ navbarVariant = "default", sidebarTitle, sidebarSubti
           subtitle={sidebarSubtitle}
           links={sidebarLinks}
         />
-        <div className={`flex-1 p-6 lg:p-8 overflow-auto ${mobileNav === "bottom-tabs" || mobileNav === "hamburger" ? "pb-24 lg:pb-8" : ""}`}>
+        <div className={`flex-1 p-3 lg:p-8 overflow-auto ${mobileNav === "bottom-tabs" || mobileNav === "hamburger" ? "pb-24 lg:pb-8" : ""}`}>
           <Outlet />
         </div>
       </div>
