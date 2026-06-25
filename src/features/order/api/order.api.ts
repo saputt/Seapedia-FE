@@ -7,7 +7,7 @@ import type {
   ShippingMethod,
 } from "../../../types";
 
-interface OrderSummaryInput {
+export interface OrderSummaryInput {
   items: Array<{ productId: string; quantity: number }>;
   shippingMethod: ShippingMethod;
   discountCode?: string;
