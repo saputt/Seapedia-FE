@@ -22,6 +22,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
       to={`/products/${product.id}`} 
       className="card group block p-0"
       onMouseEnter={() => prefetchProductDetail(product.id)}
+      onTouchStart={() => prefetchProductDetail(product.id)}
     >
       <div className="aspect-square bg-bg-tertiary flex items-center justify-center mb-3 overflow-hidden">
         {product.imageUrl ? (
