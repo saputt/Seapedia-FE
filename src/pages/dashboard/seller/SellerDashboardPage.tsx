@@ -55,12 +55,24 @@ const SellerDashboardPage: React.FC = () => {
           value={`Rp${stats.totalRevenue.toLocaleString("id-ID")}`}
           variant="badge"
           color="bg-success"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          }
         />
         <StatCard
           label="Perlu Diproses"
           value={stats.pending}
           variant="badge"
           color={stats.pending > 0 ? "bg-warning" : "bg-gray-400"}
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+          }
         />
       </div>
 
