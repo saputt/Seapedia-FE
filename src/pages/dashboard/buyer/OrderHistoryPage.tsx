@@ -120,6 +120,7 @@ const OrderHistoryPage: React.FC = () => {
               to={`/orders/${order.id}`}
               className="card block hover:shadow-lg transition-shadow"
               onMouseEnter={() => prefetchOrderDetail(order.id)}
+              onTouchStart={() => prefetchOrderDetail(order.id)}
             >
               <div className="flex items-start justify-between mb-2">
                 <div>

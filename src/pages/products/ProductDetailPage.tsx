@@ -234,6 +234,7 @@ const ProductDetailPage: React.FC = () => {
                       to={`/stores/${product.store.id}`} 
                       className="block mt-6"
                       onMouseEnter={() => prefetchStore(product.store.id)}
+                      onTouchStart={() => prefetchStore(product.store.id)}
                     >
                       <div className="card p-5 hover:bg-brand-subtle hover:border-brand-deep/30 transition-all duration-200 border-[2px] border-bg-tertiary w-full">
                         <div className="flex items-center justify-between">
