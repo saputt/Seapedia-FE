@@ -35,6 +35,7 @@ const DefaultNavbar = () => {
   const token = useAuthStore((s) => s.token);
   const refreshCart = useCartStore((s) => s.refreshCart);
   const searchQuery = searchParams.get("q") || "";
+  const categoryQuery = searchParams.get("category") || "";
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [history, setHistory] = useState<string[]>(getSearchHistory);
@@ -83,10 +84,10 @@ const DefaultNavbar = () => {
       <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            {(location.pathname !== "/" || searchQuery) && (
+            {(location.pathname !== "/" || searchQuery || categoryQuery) && (
               <button
                 onClick={() => {
-                  if (searchQuery && location.pathname === "/") {
+                  if (location.pathname === "/" && (searchQuery || categoryQuery)) {
                     setSearchParams({}, { replace: true });
                   } else {
                     navigate(-1);
