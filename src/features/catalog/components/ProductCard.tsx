@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORY_SHORT } from "../../../shared/constants/product";
 import StarRating from "../../../shared/components/ui/StarRating";
+import { prefetchProductDetail } from "@/shared/utils/prefetch";
 import type { Product } from "../../../types";
 
 interface ProductCardProduct extends Product {
@@ -17,7 +18,11 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
   const price = product.price?.toLocaleString("id-ID");
 
   return (
-    <Link to={`/products/${product.id}`} className="card group block p-0">
+    <Link 
+      to={`/products/${product.id}`} 
+      className="card group block p-0"
+      onMouseEnter={() => prefetchProductDetail(product.id)}
+    >
       <div className="aspect-square bg-bg-tertiary flex items-center justify-center mb-3 overflow-hidden">
         {product.imageUrl ? (
           <img 
