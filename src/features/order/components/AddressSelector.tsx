@@ -34,7 +34,9 @@ const AddressSelector = ({ isOpen, onClose, onSelect, selectedId }: AddressSelec
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       setShowForm(false);
       setForm({ label: "", completeAddress: "" });
-    } catch { /* handled */ }
+    } catch (error) {
+      console.error("Failed to create address:", error);
+    }
     setSaving(false);
   };
 

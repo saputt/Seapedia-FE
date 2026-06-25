@@ -30,7 +30,8 @@ const useCartStore = create<CartStore>((set) => ({
       const items = Array.isArray(data) ? (data as CartItem[]) : [];
       set({ items, badgeVisible: items.length > 0 });
       return items;
-    } catch {
+    } catch (error) {
+      console.error("Failed to refresh cart:", error);
       return [];
     }
   },
