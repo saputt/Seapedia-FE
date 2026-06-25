@@ -55,8 +55,11 @@ export interface UploadResponse {
 export interface Store {
   id: string;
   name: string;
+  storeName?: string;
   imageUrl: string | null;
   address?: string;
+  isActive?: boolean;
+  deactivationReason?: string | null;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -317,12 +320,60 @@ export interface DriverJob {
 
 // ==================== Admin ====================
 
+export interface AdminDashboardStats {
+  totalUsers: number;
+  totalStores: number;
+  totalProducts: number;
+  totalOrders: number;
+  totalDrivers: number;
+}
+
+export interface AdminDashboardResponse {
+  stats: AdminDashboardStats;
+  ordersByStatus: Record<string, number>;
+  recentOrders: AdminRecentOrder[];
+}
+
+export interface AdminRecentOrder {
+  id: string;
+  buyer: { username: string };
+  store: { storeName: string };
+  totalPrice: number;
+  createdAt: string;
+}
+
 export interface AdminDashboard {
   totalUsers: number;
   totalOrders: number;
   totalRevenue: number;
   activeUsers: number;
   totalDrivers: number;
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  imageUrl?: string | null;
+  isSuspended?: boolean;
+  createdAt: string;
+}
+
+export interface AdminDriver {
+  id: string;
+  username: string;
+  email: string;
+  isAvailable?: boolean;
+  createdAt: string;
+}
+
+export interface AdminStore {
+  id: string;
+  name: string;
+  storeName?: string;
+  isActive?: boolean;
+  userId: string;
+  createdAt: string;
 }
 
 export interface SimulationStatus {
