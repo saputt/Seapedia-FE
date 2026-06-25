@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { SidebarLink } from "../../../types";
+import useLockBodyScroll from "../../hooks/useLockBodyScroll";
 
 const NavIcon = ({ path }: { path: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -19,16 +20,7 @@ interface MobileSidebarProps {
 const MobileSidebar = ({ isOpen, onClose, title, subtitle, links }: MobileSidebarProps) => {
   const location = useLocation();
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  useLockBodyScroll(isOpen);
 
   useEffect(() => {
     onClose();

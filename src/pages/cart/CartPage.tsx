@@ -31,10 +31,11 @@ const CartPage: React.FC = () => {
     const hiddenItems = items.filter((item) => (item.product as any).isHidden);
     if (hiddenItems.length > 0) {
       setRemovedHidden(hiddenItems.map((i) => i.product.name));
+      const remainingItems = items.filter((item) => !(item.product as any).isHidden);
+      setItems(remainingItems);
       hiddenItems.forEach((item) => {
         removeMutation.mutate(item.productId);
       });
-      setItems(items.filter((item) => !(item.product as any).isHidden));
     }
   }, [loading]);
 

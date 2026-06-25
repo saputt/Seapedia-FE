@@ -5,13 +5,15 @@ import { STATUS_LABEL } from "../../../shared/constants/order";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
+import type { AdminDashboardResponse, AdminRecentOrder } from "../../../types";
 
 const AdminDashboardPage: React.FC = () => {
   const { data, isLoading, error } = useAdminDashboard();
   const navigate = useNavigate();
-  const stats = (data as any)?.stats;
-  const ordersByStatus: Record<string, number> = (data as any)?.ordersByStatus ?? {};
-  const recentOrders: any[] = (data as any)?.recentOrders ?? [];
+  const dashboardData = data as AdminDashboardResponse | undefined;
+  const stats = dashboardData?.stats;
+  const ordersByStatus: Record<string, number> = dashboardData?.ordersByStatus ?? {};
+  const recentOrders: AdminRecentOrder[] = dashboardData?.recentOrders ?? [];
 
   if (isLoading) {
     return (
@@ -70,7 +72,7 @@ const AdminDashboardPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((o: any) => (
+                {recentOrders.map((o: AdminRecentOrder) => (
                   <tr
                     key={o.id}
                     className="border-b border-border hover:bg-brand-subtle cursor-pointer transition-colors"

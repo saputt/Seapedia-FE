@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../../features/auth/store/authStore";
-import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./SwitchRoleModal";
 import AlertModal from "./AlertModal";
 import Avatar from "./Avatar";
+import { useRoleSwitch } from "../../hooks/useRoleSwitch";
 import type { RoleName } from "../../../types";
 
 const ProfileDropdown = () => {
@@ -14,7 +14,6 @@ const ProfileDropdown = () => {
   const activeRole = useAuthStore((s) => s.activeRole);
   const userRoles = useAuthStore((s) => s.userRoles);
   const logout = useAuthStore((s) => s.logout);
-  const switchRole = useAuthStore((s) => s.switchRole);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [switchingRole, setSwitchingRole] = useState<RoleName | null>(null);
@@ -22,7 +21,11 @@ const ProfileDropdown = () => {
   const profileRef = useRef<HTMLDivElement>(null);
 
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
-  const initial = displayName[0].toUpperCase();
+
+  const { switchToRole } = useRoleSwitch({
+    onSuccess: () => setSwitchingRole(null),
+    onError: () => setSwitchingRole(null),
+  });
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -40,43 +43,26 @@ const ProfileDropdown = () => {
       const store = await getMyStore();
       if (store) {
         setSwitchingRole("SELLER");
-        const res = await switchUserRole("SELLER");
-        switchRole("SELLER", res.accessToken, res.userRoles);
-        setSwitchingRole(null);
-        navigate("/dashboard/seller", { replace: true });
+        await switchToRole("SELLER", "/dashboard/seller");
       } else {
         navigate("/dashboard/seller/create-store");
       }
     } catch {
       navigate("/dashboard/seller/create-store");
     }
-  }, [navigate, switchRole]);
+  }, [navigate, switchToRole]);
 
-  const handleBuyerClick = useCallback(async () => {
+  const handleBuyerClick = useCallback(() => {
     setDropdownOpen(false);
     setSwitchingRole("BUYER");
-    try {
-      const res = await switchUserRole("BUYER");
-      switchRole("BUYER", res.accessToken, res.userRoles);
-      setSwitchingRole(null);
-      navigate("/", { replace: true });
-    } catch {
-      setSwitchingRole(null);
-    }
-  }, [navigate, switchRole]);
+    switchToRole("BUYER", "/");
+  }, [switchToRole]);
 
-  const handleDriverClick = useCallback(async () => {
+  const handleDriverClick = useCallback(() => {
     setDropdownOpen(false);
     setSwitchingRole("DRIVER");
-    try {
-      const res = await switchUserRole("DRIVER");
-      switchRole("DRIVER", res.accessToken, res.userRoles);
-      setSwitchingRole(null);
-      navigate("/dashboard/driver", { replace: true });
-    } catch {
-      setSwitchingRole(null);
-    }
-  }, [navigate, switchRole]);
+    switchToRole("DRIVER", "/dashboard/driver");
+  }, [switchToRole]);
 
   return (
     <>

@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import QuantitySelector from "./QuantitySelector";
+import useLockBodyScroll from "../../../shared/hooks/useLockBodyScroll";
 
 interface BuyBottomSheetProps {
   isOpen: boolean;
@@ -27,16 +28,7 @@ const BuyBottomSheet: React.FC<BuyBottomSheetProps> = ({
   isLoggedIn,
   onLoginClick,
 }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  useLockBodyScroll(isOpen);
 
   if (!isOpen || !product) return null;
 

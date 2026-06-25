@@ -11,21 +11,24 @@ import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayo
 import SellerRoute from "./SellerRoute";
 import DriverRoute from "./DriverRoute";
 import Spinner from "../shared/components/ui/Spinner";
+import ErrorBoundary from "../shared/components/ui/ErrorBoundary";
 import ScrollToTop from "../shared/utils/ScrollToTop";
 import { sellerSidebarLinks, driverSidebarLinks, adminSidebarLinks } from "../shared/constants/sidebarLinks";
 
 const lazyLoad = <T extends object>(importFn: () => Promise<{ default: ComponentType<T> }>) => {
   const Component = lazy(importFn);
   return (props: T) => (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-bg-primary">
-          <Spinner size="lg" />
-        </div>
-      }
-    >
-      <Component {...props} />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+            <Spinner size="lg" />
+          </div>
+        }
+      >
+        <Component {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 

@@ -7,6 +7,9 @@ import Button from "../../shared/components/ui/Button";
 import AddressSelector from "../../features/order/components/AddressSelector";
 import CheckoutShippingSelector from "../../features/checkout/components/CheckoutShippingSelector";
 import CheckoutSummaryCard from "../../features/checkout/components/CheckoutSummaryCard";
+import CheckoutAddressSection from "../../features/checkout/components/CheckoutAddressSection";
+import CheckoutItemsList from "../../features/checkout/components/CheckoutItemsList";
+import CheckoutDiscountSection from "../../features/checkout/components/CheckoutDiscountSection";
 import { useOrderSummary } from "../../features/order/hooks/useOrderSummary";
 import { useCheckoutOrder } from "../../features/order/hooks/useOrders";
 import { useAddresses } from "../../features/address/hooks/useAddresses";
@@ -72,8 +75,9 @@ const CheckoutPage: React.FC = () => {
       return;
     }
     setCheckoutError("");
+    const currentTotalPrice = summary?.totalPrice ?? 0;
     checkoutMutation.mutate(
-      { orderToken, addressId: selectedAddress.id, totalPrice },
+      { orderToken, addressId: selectedAddress.id, totalPrice: currentTotalPrice },
       {
         onSuccess: () => {
           navigate("/checkout/success");
@@ -103,7 +107,7 @@ const CheckoutPage: React.FC = () => {
     checkDiscountMutation.mutate(trimmed, {
       onSuccess: () => {
         setAppliedCode(trimmed);
-        setDiscountCode(""); // Clear input after successful application
+        setDiscountCode("");
       },
       onError: (err: Error) => {
         const msg = err?.message || "";
@@ -122,6 +126,10 @@ const CheckoutPage: React.FC = () => {
     setDiscountCode("");
     setAppliedCode("");
     setDiscountCheckError("");
+  };
+
+  const handleDiscountKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleApplyDiscount();
   };
 
   const subtotal = summary?.subtotal ?? 0;
@@ -154,129 +162,25 @@ const CheckoutPage: React.FC = () => {
 
         {summary && (
           <div className="space-y-6">
-            {/* Address */}
-            <div className="card">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Alamat Pengiriman
-              </h2>
-              {selectedAddress ? (
-                <div
-                  onClick={() => setShowAddressSelector(true)}
-                  className="cursor-pointer hover:bg-brand-subtle -mx-3 -my-2 px-3 py-2 rounded transition-colors"
-                >
-                  <p className="text-sm font-semibold text-text-primary">
-                    {selectedAddress.label}
-                  </p>
-                  <p className="text-xs text-text-secondary mt-0.5">
-                    {selectedAddress.fullAddress}
-                  </p>
-                  <p className="text-xs text-brand-deep mt-1 font-medium">
-                    Ketuk untuk mengganti
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-sm text-text-secondary mb-3">
-                    Belum ada alamat pengiriman dipilih.
-                  </p>
-                  <Button
-                    onClick={() => setShowAddressSelector(true)}
-                    variant="primary"
-                  >
-                    Pilih Alamat
-                  </Button>
-                </div>
-              )}
-            </div>
+            <CheckoutAddressSection
+              selectedAddress={selectedAddress}
+              onSelectClick={() => setShowAddressSelector(true)}
+            />
 
-            {/* Items */}
-            <div className="card">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Produk ({summary.products?.length || 0})
-              </h2>
-              <div className="space-y-3">
-                {summary.products?.map((item: { productId: string; imageUrl?: string; name: string; price: number; quantity: number; totalItemPrice: number }) => (
-                  <div
-                    key={item.productId}
-                    className="flex items-center gap-3"
-                  >
-                    <div className="w-14 h-14 bg-bg-tertiary rounded flex items-center justify-center overflow-hidden shrink-0">
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xs text-text-muted">Img</span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-primary truncate">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-text-secondary">
-                        Rp{item.price?.toLocaleString("id-ID")} x {item.quantity}
-                      </p>
-                    </div>
-                    <p className="text-sm font-semibold text-text-primary shrink-0">
-                      Rp{item.totalItemPrice?.toLocaleString("id-ID")}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CheckoutItemsList items={summary.products ?? []} />
 
-            {/* Discount */}
-            <div className="card">
-              <h2 className="text-sm font-bold text-text-primary mb-3">
-                Kode Diskon
-              </h2>
-              {appliedCode ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-success">{appliedCode}</p>
-                    {discountValue > 0 && (
-                      <p className="text-xs text-text-secondary">
-                        Diskon: Rp{discountValue.toLocaleString("id-ID")}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    onClick={handleRemoveDiscount}
-                    className="text-sm text-danger hover:underline self-start sm:self-auto"
-                  >
-                    Hapus
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleApplyDiscount()}
-                    className="input-neo w-full !py-2 !text-sm"
-                    placeholder="Masukkan kode diskon"
-                  />
-                  <Button
-                    onClick={handleApplyDiscount}
-                    variant="primary"
-                    size="sm"
-                    disabled={!discountCode.trim() || checkDiscountMutation.isPending}
-                  >
-                    {checkDiscountMutation.isPending ? "Memvalidasi..." : "Pakai"}
-                  </Button>
-                </div>
-              )}
-              {(discountCheckError || discountErrorMsg) && (
-                <p className="text-danger text-xs mt-1">{discountCheckError || discountErrorMsg}</p>
-              )}
-              {appliedCode && !discountCheckError && !discountErrorMsg && (
-                <p className="text-success text-xs mt-1">Diskon {appliedCode} berhasil diterapkan!</p>
-              )}
-            </div>
+            <CheckoutDiscountSection
+              discountCode={discountCode}
+              appliedCode={appliedCode}
+              discountValue={discountValue}
+              discountCheckError={discountCheckError}
+              discountErrorMsg={discountErrorMsg}
+              isPending={checkDiscountMutation.isPending}
+              onCodeChange={setDiscountCode}
+              onApply={handleApplyDiscount}
+              onRemove={handleRemoveDiscount}
+              onKeyDown={handleDiscountKeyDown}
+            />
 
             <CheckoutShippingSelector
               shippingMethod={shippingMethod}
@@ -292,7 +196,6 @@ const CheckoutPage: React.FC = () => {
               totalPrice={totalPrice}
             />
 
-            {/* Checkout Button */}
             {checkoutError && (
               <p className="text-danger text-sm text-center">{checkoutError}</p>
             )}
