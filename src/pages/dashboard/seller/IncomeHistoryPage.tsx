@@ -1,13 +1,35 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
+import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import { useWallet, useTransactions } from "../../../features/wallet/hooks/useWallet";
 import { WALLET_TYPE_LABEL } from "../../../shared/constants/wallet";
 
+const ALL_LIMIT = 1000;
+
+const toLocalDateStr = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 const IncomeHistoryPage: React.FC = () => {
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet() as any;
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError } = useTransactions() as any;
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const hasFilter = !!startDate || !!endDate;
+
+  const apiFilters = useMemo(() => ({
+    ...(startDate ? { startDate: toLocalDateStr(startDate) } : {}),
+    ...(endDate ? { endDate: toLocalDateStr(endDate) } : {}),
+  }), [startDate, endDate]);
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading: txLoading, error: txError, isFetching } = useTransactions(apiFilters, hasFilter ? ALL_LIMIT : undefined) as any;
 
   const loading = walletLoading || txLoading;
   const error = walletError || txError;
@@ -17,7 +39,7 @@ const IncomeHistoryPage: React.FC = () => {
   const totalIncome = incomeTx.reduce((sum: number, tx: any) => sum + tx.amount, 0);
 
   const sentinelRef = useInfiniteScroll(fetchNextPage, {
-    enabled: hasNextPage && !isFetchingNextPage,
+    enabled: !hasFilter && hasNextPage && !isFetchingNextPage,
   });
 
   if (loading) {
@@ -43,7 +65,7 @@ const IncomeHistoryPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Riwayat Pemasukkan</h1>
       <p className="text-sm text-text-muted mb-6">Riwayat pendapatan dari penjualan</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div className="card">
           <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1">
             Saldo Dompet
@@ -62,13 +84,58 @@ const IncomeHistoryPage: React.FC = () => {
         </div>
       </div>
 
+      <div className="card mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-text-muted mb-1.5">Filter Tanggal</p>
+            <button
+              type="button"
+              onClick={() => setShowCalendar(true)}
+              className="w-full border-[3px] border-brand-deep px-3 py-2 text-sm text-left bg-white hover:bg-brand-subtle transition-colors"
+            >
+              {startDate
+                ? `${startDate.toLocaleDateString("id-ID")}${endDate ? ` — ${endDate.toLocaleDateString("id-ID")}` : ""}`
+                : "Pilih periode..."}
+            </button>
+          </div>
+          {hasFilter && (
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => { setStartDate(null); setEndDate(null); }}
+                className="text-xs text-danger hover:underline whitespace-nowrap"
+              >
+                Reset Filter
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showCalendar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div onClick={(e) => e.stopPropagation()}>
+            <NeoCalendar
+              startDate={startDate}
+              endDate={endDate}
+              onStartChange={(d: Date | null) => setStartDate(d)}
+              onEndChange={(d: Date | null) => setEndDate(d)}
+              onClose={() => setShowCalendar(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="card">
-        <h2 className="text-sm font-bold text-text-primary mb-3">Riwayat Transaksi</h2>
-        {transactions.length === 0 ? (
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-text-primary">Riwayat Transaksi</h2>
+          <span className="text-xs text-text-muted">{incomeTx.length} transaksi</span>
+        </div>
+        {incomeTx.length === 0 ? (
           <p className="text-sm text-text-secondary text-center py-6">Belum ada transaksi.</p>
         ) : (
           <div className="space-y-2">
-            {transactions.map((tx: any) => (
+            {incomeTx.map((tx: any) => (
               <div
                 key={tx.id}
                 className="flex items-center justify-between px-3 py-2 rounded hover:bg-brand-subtle transition-colors"
@@ -85,27 +152,22 @@ const IncomeHistoryPage: React.FC = () => {
                     })}
                   </p>
                 </div>
-                <p
-                  className={`text-sm font-semibold ${
-                    tx.type === "SELLER_EARNING"
-                      ? "text-success"
-                      : tx.type === "PAYMENT"
-                        ? "text-danger"
-                        : "text-text-primary"
-                  }`}
-                >
-                  {tx.type === "SELLER_EARNING" || tx.type === "TOP_UP" || tx.type === "REFUND"
-                    ? `+Rp${tx.amount.toLocaleString("id-ID")}`
-                    : `-Rp${tx.amount.toLocaleString("id-ID")}`}
+                <p className="text-sm font-semibold text-success">
+                  +Rp{tx.amount.toLocaleString("id-ID")}
                 </p>
               </div>
             ))}
-            {isFetchingNextPage && (
+            {hasFilter && isFetching && (
               <div className="flex justify-center py-3">
                 <Spinner />
               </div>
             )}
-            {hasNextPage && !isFetchingNextPage && (
+            {!hasFilter && isFetchingNextPage && (
+              <div className="flex justify-center py-3">
+                <Spinner />
+              </div>
+            )}
+            {!hasFilter && hasNextPage && !isFetchingNextPage && (
               <div ref={sentinelRef} className="h-4" />
             )}
           </div>
