@@ -16,6 +16,7 @@ import { getAllProducts } from "../../features/catalog/api/catalog.api";
 import { useAddToCart, useClearAndAddToCart } from "../../features/cart/hooks/useCartMutations";
 import useAuthStore from "../../features/auth/store/authStore";
 import { CATEGORY_LABEL } from "../../shared/constants/product";
+import { prefetchStore } from "@/shared/utils/prefetch";
 
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -229,7 +230,11 @@ const ProductDetailPage: React.FC = () => {
                   )}
 
                   {product.store && (
-                    <Link to={`/stores/${product.store.id}`} className="block mt-6">
+                    <Link 
+                      to={`/stores/${product.store.id}`} 
+                      className="block mt-6"
+                      onMouseEnter={() => prefetchStore(product.store.id)}
+                    >
                       <div className="card p-5 hover:bg-brand-subtle hover:border-brand-deep/30 transition-all duration-200 border-[2px] border-bg-tertiary w-full">
                         <div className="flex items-center justify-between">
                           <div className="flex-1 min-w-0">
