@@ -99,9 +99,43 @@ const DriverDashboardPage: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <StatCard label="Saldo Dompet" value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`} variant="badge" color="bg-brand-deep" />
-        <StatCard label="Pendapatan Hari Ini" value={`Rp${stats.todayEarnings.toLocaleString("id-ID")}`} variant="badge" color="bg-success" />
-        <StatCard label="Pengiriman Hari Ini" value={stats.todayDelivered} variant="badge" color="bg-info" />
+        <StatCard
+          label="Saldo Dompet"
+          value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`}
+          variant="badge"
+          color="bg-brand-deep"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Pendapatan Hari Ini"
+          value={`Rp${stats.todayEarnings.toLocaleString("id-ID")}`}
+          variant="badge"
+          color="bg-success"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Pengiriman Hari Ini"
+          value={stats.todayDelivered}
+          variant="badge"
+          color="bg-info"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          }
+        />
       </div>
 
       <div className="card !p-5">
