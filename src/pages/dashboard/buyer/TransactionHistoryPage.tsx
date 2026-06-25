@@ -84,6 +84,21 @@ const TransactionHistoryPage: React.FC = () => {
                     onChange={setTypeFilter}
                   />
                 </div>
+                {hasFilter && (
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStartDate(null);
+                        setEndDate(null);
+                        setTypeFilter("ALL");
+                      }}
+                      className="text-xs text-danger hover:underline whitespace-nowrap"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

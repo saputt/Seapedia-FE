@@ -71,8 +71,9 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
     if (!startDate) {
       onStartChange(day);
       onEndChange(day);
-    } else if (day >= startDate) {
+    } else if (!endDate || day >= startDate) {
       onEndChange(day);
+      onClose();
     } else {
       onStartChange(day);
       onEndChange(day);
@@ -92,6 +93,7 @@ const NeoCalendar = ({ startDate, endDate, onStartChange, onEndChange, onClose }
     start.setHours(0, 0, 0, 0);
     onStartChange(start);
     onEndChange(end);
+    onClose();
   };
 
   const clearFilter = () => {
