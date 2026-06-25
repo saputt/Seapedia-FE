@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/components/ui/Button";
 import Input from "../../../shared/components/ui/Input";
 import { discountSchema, type DiscountInput } from "@/shared/validations";
+import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
 
 interface DiscountSubmitData {
   code: string;
@@ -70,11 +71,17 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
           <option value="VOUCHER">Voucher</option>
         </select>
         <Input
-          type="number"
-          {...register("value", { valueAsNumber: true })}
+          type="text"
+          inputMode="numeric"
+          {...register("value")}
+          onChange={(e) => {
+            handleNumberInput(e, (val) => {
+              setValue("value", val === "" ? 0 : parseInt(val, 10), { shouldValidate: true });
+            });
+          }}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full !text-sm !py-2"
           placeholder="Nilai diskon"
-          min="1"
           error={errors.value?.message}
         />
         <label className="flex items-center gap-2 text-sm text-text-secondary">
@@ -86,11 +93,17 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
           Persentase
         </label>
         <Input
-          type="number"
-          {...register("usageLimit", { valueAsNumber: true })}
+          type="text"
+          inputMode="numeric"
+          {...register("usageLimit")}
+          onChange={(e) => {
+            handleNumberInput(e, (val) => {
+              setValue("usageLimit", val === "" ? undefined : parseInt(val, 10), { shouldValidate: true });
+            });
+          }}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full !text-sm !py-2"
           placeholder="Maks penggunaan (opsional)"
-          min="1"
         />
         <Input
           type="date"

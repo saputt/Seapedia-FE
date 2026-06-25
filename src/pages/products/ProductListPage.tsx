@@ -299,6 +299,7 @@ const ProductListPage: React.FC = () => {
                 onClearAll={handleClearAll}
                 onMinPriceChange={setFilterMinPrice}
                 onMaxPriceChange={setFilterMaxPrice}
+                onClose={() => setShowFilters(false)}
               />
             </aside>
 

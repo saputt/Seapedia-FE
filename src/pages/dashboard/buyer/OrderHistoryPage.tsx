@@ -9,6 +9,7 @@ import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../f
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 import Spinner from "../../../shared/components/ui/Spinner";
+import { prefetchOrderDetail } from "@/shared/utils/prefetch";
 
 interface ModalState {
   type: "cancel" | "confirm";
@@ -118,6 +119,7 @@ const OrderHistoryPage: React.FC = () => {
               key={order.id}
               to={`/orders/${order.id}`}
               className="card block hover:shadow-lg transition-shadow"
+              onMouseEnter={() => prefetchOrderDetail(order.id)}
             >
               <div className="flex items-start justify-between mb-2">
                 <div>

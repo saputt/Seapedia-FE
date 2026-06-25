@@ -1,4 +1,5 @@
 import { CATEGORY_LABEL } from "../../../shared/constants/product";
+import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
 
 interface ProductFilterSidebarProps {
   categoryFilter: string;
@@ -9,6 +10,7 @@ interface ProductFilterSidebarProps {
   onClearAll: () => void;
   onMinPriceChange: (value: string) => void;
   onMaxPriceChange: (value: string) => void;
+  onClose?: () => void;
 }
 
 const ProductFilterSidebar = ({
@@ -20,10 +22,23 @@ const ProductFilterSidebar = ({
   onClearAll,
   onMinPriceChange,
   onMaxPriceChange,
+  onClose,
 }: ProductFilterSidebarProps) => (
   <div className="card !p-4">
     <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-bold text-text-primary">Filter</h3>
+      <div className="flex items-center gap-2">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-bg-tertiary rounded-lg transition-colors lg:hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-primary">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        )}
+        <h3 className="text-sm font-bold text-text-primary">Filter</h3>
+      </div>
       <button onClick={onClearAll} className="text-xs text-brand-deep font-semibold hover:underline">
         Hapus
       </button>
@@ -52,21 +67,23 @@ const ProductFilterSidebar = ({
       <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">Harga</h4>
       <div className="flex items-center gap-2">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={filterMinPrice}
-          onChange={(e) => onMinPriceChange(e.target.value)}
+          onChange={(e) => handleNumberInput(e, onMinPriceChange)}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full text-sm !py-1.5"
           placeholder="Min"
-          min="0"
         />
         <span className="text-text-muted text-xs">-</span>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={filterMaxPrice}
-          onChange={(e) => onMaxPriceChange(e.target.value)}
+          onChange={(e) => handleNumberInput(e, onMaxPriceChange)}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full text-sm !py-1.5"
           placeholder="Max"
-          min="0"
         />
       </div>
       <button onClick={onApplyPriceFilter} className="mt-2 text-xs font-semibold text-brand-deep hover:underline">
