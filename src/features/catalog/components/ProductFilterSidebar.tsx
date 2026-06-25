@@ -1,4 +1,5 @@
 import { CATEGORY_LABEL } from "../../../shared/constants/product";
+import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
 
 interface ProductFilterSidebarProps {
   categoryFilter: string;
@@ -66,21 +67,23 @@ const ProductFilterSidebar = ({
       <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">Harga</h4>
       <div className="flex items-center gap-2">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={filterMinPrice}
-          onChange={(e) => onMinPriceChange(e.target.value)}
+          onChange={(e) => handleNumberInput(e, onMinPriceChange)}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full text-sm !py-1.5"
           placeholder="Min"
-          min="0"
         />
         <span className="text-text-muted text-xs">-</span>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={filterMaxPrice}
-          onChange={(e) => onMaxPriceChange(e.target.value)}
+          onChange={(e) => handleNumberInput(e, onMaxPriceChange)}
+          onKeyDown={handleNumberKeyDown}
           className="input-neo w-full text-sm !py-1.5"
           placeholder="Max"
-          min="0"
         />
       </div>
       <button onClick={onApplyPriceFilter} className="mt-2 text-xs font-semibold text-brand-deep hover:underline">

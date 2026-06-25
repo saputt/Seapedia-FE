@@ -7,6 +7,7 @@ import { uploadImage } from "../../../api/upload";
 import type { ProductInput, ProductCategory } from "../../../types";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { productSchema, type ProductInput as ProductInputType } from "@/shared/validations";
+import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
 
 interface ProductFormProps {
   initialData?: ProductInput | null;
@@ -101,22 +102,34 @@ const ProductForm = ({
             <div>
               <label className="block text-text-secondary font-medium text-sm mb-1">Harga (Rp)</label>
               <Input
-                type="number"
-                {...register("price", { valueAsNumber: true })}
+                type="text"
+                inputMode="numeric"
+                {...register("price")}
+                onChange={(e) => {
+                  handleNumberInput(e, (val) => {
+                    setValue("price", val, { shouldValidate: true });
+                  });
+                }}
+                onKeyDown={handleNumberKeyDown}
                 className="input-neo w-full"
                 placeholder="50000"
-                min="100"
                 error={errors.price?.message}
               />
             </div>
             <div>
               <label className="block text-text-secondary font-medium text-sm mb-1">Stok</label>
               <Input
-                type="number"
-                {...register("stock", { valueAsNumber: true })}
+                type="text"
+                inputMode="numeric"
+                {...register("stock")}
+                onChange={(e) => {
+                  handleNumberInput(e, (val) => {
+                    setValue("stock", val, { shouldValidate: true });
+                  });
+                }}
+                onKeyDown={handleNumberKeyDown}
                 className="input-neo w-full"
                 placeholder="10"
-                min="0"
                 error={errors.stock?.message}
               />
             </div>
