@@ -9,6 +9,7 @@ interface ProductFilterSidebarProps {
   onClearAll: () => void;
   onMinPriceChange: (value: string) => void;
   onMaxPriceChange: (value: string) => void;
+  onClose?: () => void;
 }
 
 const ProductFilterSidebar = ({
@@ -20,10 +21,23 @@ const ProductFilterSidebar = ({
   onClearAll,
   onMinPriceChange,
   onMaxPriceChange,
+  onClose,
 }: ProductFilterSidebarProps) => (
   <div className="card !p-4">
     <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-bold text-text-primary">Filter</h3>
+      <div className="flex items-center gap-2">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-bg-tertiary rounded-lg transition-colors lg:hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-primary">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        )}
+        <h3 className="text-sm font-bold text-text-primary">Filter</h3>
+      </div>
       <button onClick={onClearAll} className="text-xs text-brand-deep font-semibold hover:underline">
         Hapus
       </button>
