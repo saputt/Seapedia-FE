@@ -137,7 +137,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-8 animate-pulse">
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row gap-10">
-                  <div className="aspect-square bg-bg-tertiary w-[100vw] md:w-[40%]" />
+                  <div className="aspect-square bg-bg-tertiary flex items-center justify-center overflow-hidden w-[100vw] relative left-[50%] -translate-x-1/2 -mt-8 md:w-[40%] md:left-0 md:translate-x-0 md:relative md:-mt-0" />
                   <div className="flex-1 space-y-4">
                     <div className="h-8 bg-bg-tertiary rounded w-3/4" />
                     <div className="h-6 bg-bg-tertiary rounded w-1/4" />
