@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden">
@@ -14,12 +16,12 @@ const HeroSection = () => {
             Belanja cepat, aman, dan nyaman hanya di SEAPEDIA.
           </p>
           <div className="mt-8 flex items-center gap-4">
-            <a href="/auth/register" className="btn-primary text-base !py-3 !px-8">
+            <Link to="/auth/register" className="btn-primary text-base !py-3 !px-8">
               Mulai Belanja
-            </a>
-            <a href="/" className="btn-ghost text-base !py-3 !px-8">
+            </Link>
+            <Link to="/" className="btn-ghost text-base !py-3 !px-8">
               Lihat Produk
-            </a>
+            </Link>
           </div>
         </div>
       </div>

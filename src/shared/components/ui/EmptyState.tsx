@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Button from "./Button";
 
 export type EmptyStateProps = {
@@ -13,9 +14,9 @@ const EmptyState = ({ message = "Tidak ada data.", actionLabel, actionTo, onActi
     {(actionLabel && (actionTo || onAction)) && (
       <div className="mt-4">
         {actionTo ? (
-          <a href={actionTo} className="btn-primary text-sm !py-2 !px-6 inline-block">
+          <Link to={actionTo} className="btn-primary text-sm !py-2 !px-6 inline-block">
             {actionLabel}
-          </a>
+          </Link>
         ) : (
           <Button onClick={onAction} variant="primary" size="sm">
             {actionLabel}
