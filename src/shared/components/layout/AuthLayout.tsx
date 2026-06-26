@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 
 interface AuthLayoutProps {
   children: React.ReactNode;

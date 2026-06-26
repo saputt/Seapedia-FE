@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useCartStore from "../../../features/cart/store/cartStore";
 
 const CartPreview = () => {

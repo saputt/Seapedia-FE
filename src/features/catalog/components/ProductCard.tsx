@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import { CATEGORY_SHORT } from "../../../shared/constants/product";
 import StarRating from "../../../shared/components/ui/StarRating";
 import { prefetchProductDetail } from "@/shared/utils/prefetch";

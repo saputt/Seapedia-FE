@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import StarRating from "../../../shared/components/ui/StarRating";
 import Spinner from "../../../shared/components/ui/Spinner";
 import type { Product } from "../../../types";

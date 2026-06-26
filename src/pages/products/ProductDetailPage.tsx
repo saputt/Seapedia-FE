@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";

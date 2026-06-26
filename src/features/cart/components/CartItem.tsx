@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import type { CartItem as CartItemType, Product, Store } from "../../../types";
 
 type CartItemProduct = Product & { store?: Store & { storeName?: string } };

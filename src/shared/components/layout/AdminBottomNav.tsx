@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
 import AlertModal from "../ui/AlertModal";
 import useLockBodyScroll from "../../hooks/useLockBodyScroll";

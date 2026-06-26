@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
 import AuthLayout from "../../shared/components/layout/AuthLayout";
 import { useRegister } from "../../features/auth/hooks/useRegister";
 import { getReadableError } from "../../shared/utils/errorMapper";

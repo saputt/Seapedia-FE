@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import ProductCard from "../../features/catalog/components/ProductCard";
 import StoreReviews from "../../features/store/components/StoreReviews";

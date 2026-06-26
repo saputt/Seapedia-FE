@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
 import Button from "../../shared/components/ui/Button";

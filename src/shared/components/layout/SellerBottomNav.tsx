@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
 import { switchUserRole } from "../../../features/auth/api/auth.api";
 import AlertModal from "../ui/AlertModal";

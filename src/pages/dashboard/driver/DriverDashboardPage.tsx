@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import { useMyDriverJobs, useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { useWallet } from "../../../features/wallet/hooks/useWallet";
 import Spinner from "../../../shared/components/ui/Spinner";

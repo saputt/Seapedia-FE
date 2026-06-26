@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
 import ProfileDropdown from "../ui/ProfileDropdown";
 

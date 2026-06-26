@@ -1,4 +1,5 @@
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import Navbar from "./Navbar";
 import BuyerBottomNav from "./BuyerBottomNav";
 import { SidebarLink } from "../../../types";

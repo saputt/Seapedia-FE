@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import type { Order } from "../../../types";
 
 interface TopSellingProductsProps {
