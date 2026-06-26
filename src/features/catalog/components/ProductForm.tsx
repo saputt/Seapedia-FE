@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../../../shared/components/ui/Button";
 import Input from "../../../shared/components/ui/Input";
 import ImageUpload from "../../../shared/components/ui/ImageUpload";
@@ -8,6 +8,7 @@ import type { ProductInput, ProductCategory } from "../../../types";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { productSchema, type ProductInput as ProductInputType } from "@/shared/validations";
 import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
+import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface ProductFormProps {
   initialData?: ProductInput | null;
@@ -30,13 +31,7 @@ const ProductForm = ({
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.imageUrl || null);
   const [uploading, setUploading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-  } = useZodForm(productSchema, {
+  const form = useZodForm(productSchema, {
     name: initialData?.name || "",
     description: initialData?.description || "",
     price: initialData?.price?.toString() || "",
@@ -44,6 +39,18 @@ const ProductForm = ({
     category: initialData?.category || "HOBBY",
     images: initialData?.imageUrl ? [initialData.imageUrl] : [],
   });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = form;
+
+  const { persist: persistForm, clearPersisted } = useFormPersist("product", form as any);
+  const formValues = watch();
+  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
 
   const handleImageChange = (file: File) => {
     setImageFile(file);
@@ -53,6 +60,7 @@ const ProductForm = ({
   };
 
   const onSubmitForm = async (data: ProductInputType) => {
+    clearPersisted();
     const payload: ProductInput = {
       name: data.name,
       description: data.description,

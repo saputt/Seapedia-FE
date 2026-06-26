@@ -1,13 +1,23 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../../shared/components/ui/Button";
 import Input from "../../../shared/components/ui/Input";
-import { discountSchema, type DiscountInput } from "@/shared/validations";
+import CustomSelect from "../../../shared/components/ui/CustomSelect";
+import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
+import { discountSchema } from "@/shared/validations";
+import type { DiscountInput } from "@/shared/validations";
 import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
+import { useFormPersist } from "@/shared/hooks/useFormPersist";
+
+const DISCOUNT_TYPE_OPTIONS: [string, string][] = [
+  ["PROMO", "Promo"],
+  ["VOUCHER", "Voucher"],
+];
 
 interface DiscountSubmitData {
   code: string;
-  type: string;
+  type: "VOUCHER" | "PROMO";
   value: number;
   isPercent: boolean;
   maxUses: number | null;
@@ -21,35 +31,51 @@ interface DiscountFormProps {
 }
 
 const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
+  const [showCalendar, setShowCalendar] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     watch,
   } = useForm<DiscountInput>({
     resolver: zodResolver(discountSchema),
     defaultValues: {
       code: "",
-      type: "PROMO",
+      type: "VOUCHER",
       value: 0,
       isPercent: false,
       usageLimit: undefined,
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      userLimit: undefined,
-      applicableStores: [],
-      applicableProducts: [],
+      expiredAt: "",
     },
   });
 
+  const { persist: persistForm, clearPersisted } = useFormPersist("discount", { watch, setValue } as any);
+  const formValues = watch();
+  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
+
+  const discountType = watch("type");
+  const expiredAt = watch("expiredAt");
+  const isPercent = watch("isPercent");
+
+  const formatDateDisplay = (dateStr: string) => {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  };
+
+  const selectedDate = expiredAt ? new Date(expiredAt + "T00:00:00") : null;
+
   const onSubmitForm = (data: DiscountInput) => {
+    clearPersisted();
     onSubmit({
       code: data.code,
       type: data.type,
       value: data.value,
       isPercent: data.isPercent,
       maxUses: data.usageLimit ?? null,
-      expiredAt: data.endDate,
+      expiredAt: data.expiredAt,
     });
   };
 
@@ -63,17 +89,15 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
           placeholder="Kode diskon"
           error={errors.code?.message}
         />
-        <select
-          {...register("type")}
-          className="input-neo w-full !text-sm !py-2"
-        >
-          <option value="PROMO">Promo</option>
-          <option value="VOUCHER">Voucher</option>
-        </select>
+        <CustomSelect
+          value={discountType}
+          options={DISCOUNT_TYPE_OPTIONS}
+          onChange={(val) => setValue("type", val as "PROMO" | "VOUCHER", { shouldValidate: true })}
+        />
         <Input
           type="text"
           inputMode="numeric"
-          {...register("value")}
+          name="value"
           onChange={(e) => {
             handleNumberInput(e, (val) => {
               setValue("value", val === "" ? 0 : parseInt(val, 10), { shouldValidate: true });
@@ -95,7 +119,7 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
         <Input
           type="text"
           inputMode="numeric"
-          {...register("usageLimit")}
+          name="usageLimit"
           onChange={(e) => {
             handleNumberInput(e, (val) => {
               setValue("usageLimit", val === "" ? undefined : parseInt(val, 10), { shouldValidate: true });
@@ -105,21 +129,48 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
           className="input-neo w-full !text-sm !py-2"
           placeholder="Maks penggunaan (opsional)"
         />
-        <Input
-          type="date"
-          {...register("endDate")}
-          className="input-neo w-full !text-sm !py-2"
-          error={errors.endDate?.message}
-        />
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowCalendar(true)}
+            className="w-full border-[3px] border-brand-deep px-3 py-2 text-sm bg-white text-left hover:bg-brand-subtle transition-colors"
+          >
+            {expiredAt ? formatDateDisplay(expiredAt) : "Tanggal berakhir"}
+          </button>
+          {errors.expiredAt?.message && (
+            <p className="text-xs text-danger mt-1">{errors.expiredAt?.message}</p>
+          )}
+        </div>
+        <div className="sm:col-span-2 flex items-center gap-3 mt-2">
+          <Button type="submit" variant="primary" loading={isPending}>
+            {isPending ? "Menyimpan..." : "Simpan"}
+          </Button>
+          <Button type="button" onClick={onCancel} variant="ghost">
+            Batal
+          </Button>
+        </div>
       </form>
-      <div className="flex items-center gap-3 mt-4">
-        <Button type="submit" variant="primary" loading={isPending}>
-          {isPending ? "Menyimpan..." : "Simpan"}
-        </Button>
-        <Button type="button" onClick={onCancel} variant="ghost">
-          Batal
-        </Button>
-      </div>
+
+      {showCalendar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div onClick={(e) => e.stopPropagation()}>
+            <NeoCalendar
+              startDate={selectedDate}
+              endDate={selectedDate}
+              onStartChange={(d) => {
+                if (d) {
+                  const year = d.getFullYear();
+                  const month = String(d.getMonth() + 1).padStart(2, "0");
+                  const day = String(d.getDate()).padStart(2, "0");
+                  setValue("expiredAt", `${year}-${month}-${day}`, { shouldValidate: true });
+                }
+              }}
+              onEndChange={() => {}}
+              onClose={() => setShowCalendar(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
