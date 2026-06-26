@@ -86,9 +86,15 @@ const DefaultNavbar = () => {
       <nav className="sticky top-0 z-40 bg-bg-primary border-b-[3px] border-brand-deep h-16 px-6 lg:px-8">
         <div className="max-w-[1280px] mx-auto h-full flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            {location.pathname !== "/" && (
+            {(location.pathname !== "/" || searchQuery || categoryQuery) && (
               <button
-                onClick={() => navigate(getParentRoute(location.pathname))}
+                onClick={() => {
+                  if (location.pathname === "/") {
+                    navigate("/");
+                  } else {
+                    navigate(getParentRoute(location.pathname));
+                  }
+                }}
                 className="md:hidden p-2 -ml-2 hover:bg-brand-subtle rounded-lg transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-primary">
