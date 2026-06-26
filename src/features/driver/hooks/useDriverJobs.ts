@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAvailableJobs, getMyDriverJobs, takeJob, progressJob, deliveryDone } from "../api/driver.api";
 
-export const useAvailableJobs = () =>
+export const useAvailableJobs = (options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: ["availableJobs"],
     queryFn: getAvailableJobs,
     refetchInterval: 15_000,
+    enabled: options?.enabled ?? true,
   });
 
 export const useMyDriverJobs = () =>
