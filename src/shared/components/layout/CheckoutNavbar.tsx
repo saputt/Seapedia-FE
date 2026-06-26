@@ -1,12 +1,21 @@
 import { memo, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { getParentRoute } from "../../utils/backNavigation";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getCheckoutOrigin } from "../../utils/backNavigation";
 import AlertModal from "../ui/AlertModal";
 
 const CheckoutNavbar = memo(() => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const getBackTarget = () => {
+    const origin = getCheckoutOrigin();
+    if (origin) return origin;
+    const isDirectBuy = searchParams.get("buyNow") === "1";
+    const productId = searchParams.get("productId");
+    if (isDirectBuy && productId) return `/products/${productId}`;
+    return "/cart";
+  };
 
   return (
     <>
@@ -34,7 +43,7 @@ const CheckoutNavbar = memo(() => {
         title="Batalkan Pesanan?"
         message="Pesanan yang sedang diisi akan hilang jika Anda keluar dari halaman ini."
         actionLabel="Ya, Keluar"
-        onAction={() => { setShowConfirm(false); navigate(getParentRoute(location.pathname)); }}
+        onAction={() => { setShowConfirm(false); navigate(getBackTarget()); }}
       />
     </>
   );
