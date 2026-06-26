@@ -46,10 +46,10 @@ export const useToggleDriverSuspend = () => {
   });
 };
 
-export const useAdminOrders = (page = 1) =>
+export const useAdminOrders = (page = 1, status?: string) =>
   useQuery({
-    queryKey: ["admin", "orders", page],
-    queryFn: () => getAdminOrders(page),
+    queryKey: ["admin", "orders", page, status],
+    queryFn: () => getAdminOrders(page, 10, status),
   });
 
 export const useToggleStoreActive = () => {

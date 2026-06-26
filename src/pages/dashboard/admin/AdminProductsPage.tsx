@@ -3,6 +3,7 @@ import { useAdminProducts, useToggleProductHidden } from "../../../features/admi
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
+import Icon from "../../../shared/components/ui/Icon";
 
 const AdminProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -104,7 +105,11 @@ const AdminProductsPage: React.FC = () => {
           <div className="card max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
             {confirmTarget.currentHidden ? (
               <>
-                <div className="text-5xl mb-4">✅</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="check" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Tampilkan Produk</h3>
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   Produk ini akan tampil kembali dan bisa dilihat oleh pembeli.
@@ -116,14 +121,18 @@ const AdminProductsPage: React.FC = () => {
               </>
             ) : (
               <>
-                <div className="text-5xl mb-4">🙈</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="close" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Sembunyikan Produk</h3>
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   Produk ini akan disembunyikan dari semua pembeli.
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <Button onClick={() => setConfirmTarget(null)} variant="ghost" size="sm">Batal</Button>
-                  <Button onClick={handleConfirm} variant="ghost" size="sm" loading={toggleHidden.isPending}>Sembunyikan</Button>
+                  <Button onClick={handleConfirm} variant="primary" size="sm" loading={toggleHidden.isPending}>Sembunyikan</Button>
                 </div>
               </>
             )}

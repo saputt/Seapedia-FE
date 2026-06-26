@@ -5,9 +5,11 @@ import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import ReviewModal from "../../../features/review/components/ReviewModal";
+import DriverReviewModal from "../../../features/driver/components/DriverReviewModal";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
+import { createDriverReview } from "../../../features/driver/api/driverReview.api";
 import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -23,6 +25,9 @@ const OrderDetailPage: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
   const [modal, setModal] = useState<string | null>(null);
   const [reviewModal, setReviewModal] = useState<any>(null);
+  const [driverReviewModal, setDriverReviewModal] = useState(false);
+  const [driverReviewError, setDriverReviewError] = useState<string | null>(null);
+  const [driverReviewLoading, setDriverReviewLoading] = useState(false);
 
   const handleCancel = async () => {
     setModal(null);
@@ -54,6 +59,18 @@ const OrderDetailPage: React.FC = () => {
       comment,
     } as any);
     setReviewModal(null);
+  };
+
+  const handleDriverReviewSubmit = async (rating: number, comment: string) => {
+    setDriverReviewError(null);
+    setDriverReviewLoading(true);
+    try {
+      await createDriverReview(orderId!, { rating, comment });
+      setDriverReviewModal(false);
+    } catch (err: any) {
+      setDriverReviewError(err?.message || "Gagal mengirim review driver");
+    }
+    setDriverReviewLoading(false);
   };
 
   if (isLoading) {
@@ -88,18 +105,62 @@ const OrderDetailPage: React.FC = () => {
           </span>
         </div>
 
-        {order.store && (
-          <div className="card">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-brand-deep/10 flex items-center justify-center text-brand-deep font-bold text-sm">
-                {order.store.storeName?.charAt(0) || "S"}
+          {order.store && (
+            <div className="card">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand-deep/10 flex items-center justify-center text-brand-deep font-bold text-sm">
+                  {order.store.storeName?.charAt(0) || "S"}
+                </div>
+                <p className="text-sm font-semibold text-text-primary">{order.store.storeName}</p>
               </div>
-              <p className="text-sm font-semibold text-text-primary">{order.store.storeName}</p>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="card">
+          {order.driverJob?.driver && (
+            <div className="card">
+              <h2 className="text-sm font-bold text-text-primary mb-3">Driver Pengirim</h2>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden flex items-center justify-center text-sm font-bold text-text-primary">
+                  <img
+                    src={order.driverJob.driver.driverImageUrl || order.driverJob.driver.imageUrl || PLACEHOLDER_IMAGE}
+                    alt={order.driverJob.driver.username}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                      if (target.parentElement) {
+                        target.parentElement.textContent = order.driverJob.driver.username.charAt(0).toUpperCase();
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-text-primary">
+                    {order.driverJob.driver.username}
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {order.driverJob.doneAt
+                      ? "Pengiriman selesai"
+                      : "Sedang mengirim pesanan"}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {order.driverReview ? (
+                    <p className="text-xs text-success font-semibold">✓ Direview</p>
+                  ) : order.status === "DELIVERED" ? (
+                    <button
+                      onClick={() => setDriverReviewModal(true)}
+                      className="text-xs text-brand-deep font-semibold mt-1 hover:underline"
+                    >
+                      Rating Driver
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="card">
           <h2 className="text-sm font-bold text-text-primary mb-3">Pesanan #{order.id?.slice(0, 8)}</h2>
           <p className="text-xs text-text-muted mb-4">
             {new Date(order.createdAt).toLocaleDateString("id-ID", {
@@ -294,6 +355,18 @@ const OrderDetailPage: React.FC = () => {
           multiProduct={false}
         />
       )}
+
+      <DriverReviewModal
+        isOpen={driverReviewModal}
+        driverName={order.driverJob?.driver?.username}
+        onClose={() => {
+          setDriverReviewModal(false);
+          setDriverReviewError(null);
+        }}
+        onSubmit={handleDriverReviewSubmit}
+        isPending={driverReviewLoading}
+        error={driverReviewError}
+      />
     </>
   );
 };

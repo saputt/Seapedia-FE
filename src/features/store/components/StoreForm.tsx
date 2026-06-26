@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
@@ -6,6 +6,7 @@ import Input from "@/shared/components/ui/Input";
 import Avatar from "@/shared/components/ui/Avatar";
 import { uploadStoreImage } from "@/api/upload";
 import { storeSchema, type StoreInput } from "@/shared/validations";
+import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface StoreFormProps {
   onSubmit: (data: StoreInput) => void;
@@ -18,12 +19,7 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<StoreInput>({
+  const form = useForm<StoreInput>({
     resolver: zodResolver(storeSchema),
     defaultValues: {
       name: "",
@@ -33,6 +29,18 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
       ...defaultValues,
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    watch,
+  } = form;
+
+  const { persist: persistForm, clearPersisted } = useFormPersist("store", form as any);
+  const formValues = watch();
+  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,6 +57,7 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
   };
 
   const handleFormSubmit = (data: StoreInput) => {
+    clearPersisted();
     onSubmit(data);
   };
 

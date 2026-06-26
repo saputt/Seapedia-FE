@@ -12,6 +12,7 @@ const driverLinks = [
   { to: "/dashboard/driver/jobs", label: "Pekerjaan Tersedia" },
   { to: "/dashboard/driver/history", label: "Riwayat" },
   { to: "/dashboard/driver/income", label: "Pemasukkan" },
+  { to: "/dashboard/driver/ratings", label: "Penilaian" },
 ];
 
 const DriverBottomNav = () => {

@@ -4,6 +4,7 @@ import useDebounce from "../../../shared/hooks/useDebounce";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
+import Icon from "../../../shared/components/ui/Icon";
 
 const AdminStoresPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -96,7 +97,7 @@ const AdminStoresPage: React.FC = () => {
                     <td className="py-2.5">
                       <Button
                         onClick={() => setConfirmTarget({ id: s.id, currentActive: s.isActive })}
-                        variant={s.isActive ? "danger" : "primary"}
+                        variant={s.isActive ? "primary" : "primary"}
                         size="sm"
                       >
                         {s.isActive ? "Nonaktifkan" : "Aktifkan"}
@@ -127,7 +128,11 @@ const AdminStoresPage: React.FC = () => {
           <div className="card max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
             {confirmTarget.currentActive ? (
               <>
-                <div className="text-5xl mb-4">⛔</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="close" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Nonaktifkan Toko</h3>
                 <p className="text-text-secondary mb-4 leading-relaxed">
                   Yakin ingin menonaktifkan toko ini? Produk dari toko ini tidak akan tampil di pembeli.
@@ -142,14 +147,18 @@ const AdminStoresPage: React.FC = () => {
                   <Button onClick={() => { setConfirmTarget(null); setReason(""); }} variant="ghost" size="sm">
                     Batal
                   </Button>
-                  <Button onClick={handleConfirm} variant="danger" size="sm" loading={toggleActive.isPending}>
+                  <Button onClick={handleConfirm} variant="primary" size="sm" loading={toggleActive.isPending}>
                     Nonaktifkan
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <div className="text-5xl mb-4">✅</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="check" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Aktifkan Toko</h3>
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   Toko ini akan aktif kembali dan produknya akan tampil di pembeli.

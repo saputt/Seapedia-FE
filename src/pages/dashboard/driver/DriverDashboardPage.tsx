@@ -2,13 +2,22 @@ import React, { useMemo } from "react";
 import { VTLink as Link } from "../../../shared/utils/VTLink";
 import { useMyDriverJobs, useAvailableJobs } from "../../../features/driver/hooks/useDriverJobs";
 import { useWallet } from "../../../features/wallet/hooks/useWallet";
+import { getMyDriverReviews } from "../../../features/driver/api/driverReview.api";
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
+import StarRating from "../../../shared/components/ui/StarRating";
+import { useQuery } from "@tanstack/react-query";
 
 const DriverDashboardPage: React.FC = () => {
   const { data: jobs = [], isLoading } = useMyDriverJobs() as any;
   const { data: wallet } = useWallet() as any;
   const { data: availableJobs } = useAvailableJobs() as any;
+  const { data: reviewData } = useQuery({
+    queryKey: ["myDriverReviews"],
+    queryFn: getMyDriverReviews,
+  });
+
+  const reviewStats = reviewData?.stats;
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -98,7 +107,7 @@ const DriverDashboardPage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         <StatCard
           label="Saldo Dompet"
           value={`Rp${(wallet?.balance || 0).toLocaleString("id-ID")}`}
@@ -133,6 +142,17 @@ const DriverDashboardPage: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Rating"
+          value={reviewStats ? `${reviewStats.averageRating.toFixed(1)}` : "-"}
+          variant="badge"
+          color="bg-warning"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           }
         />

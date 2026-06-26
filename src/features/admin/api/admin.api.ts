@@ -30,8 +30,11 @@ export const toggleStoreActive = (id: string, reason?: string): Promise<any> =>
 export const toggleProductHidden = (id: string): Promise<any> =>
   apiFetch(`admin/products/${id}/toggle-hidden`, { method: "PATCH" });
 
-export const getAdminOrders = (page = 1, limit = 10): Promise<PaginatedResponse<Order>> =>
-  apiFetch(`orders/admin?page=${page}&limit=${limit}`);
+export const getAdminOrders = (page = 1, limit = 10, status?: string): Promise<PaginatedResponse<Order>> => {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  return apiFetch(`orders/admin?${params}`);
+};
 
 export const simulateOverdue = (daysToSkip = 1): Promise<SimulationStatus> =>
   apiFetch("admin/simulation/overdue", {

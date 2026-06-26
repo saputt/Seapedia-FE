@@ -4,6 +4,7 @@ import useDebounce from "../../../shared/hooks/useDebounce";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
+import Icon from "../../../shared/components/ui/Icon";
 
 const AdminDriversPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -101,7 +102,7 @@ const AdminDriversPage: React.FC = () => {
                     <td className="py-2.5">
                       <Button
                         onClick={() => setConfirmTarget({ id: d.id, currentSuspended: d.isSuspended })}
-                        variant={d.isSuspended ? "primary" : "danger"}
+                        variant={d.isSuspended ? "primary" : "primary"}
                         size="sm"
                       >
                         {d.isSuspended ? "Aktifkan" : "Suspen"}
@@ -132,7 +133,11 @@ const AdminDriversPage: React.FC = () => {
           <div className="card max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
             {confirmTarget.currentSuspended ? (
               <>
-                <div className="text-5xl mb-4">✅</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="check" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Aktifkan Driver</h3>
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   Driver ini akan aktif kembali dan dapat mengambil pesanan lagi.
@@ -148,7 +153,11 @@ const AdminDriversPage: React.FC = () => {
               </>
             ) : (
               <>
-                <div className="text-5xl mb-4">⛔</div>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-brand-deep flex items-center justify-center">
+                    <Icon name="close" size={28} className="text-white" />
+                  </div>
+                </div>
                 <h3 className="text-xl font-bold text-text-primary mb-2">Suspen Driver</h3>
                 <p className="text-text-secondary mb-4 leading-relaxed">
                   Driver yang disuspen tidak dapat mengambil pesanan baru.
@@ -163,7 +172,7 @@ const AdminDriversPage: React.FC = () => {
                   <Button onClick={() => { setConfirmTarget(null); setReason(""); }} variant="ghost" size="sm">
                     Batal
                   </Button>
-                  <Button onClick={handleConfirm} variant="danger" size="sm" loading={toggleSuspend.isPending}>
+                  <Button onClick={handleConfirm} variant="primary" size="sm" loading={toggleSuspend.isPending}>
                     Suspen
                   </Button>
                 </div>

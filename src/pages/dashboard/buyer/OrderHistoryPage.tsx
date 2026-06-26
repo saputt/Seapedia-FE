@@ -6,8 +6,10 @@ import Button from "../../../shared/components/ui/Button";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import FilterPill from "../../../shared/components/ui/FilterPill";
 import ReviewModal from "../../../features/review/components/ReviewModal";
+import DriverReviewModal from "../../../features/driver/components/DriverReviewModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
+import { createDriverReview } from "../../../features/driver/api/driverReview.api";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -29,6 +31,9 @@ const OrderHistoryPage: React.FC = () => {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
+  const [driverReviewOrder, setDriverReviewOrder] = useState<any>(null);
+  const [driverReviewError, setDriverReviewError] = useState<string | null>(null);
+  const [driverReviewLoading, setDriverReviewLoading] = useState(false);
 
   const filterItems = [
     { key: "ALL", label: "Semua" },
@@ -65,6 +70,10 @@ const OrderHistoryPage: React.FC = () => {
     setReviewOrder(order);
   };
 
+  const handleOpenDriverReview = (order: any) => {
+    setDriverReviewOrder(order);
+  };
+
   const handleSubmitReview = async (productId: string, rating: number, comment: string) => {
     await reviewMutation.mutateAsync({
       productId,
@@ -72,6 +81,19 @@ const OrderHistoryPage: React.FC = () => {
       rating,
       comment,
     } as any);
+  };
+
+  const handleDriverReviewSubmit = async (rating: number, comment: string) => {
+    if (!driverReviewOrder) return;
+    setDriverReviewError(null);
+    setDriverReviewLoading(true);
+    try {
+      await createDriverReview(driverReviewOrder.id, { rating, comment });
+      setDriverReviewOrder(null);
+    } catch (err: any) {
+      setDriverReviewError(err?.message || "Gagal mengirim review driver");
+    }
+    setDriverReviewLoading(false);
   };
 
   if (isLoading) {
@@ -199,19 +221,36 @@ const OrderHistoryPage: React.FC = () => {
                     </Button>
                   )}
                   {order.status === "DELIVERED" && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      disabled={order.reviews?.length >= order.orderItems?.length}
-                      onClick={(e: React.MouseEvent) => {
-                        e.preventDefault();
-                        if (!(order.reviews?.length >= order.orderItems?.length)) {
-                          handleOpenReview(order);
-                        }
-                      }}
-                    >
-                      {order.reviews?.length >= order.orderItems?.length ? "Sudah Direview" : "Beri Rating"}
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={order.reviews?.length >= order.orderItems?.length}
+                        onClick={(e: React.MouseEvent) => {
+                          e.preventDefault();
+                          if (!(order.reviews?.length >= order.orderItems?.length)) {
+                            handleOpenReview(order);
+                          }
+                        }}
+                      >
+                        {order.reviews?.length >= order.orderItems?.length ? "Sudah Direview" : "Beri Rating"}
+                      </Button>
+                      {order.driverJob && (
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          disabled={!!order.driverReview}
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            if (!order.driverReview) {
+                              handleOpenDriverReview(order);
+                            }
+                          }}
+                        >
+                          {order.driverReview ? "Driver Sudah Direview" : "Rating Driver"}
+                        </Button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -253,6 +292,18 @@ const OrderHistoryPage: React.FC = () => {
           multiProduct
         />
       )}
+
+      <DriverReviewModal
+        isOpen={!!driverReviewOrder}
+        driverName={driverReviewOrder?.driverJob?.driver?.username}
+        onClose={() => {
+          setDriverReviewOrder(null);
+          setDriverReviewError(null);
+        }}
+        onSubmit={handleDriverReviewSubmit}
+        isPending={driverReviewLoading}
+        error={driverReviewError}
+      />
     </>
   );
 };

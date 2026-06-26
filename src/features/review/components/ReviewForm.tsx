@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
 import Input from "@/shared/components/ui/Input";
 import { reviewSchema, type ReviewInput } from "@/shared/validations";
 import StarRating from "@/shared/components/ui/StarRating";
+import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface ReviewFormProps {
   onSubmit: (data: ReviewInput) => void;
@@ -13,13 +15,7 @@ interface ReviewFormProps {
 }
 
 export const ReviewForm = ({ onSubmit, isPending = false, defaultValues, onCancel }: ReviewFormProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm<ReviewInput>({
+  const form = useForm<ReviewInput>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
       productId: "",
@@ -30,14 +26,31 @@ export const ReviewForm = ({ onSubmit, isPending = false, defaultValues, onCance
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = form;
+
+  const { persist: persistForm, clearPersisted } = useFormPersist("review", form as any);
+  const formValues = watch();
+  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
+
   const rating = watch("rating");
 
   const handleRatingChange = (value: number) => {
     setValue("rating", value);
   };
 
+  const handleSubmitForm = (data: ReviewInput) => {
+    clearPersisted();
+    onSubmit(data);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-5">
       <div>
         <label className="block text-text-secondary font-medium text-sm mb-2">Rating</label>
         <StarRating
