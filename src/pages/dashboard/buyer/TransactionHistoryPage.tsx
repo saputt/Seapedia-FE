@@ -50,7 +50,7 @@ const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[720px] mx-auto w-full space-y-6">
+    <div className="max-w-[720px] mx-auto w-full px-3 lg:px-0 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-text-primary">Riwayat Transaksi</h1>

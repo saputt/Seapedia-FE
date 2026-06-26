@@ -80,7 +80,7 @@ const OrderDetailPage: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-[720px] mx-auto w-full space-y-6">
+      <div className="max-w-[720px] mx-auto w-full px-3 lg:px-0 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Detail Pesanan</h1>
           <span className={`text-xs font-bold ${STATUS_COLOR[order.status] || "text-text-secondary"}`}>
@@ -262,7 +262,11 @@ const OrderDetailPage: React.FC = () => {
       <AlertModal
         isOpen={!!modal}
         onClose={() => setModal(null)}
-        icon={modal === "cancel" ? "⚠️" : "✅"}
+        icon={modal === "cancel" ? "⚠️" : (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
         title={modal === "cancel" ? "Batalkan Pesanan" : "Konfirmasi Penerimaan"}
         message={
           modal === "cancel"
