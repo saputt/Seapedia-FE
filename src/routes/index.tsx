@@ -5,6 +5,7 @@ import PublicRoute from "./PublicRoute";
 import RoleRoute from "./RoleRoute";
 import BuyerRoute from "./BuyerRoute";
 import LandingPage from "../pages/LandingPage";
+import ProductListPage from "../pages/products/ProductListPage";
 
 import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import BuyerDashboardLayout from "../shared/components/layout/BuyerDashboardLayout";
@@ -35,7 +36,6 @@ const lazyLoad = <T extends object>(importFn: () => Promise<{ default: Component
 const LoginPage = lazyLoad(() => import("../pages/auth/LoginPage"));
 const RegisterPage = lazyLoad(() => import("../pages/auth/RegisterPage"));
 const RoleSelectPage = lazyLoad(() => import("../pages/auth/RoleSelectPage"));
-const ProductListPage = lazyLoad(() => import("../pages/products/ProductListPage"));
 const ProductDetailPage = lazyLoad(() => import("../pages/products/ProductDetailPage"));
 const StoreDetailPage = lazyLoad(() => import("../pages/stores/StoreDetailPage"));
 const CartMainPage = lazyLoad(() => import("../pages/cart/CartPage"));
