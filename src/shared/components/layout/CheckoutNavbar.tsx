@@ -1,9 +1,11 @@
 import { memo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getParentRoute } from "../../utils/backNavigation";
 import AlertModal from "../ui/AlertModal";
 
 const CheckoutNavbar = memo(() => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
@@ -24,11 +26,15 @@ const CheckoutNavbar = memo(() => {
       <AlertModal
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
-        icon="❌"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        }
         title="Batalkan Pesanan?"
         message="Pesanan yang sedang diisi akan hilang jika Anda keluar dari halaman ini."
         actionLabel="Ya, Keluar"
-        onAction={() => { setShowConfirm(false); navigate(-1); }}
+        onAction={() => { setShowConfirm(false); navigate(getParentRoute(location.pathname)); }}
       />
     </>
   );

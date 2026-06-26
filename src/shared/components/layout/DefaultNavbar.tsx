@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
+import { getParentRoute } from "../../utils/backNavigation";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
 import ProfileDropdown from "../ui/ProfileDropdown";
@@ -87,7 +88,7 @@ const DefaultNavbar = () => {
           <div className="flex items-center gap-3 shrink-0">
             {location.pathname !== "/" && (
               <button
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(getParentRoute(location.pathname))}
                 className="md:hidden p-2 -ml-2 hover:bg-brand-subtle rounded-lg transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-primary">
