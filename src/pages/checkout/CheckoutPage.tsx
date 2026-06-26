@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MainLayout from "../../shared/components/layout/MainLayout";
@@ -47,14 +47,11 @@ const CheckoutPage: React.FC = () => {
 
   const { data: addressesData } = useAddresses(true);
 
-  const initialAddressSet = useRef(false);
   useEffect(() => {
-    if (isLoading || initialAddressSet.current || !addressesData) return;
-    const addr = Array.isArray(addressesData) ? addressesData[0] : null;
-    if (addr) {
-      setSelectedAddress(addr);
-      initialAddressSet.current = true;
-    }
+    if (isLoading || !addressesData) return;
+    const addrs = Array.isArray(addressesData) ? addressesData : [];
+    const defaultAddr = addrs.find((a) => a.lastUsed) ?? addrs[0] ?? null;
+    if (defaultAddr) setSelectedAddress(defaultAddr);
   }, [isLoading, addressesData]);
 
   const summaryErrorMessage = summaryError?.message || "";
