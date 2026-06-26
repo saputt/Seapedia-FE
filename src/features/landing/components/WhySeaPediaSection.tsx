@@ -67,7 +67,7 @@ const WhySeaPediaSection = () => (
   <section className="py-16 md:py-20 relative overflow-hidden">
     <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-subtle rounded-full opacity-40 pointer-events-none" />
 
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-8 relative z-10">
+    <div className="max-w-[1280px] mx-auto px-3 lg:px-8 relative z-10">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16">
         <div className="lg:col-span-2">
           <div className="w-12 h-1.5 bg-brand-deep rounded-full mb-5" />

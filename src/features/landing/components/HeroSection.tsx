@@ -3,7 +3,7 @@ import { VTLink as Link } from "../../../shared/utils/VTLink";
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-8 py-20 md:py-28">
+      <div className="max-w-[1280px] mx-auto px-3 lg:px-8 py-20 md:py-28">
         <div className="max-w-3xl">
           <h1 className="text-[2.75rem] md:text-5xl lg:text-6xl font-extrabold text-text-primary leading-[1.2] tracking-tight">
             Belanja Kebutuhan

@@ -49,7 +49,7 @@ const StoreDetailPage: React.FC = () => {
   if (storeLoading) {
     return (
       <MainLayout>
-        <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8">
+        <div className="max-w-[1280px] mx-auto w-full px-3 lg:px-8 py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-6 w-32 bg-bg-tertiary rounded" />
           <div className="card space-y-3">
@@ -80,7 +80,7 @@ const StoreDetailPage: React.FC = () => {
   if (storeError || !store) {
     return (
       <MainLayout>
-        <div className="max-w-[1280px] mx-auto w-full px-6 lg:px-8 py-8 text-center">
+        <div className="max-w-[1280px] mx-auto w-full px-3 lg:px-8 py-8 text-center">
           <p className="text-danger font-semibold text-lg">Toko tidak ditemukan.</p>
           <Link to="/" className="text-brand-deep font-medium hover:underline mt-2 inline-block">
             Lihat produk lainnya
