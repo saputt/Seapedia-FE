@@ -5,20 +5,23 @@ import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/cons
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
+import CustomSelect from "../../../shared/components/ui/CustomSelect";
+
+const STATUS_FILTER_OPTIONS: [string, string][] = [
+  ["", "Semua Status"],
+  ["PENDING", "Menunggu Konfirmasi"],
+  ["READY_FOR_DELIVERY", "Siap Dikirim"],
+  ["ON_DELIVERY", "Dalam Pengiriman"],
+  ["DELIVERED", "Diterima"],
+  ["CANCELLED", "Dibatalkan"],
+];
 
 const AdminOrdersPage: React.FC = () => {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useAdminOrders(page);
+  const [statusFilter, setStatusFilter] = useState("");
+  const { data, isFetching, error } = useAdminOrders(page, statusFilter || undefined);
   const orders: any[] = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
 
   if (error) {
     return <ErrorState message="Gagal memuat pesanan." onRetry={() => window.location.reload()} />;
@@ -29,7 +32,20 @@ const AdminOrdersPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Semua Pesanan</h1>
       <p className="text-sm text-text-muted mb-6">Kelola seluruh pesanan di Seapedia</p>
 
-      <div className="card">
+      <div className="mb-4 max-w-xs">
+        <CustomSelect
+          value={statusFilter}
+          options={STATUS_FILTER_OPTIONS}
+          onChange={(val) => { setStatusFilter(val); setPage(1); }}
+        />
+      </div>
+
+      <div className="card relative">
+        {isFetching && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 rounded-lg">
+            <Spinner size="lg" />
+          </div>
+        )}
         {orders.length === 0 ? (
           <p className="text-sm text-text-secondary text-center py-6">Belum ada pesanan.</p>
         ) : (
