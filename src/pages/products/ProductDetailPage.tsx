@@ -132,15 +132,30 @@ const ProductDetailPage: React.FC = () => {
         )}
 
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-pulse">
-            <div className="aspect-square bg-bg-tertiary" />
-            <div className="space-y-4">
-              <div className="h-8 bg-bg-tertiary rounded w-3/4" />
-              <div className="h-6 bg-bg-tertiary rounded w-1/4" />
-              <div className="h-4 bg-bg-tertiary rounded w-1/3" />
-              <div className="h-20 bg-bg-tertiary rounded" />
+          <>
+            <div className="hidden md:block h-6 mb-6" />
+            <div className="flex flex-col md:flex-row gap-8 animate-pulse">
+              <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-10">
+                  <div className="aspect-square bg-bg-tertiary w-[100vw] md:w-[40%]" />
+                  <div className="flex-1 space-y-4">
+                    <div className="h-8 bg-bg-tertiary rounded w-3/4" />
+                    <div className="h-6 bg-bg-tertiary rounded w-1/4" />
+                    <div className="h-4 bg-bg-tertiary rounded w-1/3" />
+                    <div className="h-20 bg-bg-tertiary rounded" />
+                  </div>
+                </div>
+              </div>
+              <div className="hidden md:block w-80">
+                <div className="card p-6 space-y-4">
+                  <div className="h-6 bg-bg-tertiary rounded w-1/2" />
+                  <div className="h-10 bg-bg-tertiary rounded" />
+                  <div className="h-5 bg-bg-tertiary rounded w-1/3" />
+                  <div className="h-12 bg-bg-tertiary rounded" />
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {isError && (
@@ -183,7 +198,6 @@ const ProductDetailPage: React.FC = () => {
                     <img
                       src={product.imageUrl}
                       alt={product.name}
-                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -352,22 +366,50 @@ const ProductDetailPage: React.FC = () => {
           {storeId && (
             <section className="mt-12">
               <h2 className="text-xl font-bold text-text-primary mb-6">Lainnya di Toko</h2>
+              {storeProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {storeProducts.slice(0, 5).map((p: any) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
+              ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="card animate-pulse p-0">
+                    <div className="aspect-square bg-bg-tertiary" />
+                    <div className="p-2 space-y-2">
+                      <div className="h-4 bg-bg-tertiary rounded w-3/4" />
+                      <div className="h-5 bg-bg-tertiary rounded w-1/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              )}
             </section>
           )}
 
           {storeId && (
             <section className="mt-12 mb-12">
               <h2 className="text-xl font-bold text-text-primary mb-6">Pilihan Lainnya Untukmu</h2>
+              {randomProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {randomProducts.slice(0, 10).map((p: any) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
+              ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="card animate-pulse p-0">
+                    <div className="aspect-square bg-bg-tertiary" />
+                    <div className="p-2 space-y-2">
+                      <div className="h-4 bg-bg-tertiary rounded w-3/4" />
+                      <div className="h-5 bg-bg-tertiary rounded w-1/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              )}
             </section>
           )}
         </>)}
