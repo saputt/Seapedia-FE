@@ -63,17 +63,11 @@ export type ProductInput = z.infer<typeof productSchema>;
  */
 export const discountSchema = z.object({
   code: z.string().min(3, "Kode minimal 3 karakter").max(50).toUpperCase(),
-  description: z.string().max(500).optional(),
-  type: z.enum(["PERCENTAGE", "FIXED"]),
-  value: z.number().positive("Nilai harus > 0"),
-  minPurchase: z.number().int().min(0).default(0),
-  maxDiscount: z.number().int().positive().optional(),
-  startDate: z.string().datetime("Format tanggal tidak valid"),
-  endDate: z.string().datetime("Format tanggal tidak valid"),
-  usageLimit: z.number().int().positive().optional(),
-  userLimit: z.number().int().positive().optional(),
-  applicableStores: z.array(z.string().uuid()).optional(),
-  applicableProducts: z.array(z.string().uuid()).optional(),
+  type: z.enum(["VOUCHER", "PROMO"], { message: "Tipe diskon tidak valid" }),
+  value: z.number({ required_error: "Nilai wajib diisi" }).positive("Nilai harus > 0"),
+  isPercent: z.boolean().default(false),
+  usageLimit: z.number().int().positive("Maks penggunaan harus > 0").optional(),
+  expiredAt: z.string().min(1, "Tanggal berakhir wajib diisi"),
 });
 
 export type DiscountInput = z.infer<typeof discountSchema>;

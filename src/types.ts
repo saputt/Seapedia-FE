@@ -232,28 +232,27 @@ export interface WalletTransaction {
 
 // ==================== Discount ====================
 
+export type DiscountType = "VOUCHER" | "PROMO";
+
 export interface Discount {
   id: string;
   code: string;
-  name: string;
-  type: "PERCENTAGE" | "FIXED";
+  type: DiscountType;
   value: number;
-  minPurchase: number;
-  maxUsage: number;
-  usageCount: number;
-  expiresAt: string;
-  isActive: boolean;
+  isPercent: boolean;
+  maxUses: number | null;
+  usedCount: number;
+  expiredAt: string;
   createdAt: string;
 }
 
 export interface DiscountInput {
   code: string;
-  name: string;
-  type: "PERCENTAGE" | "FIXED";
+  type: DiscountType;
   value: number;
-  minPurchase: number;
-  maxUsage: number;
-  expiresAt: string;
+  isPercent: boolean;
+  maxUses?: number | null;
+  expiredAt: string;
 }
 
 export interface DiscountCheck {
@@ -314,8 +313,27 @@ export interface DriverJob {
   id: string;
   orderId: string;
   driverId?: string;
+  earning?: number;
+  takenAt?: string;
+  doneAt?: string;
   status: string;
-  order: Order;
+  order?: Order;
+  driver?: {
+    id: string;
+    username: string;
+    imageUrl?: string | null;
+    driverImageUrl?: string | null;
+  };
+}
+
+export interface DriverReview {
+  id: string;
+  driverId: string;
+  buyerId: string;
+  orderId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
 }
 
 // ==================== Admin ====================
