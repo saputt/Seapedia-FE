@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="bg-brand-deep text-white">
@@ -13,19 +15,24 @@ const Footer = () => {
             <h4 className="font-bold text-sm uppercase tracking-wider mb-3">Navigasi</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/products" className="text-brand-subtle text-sm hover:text-white transition-colors">
+                <Link to="/products" className="text-brand-subtle text-sm hover:text-white transition-colors">
                   Produk
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/stores" className="text-brand-subtle text-sm hover:text-white transition-colors">
+                <Link to="/about" className="text-brand-subtle text-sm hover:text-white transition-colors">
+                  Tentang Kita
+                </Link>
+              </li>
+              <li>
+                <Link to="/stores" className="text-brand-subtle text-sm hover:text-white transition-colors">
                   Toko
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/auth/login" className="text-brand-subtle text-sm hover:text-white transition-colors">
+                <Link to="/auth/login" className="text-brand-subtle text-sm hover:text-white transition-colors">
                   Masuk
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

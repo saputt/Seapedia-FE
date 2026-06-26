@@ -26,7 +26,9 @@ const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const token = useAuthStore((s) => s.token);
-  const { data: wallet } = useWallet();
+  const { data: wallet } = useWallet({
+    enabled: !!token,
+  });
   const rawQuery = searchParams.get("q") || "";
   const debouncedSearch = useDebounce(rawQuery, 400);
 
@@ -123,10 +125,12 @@ const ProductListPage: React.FC = () => {
         ? `Kategori ${CATEGORY_LABEL[categoryFilter]}`
         : "Semua Produk";
 
-  const renderProductGrid = () => (
+  const renderProductGrid = () => {
+    const gridCols = hasActiveFilter ? "xl:grid-cols-4" : "xl:grid-cols-5";
+    return (
     <>
       {isLoading && (
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
+        <div className={`grid grid-cols-2 md:grid-cols-4 ${gridCols} gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5`}>
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="card animate-pulse">
               <div className="aspect-square bg-bg-tertiary mb-4" />
@@ -156,7 +160,7 @@ const ProductListPage: React.FC = () => {
 
       {!isLoading && !isError && allProducts.length > 0 && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5">
+          <div className={`grid grid-cols-2 md:grid-cols-4 ${gridCols} gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5`}>
             {allProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -179,7 +183,7 @@ const ProductListPage: React.FC = () => {
             )}
             {showLoginPrompt && !isFetchingNextPage && (
               <div className="relative">
-                <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5 opacity-50 pointer-events-none select-none">
+                <div className={`grid grid-cols-2 md:grid-cols-4 ${gridCols} gap-x-4 gap-y-3 lg:gap-y-6 lg:gap-gap-5 opacity-50 pointer-events-none select-none`}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="card animate-pulse">
                       <div className="aspect-square bg-bg-tertiary mb-4" />
@@ -220,8 +224,9 @@ const ProductListPage: React.FC = () => {
           </div>
         </>
       )}
-    </>
-  );
+      </>
+    );
+  };
 
   return (
     <MainLayout navbarVariant="products">

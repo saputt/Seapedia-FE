@@ -25,10 +25,11 @@ const restoreTransactions = (queryClient: ReturnType<typeof useQueryClient>, pre
   Object.entries(prev).forEach(([key, data]) => queryClient.setQueryData(JSON.parse(key), data));
 };
 
-export const useWallet = () =>
+export const useWallet = (options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: ["wallet"],
     queryFn: getWallet,
+    enabled: options?.enabled,
   });
 
 export const useTransactions = (filters?: { startDate?: string; endDate?: string; type?: string }, limit = DEFAULT_LIMIT) => {
