@@ -3,6 +3,7 @@ import { VTLink as Link } from "../../../shared/utils/VTLink";
 import { CATEGORY_SHORT } from "../../../shared/constants/product";
 import StarRating from "../../../shared/components/ui/StarRating";
 import { prefetchProductDetail } from "@/shared/utils/prefetch";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import type { Product } from "../../../types";
 
 interface ProductCardProduct extends Product {
@@ -33,11 +34,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <circle cx="9" cy="9" r="2" />
-            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-          </svg>
+          <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
         )}
       </div>
       <div className="p-2">

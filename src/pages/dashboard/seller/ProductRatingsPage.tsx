@@ -3,6 +3,7 @@ import { useSellerReviews } from "../../../features/review/hooks/useReviews";
 import StarRating from "../../../shared/components/ui/StarRating";
 import Spinner from "../../../shared/components/ui/Spinner";
 import ErrorState from "../../../shared/components/ui/ErrorState";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 const RATING_FILTERS = [
   { label: "Semua", value: null },
@@ -97,7 +98,7 @@ const ProductRatingsPage: React.FC = () => {
                 {review.product?.imageUrl ? (
                   <img src={review.product.imageUrl} alt={review.product.name} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">Img</div>
+                  <img src={PLACEHOLDER_IMAGE} alt={review.product.name} className="w-full h-full object-cover" />
                 )}
               </div>
               <div className="flex-1 min-w-0">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { VTLink as Link } from "../../shared/utils/VTLink";
+import { PLACEHOLDER_IMAGE } from "../../shared/constants/image";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -202,7 +203,7 @@ const ProductDetailPage: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-text-muted">No Image</span>
+                    <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
                   )}
                 </div>
 

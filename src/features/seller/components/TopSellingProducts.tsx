@@ -1,4 +1,5 @@
 import { VTLink as Link } from "../../../shared/utils/VTLink";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import type { Order } from "../../../types";
 
 interface TopSellingProductsProps {
@@ -48,14 +49,12 @@ const TopSellingProducts = ({ orders = [] }: TopSellingProductsProps) => {
                 <span className="w-6 h-6 rounded-lg bg-brand-deep text-white text-xs font-bold flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
-                {product.imageUrl && (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    loading="lazy"
-                    className="w-10 h-10 rounded-lg object-cover shrink-0"
-                  />
-                )}
+                <img
+                  src={product.imageUrl || PLACEHOLDER_IMAGE}
+                  alt={product.name}
+                  loading="lazy"
+                  className="w-10 h-10 rounded-lg object-cover shrink-0"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text-primary truncate">
                     {product.name}
