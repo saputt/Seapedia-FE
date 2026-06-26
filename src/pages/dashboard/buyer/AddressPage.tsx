@@ -29,7 +29,7 @@ const AddressFormModal = ({ address, onClose, onSuccess }: AddressFormModalProps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="card !p-6 mx-4 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="card !p-6 mx-4 Cariw-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-text-primary">{isEdit ? "Edit Alamat" : "Tambah Alamat"}</h2>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary text-xl leading-none">&times;</button>
@@ -71,7 +71,7 @@ const AddressPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-3 lg:px-0">
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold text-text-primary">Alamat Saya</h1>
         <Button onClick={() => { setEditingAddress(null); setShowForm(true); }} variant="primary">

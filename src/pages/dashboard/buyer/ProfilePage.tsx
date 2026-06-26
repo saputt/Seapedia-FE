@@ -44,7 +44,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[600px] mx-auto px-3 lg:px-0 space-y-6">
+    <div className="max-w-[600px] mx-auto space-y-6">
       <h1 className="text-xl font-bold text-text-primary">Profil Saya</h1>
 
       <div className="card flex items-center gap-4">
