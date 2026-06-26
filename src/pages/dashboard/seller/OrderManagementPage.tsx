@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSellerOrders, useUpdateOrderStatus } from "../../../features/order/hooks/useOrders";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
 import ErrorState from "../../../shared/components/ui/ErrorState";
@@ -131,7 +132,7 @@ const OrderManagementPage: React.FC = () => {
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden">
                       <img
-                        src={item.product?.imageUrl || "/placeholder.png"}
+                        src={item.product?.imageUrl || PLACEHOLDER_IMAGE}
                         alt={item.product?.name || "Product"}
                         loading="lazy"
                         className="w-full h-full object-cover"

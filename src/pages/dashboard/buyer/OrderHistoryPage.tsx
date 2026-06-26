@@ -8,6 +8,7 @@ import ReviewModal from "../../../features/review/components/ReviewModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { prefetchOrderDetail } from "@/shared/utils/prefetch";
 
@@ -150,7 +151,7 @@ const OrderHistoryPage: React.FC = () => {
                   <div key={item.id || i} className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden">
                       <img
-                        src={item.product?.imageUrl || "/placeholder.png"}
+                        src={item.product?.imageUrl || PLACEHOLDER_IMAGE}
                         alt={item.product?.name || "Product"}
                         loading="lazy"
                         className="w-full h-full object-cover"

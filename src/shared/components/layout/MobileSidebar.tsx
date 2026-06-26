@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import { SidebarLink } from "../../../types";
 import useLockBodyScroll from "../../hooks/useLockBodyScroll";
 

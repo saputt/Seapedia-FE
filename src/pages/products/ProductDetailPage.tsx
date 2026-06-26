@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
+import { PLACEHOLDER_IMAGE } from "../../shared/constants/image";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../shared/components/layout/MainLayout";
 import AlertModal from "../../shared/components/ui/AlertModal";
@@ -21,7 +23,7 @@ import { prefetchStore } from "@/shared/utils/prefetch";
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const { data: product, isLoading, isError } = useProductDetail(productId!);
-  const { data: reviewsData } = useProductReviews(productId!);
+  const { data: reviewsData, isLoading: reviewsLoading } = useProductReviews(productId!);
   const reviews = (reviewsData as any)?.reviews || [];
   const token = useAuthStore((s) => s.token);
   const navigate = useNavigate();
@@ -201,7 +203,7 @@ const ProductDetailPage: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-text-muted">No Image</span>
+                    <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
                   )}
                 </div>
 
@@ -291,8 +293,46 @@ const ProductDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {!isLoading && !isError && product && (
+              {!isLoading && !isError && product && !reviewsLoading && (
                 <ProductReviews reviews={reviews} reviewCount={(product as any).reviewCount || reviews.length} averageRating={(product as any).averageRating} />
+              )}
+              {!isLoading && !isError && product && reviewsLoading && (
+                <div className="mt-12 animate-pulse">
+                  <div className="h-7 bg-bg-tertiary rounded w-48 mb-6" />
+                  <div className="card p-6 mb-6">
+                    <div className="flex flex-col md:flex-row gap-8 py-4 px-3">
+                      <div className="flex flex-col items-center md:items-start min-w-[180px] gap-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-bg-tertiary rounded" />
+                          <div className="h-8 bg-bg-tertiary rounded w-24" />
+                        </div>
+                        <div className="h-4 bg-bg-tertiary rounded w-36" />
+                        <div className="h-3 bg-bg-tertiary rounded w-28" />
+                      </div>
+                      <div className="flex-1 space-y-3">
+                        {[5, 4, 3, 2, 1].map((star) => (
+                          <div key={star} className="flex items-center gap-3">
+                            <div className="h-4 bg-bg-tertiary rounded w-4" />
+                            <div className="flex-1 h-3 bg-bg-tertiary rounded" />
+                            <div className="h-4 bg-bg-tertiary rounded w-6" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="card">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="h-4 bg-bg-tertiary rounded w-24" />
+                          <div className="h-3 bg-bg-tertiary rounded w-20" />
+                        </div>
+                        <div className="h-3 bg-bg-tertiary rounded w-32 mb-2" />
+                        <div className="h-4 bg-bg-tertiary rounded w-full" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 

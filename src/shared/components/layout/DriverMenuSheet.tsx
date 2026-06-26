@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 
 interface DriverLink {
   to: string;

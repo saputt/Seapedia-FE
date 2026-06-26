@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 
 interface AccountBottomSheetProps {
   isOpen: boolean;

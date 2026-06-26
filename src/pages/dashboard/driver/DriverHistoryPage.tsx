@@ -1,5 +1,6 @@
 import React from "react";
 import { useMyDriverJobs, useDeliveryDone } from "../../../features/driver/hooks/useDriverJobs";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -85,7 +86,7 @@ const DriverHistoryPage: React.FC = () => {
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden">
                       <img
-                        src={item.product?.imageUrl || "/placeholder.png"}
+                        src={item.product?.imageUrl || PLACEHOLDER_IMAGE}
                         alt={item.product?.name || "Product"}
                         loading="lazy"
                         className="w-full h-full object-cover"

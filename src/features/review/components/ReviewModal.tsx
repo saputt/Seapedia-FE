@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
 import StarRating from "../../../shared/components/ui/StarRating";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 interface ReviewOrder {
   id?: string;
@@ -126,7 +127,7 @@ const ReviewModal = ({
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-brand-subtle flex-shrink-0 overflow-hidden">
                     <img
-                      src={product.imageUrl || "/placeholder.png"}
+                      src={product.imageUrl || PLACEHOLDER_IMAGE}
                       alt={product.name}
                       loading="lazy"
                       className="w-full h-full object-cover"

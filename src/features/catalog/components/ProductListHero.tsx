@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import PromoBannerCarousel from "./PromoBannerCarousel";
 import { CATEGORY_SHORT } from "../../../shared/constants/product";
 import { CATEGORY_ICONS } from "../../../shared/constants/productIcons";

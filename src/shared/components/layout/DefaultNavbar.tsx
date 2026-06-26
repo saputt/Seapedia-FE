@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
 import ProfileDropdown from "../ui/ProfileDropdown";

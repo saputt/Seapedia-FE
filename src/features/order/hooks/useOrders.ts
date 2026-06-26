@@ -27,6 +27,7 @@ export const useBuyerOrders = () =>
     queryKey: ["buyer-orders"],
     queryFn: getBuyerOrders,
     staleTime: 0,
+    refetchInterval: 15_000,
   });
 
 export const useCancelOrder = () => {
@@ -85,6 +86,7 @@ export const useSellerOrders = (params = {}) =>
     queryKey: ["sellerOrders", params],
     queryFn: () => getSellerOrders(params),
     staleTime: 0,
+    refetchInterval: 15_000,
   });
 
 export const useUpdateOrderStatus = () => {

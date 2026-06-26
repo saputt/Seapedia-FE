@@ -1,6 +1,7 @@
 import React from "react";
 import QuantitySelector from "./QuantitySelector";
 import useLockBodyScroll from "../../../shared/hooks/useLockBodyScroll";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 interface BuyBottomSheetProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ const BuyBottomSheet: React.FC<BuyBottomSheetProps> = ({
               {product.imageUrl ? (
                 <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-text-muted text-xs">No Img</div>
+                <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
               )}
             </div>
             <div className="flex-1 min-w-0">

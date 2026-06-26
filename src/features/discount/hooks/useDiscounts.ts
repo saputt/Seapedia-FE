@@ -17,7 +17,20 @@ export const useCreateDiscount = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: DiscountInput) => createDiscount(data),
-    onSuccess: () => {
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ["discounts"] });
+      const previous = queryClient.getQueryData(["discounts"]);
+      queryClient.setQueryData(["discounts"], (old: any) => {
+        if (!old) return [{ ...data, id: `opt-${Date.now()}` }];
+        if (Array.isArray(old)) return [{ ...data, id: `opt-${Date.now()}` }, ...old];
+        return old;
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["discounts"], context.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["discounts"] });
     },
   });

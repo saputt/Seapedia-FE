@@ -8,6 +8,7 @@ import ReviewModal from "../../../features/review/components/ReviewModal";
 import { useOrderDetail } from "../../../features/order/hooks/useOrderDetail";
 import { useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import { STATUS_COLOR, STATUS_LABEL, SHIPPING_LABEL } from "../../../shared/constants/order";
 import Spinner from "../../../shared/components/ui/Spinner";
 
@@ -115,7 +116,7 @@ const OrderDetailPage: React.FC = () => {
               <div key={item.id || i} className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-xl bg-brand-subtle flex-shrink-0 overflow-hidden">
                   <img
-                    src={item.product?.imageUrl || "/placeholder.png"}
+                    src={item.product?.imageUrl || PLACEHOLDER_IMAGE}
                     alt={item.product?.name || "Product"}
                     loading="lazy"
                     className="w-full h-full object-cover"

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { useSellerProducts } from "../../../features/catalog/hooks/useProductMutations";
 import { useSellerOrders } from "../../../features/order/hooks/useOrders";

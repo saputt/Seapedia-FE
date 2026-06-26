@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import useCartStore from "../../../features/cart/store/cartStore";
+import { PLACEHOLDER_IMAGE } from "../../constants/image";
 
 const CartPreview = () => {
   const cartItems = useCartStore((s) => s.items);
@@ -61,7 +62,7 @@ const CartPreview = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-xs text-text-muted">Img</span>
+                    <img src={PLACEHOLDER_IMAGE} alt={item.product.name} className="w-full h-full object-cover" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

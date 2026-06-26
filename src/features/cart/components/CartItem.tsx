@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../../shared/utils/VTLink";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import type { CartItem as CartItemType, Product, Store } from "../../../types";
 
 type CartItemProduct = Product & { store?: Store & { storeName?: string } };
@@ -27,7 +28,7 @@ const ImageBlock = memo(({ imageUrl, name }: ImageBlockProps) => (
         className="w-full h-full object-cover"
       />
     ) : (
-      <span className="text-xs text-text-muted">No Image</span>
+      <img src={PLACEHOLDER_IMAGE} alt={name} className="w-full h-full object-cover" />
     )}
   </div>
 ));

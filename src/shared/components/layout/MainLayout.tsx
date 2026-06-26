@@ -11,7 +11,7 @@ const MainLayout = ({ children, navbarVariant }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary">
       <Navbar variant={navbarVariant as "default" | "checkout" | "seller" | undefined} />
-      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <main className="pb-16 md:pb-0">{children}</main>
       <Footer />
       <BuyerBottomNav />
     </div>

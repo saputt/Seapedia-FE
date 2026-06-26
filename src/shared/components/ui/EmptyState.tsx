@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 import Button from "./Button";
 
 export type EmptyStateProps = {

@@ -5,12 +5,14 @@ export const useAvailableJobs = () =>
   useQuery({
     queryKey: ["availableJobs"],
     queryFn: getAvailableJobs,
+    refetchInterval: 15_000,
   });
 
 export const useMyDriverJobs = () =>
   useQuery({
     queryKey: ["myDriverJobs"],
     queryFn: getMyDriverJobs,
+    refetchInterval: 15_000,
   });
 
 export const useTakeJob = () => {

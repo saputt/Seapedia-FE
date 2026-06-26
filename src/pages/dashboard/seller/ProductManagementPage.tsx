@@ -8,6 +8,7 @@ import AlertModal from "../../../shared/components/ui/AlertModal";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { CATEGORY_SHORT, CATEGORIES } from "../../../shared/constants/product";
 import type { Product, ProductCategory } from "../../../types";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 const ProductManagementPage: React.FC = () => {
   const navigate = useNavigate();
@@ -123,11 +124,7 @@ const ProductManagementPage: React.FC = () => {
                           {product.imageUrl ? (
                             <img src={product.imageUrl} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                           ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                              <circle cx="8.5" cy="8.5" r="1.5" />
-                              <path d="M21 15l-5-5L5 21" />
-                            </svg>
+                            <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
                           )}
                         </div>
                         <div className="min-w-0">
@@ -191,11 +188,7 @@ const ProductManagementPage: React.FC = () => {
                     {product.imageUrl ? (
                       <img src={product.imageUrl} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <path d="M21 15l-5-5L5 21" />
-                      </svg>
+                      <img src={PLACEHOLDER_IMAGE} alt={product.name} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

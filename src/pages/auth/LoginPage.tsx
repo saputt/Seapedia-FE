@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { VTLink as Link } from "../../shared/utils/VTLink";
 import AuthLayout from "../../shared/components/layout/AuthLayout";
 import { useLogin } from "../../features/auth/hooks/useLogin";
 import { getReadableError } from "../../shared/utils/errorMapper";

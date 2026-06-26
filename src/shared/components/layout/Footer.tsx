@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
+import { VTLink as Link } from "../../utils/VTLink";
 
 const Footer = () => {
   return (
-    <footer className="bg-brand-deep text-white">
+    <footer className="mt-auto bg-brand-deep text-white">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>

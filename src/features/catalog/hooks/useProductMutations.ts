@@ -13,7 +13,29 @@ export const useCreateProduct = () => {
   return useMutation({
     mutationFn: ({ storeId, data }: { storeId: string; data: any }) =>
       createProduct(storeId, data),
-    onSuccess: () => {
+    onMutate: async ({ storeId, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["sellerProducts"] });
+      const previous = queryClient.getQueriesData({ queryKey: ["sellerProducts"] });
+      const tempProduct = { id: `opt-${Date.now()}`, ...data, storeId };
+      queryClient.setQueriesData({ queryKey: ["sellerProducts"] }, (old: any) => {
+        if (!old) return old;
+        if (Array.isArray(old)) return [tempProduct, ...old];
+        if (old.pages) {
+          const pages = old.pages.map((p: any, i: number) =>
+            i === 0 ? { ...p, data: [tempProduct, ...(p.data || [])], products: [tempProduct, ...(p.products || [])] } : p
+          );
+          return { ...old, pages };
+        }
+        return old;
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        context.previous.forEach(([key, data]: [any, any]) => queryClient.setQueryData(key, data));
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerProducts"] });
     },
   });

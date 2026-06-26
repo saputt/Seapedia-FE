@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 interface CheckoutItem {
   productId: string;
@@ -33,7 +34,7 @@ const CheckoutItemsList = memo(({ items }: CheckoutItemsListProps) => (
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-xs text-text-muted">Img</span>
+              <img src={PLACEHOLDER_IMAGE} alt={item.name} className="w-full h-full object-cover" />
             )}
           </div>
           <div className="flex-1 min-w-0">
