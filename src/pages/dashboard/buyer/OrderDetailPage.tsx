@@ -262,7 +262,11 @@ const OrderDetailPage: React.FC = () => {
       <AlertModal
         isOpen={!!modal}
         onClose={() => setModal(null)}
-        icon={modal === "cancel" ? "⚠️" : "✅"}
+        icon={modal === "cancel" ? "⚠️" : (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
         title={modal === "cancel" ? "Batalkan Pesanan" : "Konfirmasi Penerimaan"}
         message={
           modal === "cancel"

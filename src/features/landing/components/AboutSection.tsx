@@ -15,7 +15,7 @@ const AboutSection = () => {
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-[30rem] h-[30rem] bg-white/5 rounded-full pointer-events-none" />
 
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1280px] mx-auto px-3 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-[2rem] md:text-4xl font-bold text-white leading-tight">

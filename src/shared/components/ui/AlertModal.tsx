@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 export type AlertModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  icon?: string;
+  icon?: ReactNode;
   title?: string;
   message: string;
   actionLabel?: string;
@@ -34,7 +34,11 @@ const AlertModal = ({ isOpen, onClose, icon, title, message, actionLabel, action
         className="card max-w-sm w-full text-center animate-[fadeIn_0.15s_ease]"
         onClick={(e) => e.stopPropagation()}
       >
-        {icon && <div className="text-5xl mb-4">{icon}</div>}
+        {icon && (
+          <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-full bg-brand-subtle/30 text-brand-deep">
+            {icon}
+          </div>
+        )}
 
         {title && (
           <h3 className="text-xl font-bold text-text-primary mb-2">

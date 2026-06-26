@@ -1,18 +1,19 @@
 import React, { useMemo } from "react";
 import { useSellerReviews } from "../../../features/review/hooks/useReviews";
 import StarRating from "../../../shared/components/ui/StarRating";
+import FilterPill from "../../../shared/components/ui/FilterPill";
 import Spinner from "../../../shared/components/ui/Spinner";
 import ErrorState from "../../../shared/components/ui/ErrorState";
 import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 
 const RATING_FILTERS = [
-  { label: "Semua", value: null },
-  { label: "★★★★★", value: 5 },
-  { label: "★★★★", value: 4 },
-  { label: "★★★", value: 3 },
-  { label: "★★", value: 2 },
-  { label: "★", value: 1 },
-] as const;
+  { key: "all", label: "Semua" },
+  { key: "5", label: "★★★★★" },
+  { key: "4", label: "★★★★" },
+  { key: "3", label: "★★★" },
+  { key: "2", label: "★★" },
+  { key: "1", label: "★" },
+];
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -30,13 +31,13 @@ function timeAgo(dateStr: string): string {
 
 const ProductRatingsPage: React.FC = () => {
   const { data: reviewsData, isLoading, error } = useSellerReviews() as any;
-  const [selectedRating, setSelectedRating] = React.useState<number | null>(null);
+  const [selectedRating, setSelectedRating] = React.useState("all");
 
   const allReviews = reviewsData?.reviews ?? [];
 
   const filteredReviews = useMemo(() => {
-    if (selectedRating === null) return allReviews;
-    return allReviews.filter((r: any) => r.rating === selectedRating);
+    if (selectedRating === "all") return allReviews;
+    return allReviews.filter((r: any) => r.rating === Number(selectedRating));
   }, [allReviews, selectedRating]);
 
   if (isLoading) {
@@ -62,21 +63,7 @@ const ProductRatingsPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Penilaian Produk</h1>
       <p className="text-sm text-text-muted mb-6">Lihat ulasan pembeli untuk produk toko Anda</p>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {RATING_FILTERS.map((f) => (
-          <button
-            key={f.label}
-            onClick={() => setSelectedRating(f.value)}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full border-3 transition-colors ${
-              selectedRating === f.value
-                ? "bg-brand-deep text-white border-brand-deep"
-                : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      <FilterPill items={RATING_FILTERS} value={selectedRating} onChange={setSelectedRating} className="mb-6" />
 
       {allReviews.length === 0 && (
         <div className="card !p-8 text-center">

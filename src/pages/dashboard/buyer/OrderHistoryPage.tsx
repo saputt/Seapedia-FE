@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import Button from "../../../shared/components/ui/Button";
 import ErrorState from "../../../shared/components/ui/ErrorState";
+import FilterPill from "../../../shared/components/ui/FilterPill";
 import ReviewModal from "../../../features/review/components/ReviewModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
@@ -29,7 +30,13 @@ const OrderHistoryPage: React.FC = () => {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
 
-  const statuses = ["ALL", "PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"];
+  const filterItems = [
+    { key: "ALL", label: "Semua" },
+    ...["PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"].map((s) => ({
+      key: s,
+      label: STATUS_LABEL[s] || s,
+    })),
+  ];
 
   const filtered =
     filter === "ALL"
@@ -88,21 +95,7 @@ const OrderHistoryPage: React.FC = () => {
     <div className="max-w-[720px] mx-auto w-full space-y-6">
       <h1 className="text-xl font-bold text-text-primary">Riwayat Pesanan</h1>
 
-        <div className="flex flex-wrap gap-2">
-          {statuses.map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                filter === s
-                  ? "bg-brand-deep text-white border-brand-deep"
-                  : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-              }`}
-            >
-              {s === "ALL" ? "Semua" : (STATUS_LABEL[s] || s)}
-            </button>
-          ))}
-        </div>
+        <FilterPill items={filterItems} value={filter} onChange={setFilter} />
 
         {filtered.length === 0 && (
           <div className="card text-center py-10">
@@ -230,7 +223,11 @@ const OrderHistoryPage: React.FC = () => {
       <AlertModal
         isOpen={!!modal}
         onClose={() => setModal(null)}
-        icon={modal?.type === "cancel" ? "⚠️" : "✅"}
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        }
         title={modal?.type === "cancel" ? "Batalkan Pesanan" : "Konfirmasi Penerimaan"}
         message={
           modal?.type === "cancel"

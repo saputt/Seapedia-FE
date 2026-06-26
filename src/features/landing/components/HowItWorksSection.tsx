@@ -1,6 +1,6 @@
 const HowItWorksSection = () => (
   <section className="py-16 md:py-20">
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
+    <div className="max-w-[1280px] mx-auto px-3 lg:px-8">
       <div className="text-center mb-12">
         <h2 className="text-[2rem] font-bold text-text-primary">
           Cara Kerja

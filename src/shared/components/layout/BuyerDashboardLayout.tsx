@@ -50,7 +50,7 @@ const BuyerDashboardLayout = () => {
           </nav>
         </aside>
 
-        <div className="flex-1 p-6 lg:p-8 overflow-auto pb-20 md:pb-8">
+        <div className="flex-1 px-3 lg:px-8 py-6 lg:py-8 overflow-auto pb-20 md:pb-8">
           <Outlet />
         </div>
       </div>

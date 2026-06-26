@@ -29,7 +29,7 @@ const AddressFormModal = ({ address, onClose, onSuccess }: AddressFormModalProps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="card !p-6 mx-4 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="card !p-6 mx-4 Cariw-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-text-primary">{isEdit ? "Edit Alamat" : "Tambah Alamat"}</h2>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary text-xl leading-none">&times;</button>
@@ -162,7 +162,11 @@ const AddressPage: React.FC = () => {
       <AlertModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        icon="🗑️"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        }
         title="Hapus Alamat"
         message={`Yakin ingin menghapus alamat "${deleteTarget?.label}"?`}
         actionLabel="Hapus"

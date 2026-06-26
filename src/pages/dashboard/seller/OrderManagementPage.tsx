@@ -4,10 +4,17 @@ import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import { useMyStore } from "../../../features/store/hooks/useMyStore";
 import { STATUS_LABEL, STATUS_COLOR, SHIPPING_LABEL } from "../../../shared/constants/order";
 import ErrorState from "../../../shared/components/ui/ErrorState";
+import FilterPill from "../../../shared/components/ui/FilterPill";
 import Spinner from "../../../shared/components/ui/Spinner";
 import Button from "../../../shared/components/ui/Button";
 
-const statusFilters = ["ALL", "PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"];
+const statusFilters = [
+  { key: "ALL", label: "Semua" },
+  ...(["PENDING", "READY_FOR_DELIVERY", "ON_DELIVERY", "DELIVERED", "CANCELLED"] as const).map((s) => ({
+    key: s,
+    label: STATUS_LABEL[s],
+  })),
+];
 
 const OrderManagementPage: React.FC = () => {
   const [filter, setFilter] = useState("ALL");
@@ -39,21 +46,7 @@ const OrderManagementPage: React.FC = () => {
       <h1 className="text-2xl font-bold text-text-primary mb-1">Pesanan</h1>
       <p className="text-sm text-text-muted mb-6">Kelola pesanan masuk toko Anda</p>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {statusFilters.map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-              filter === s
-                ? "bg-brand-deep text-white border-brand-deep"
-                : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-            }`}
-          >
-            {s === "ALL" ? "Semua" : STATUS_LABEL[s as keyof typeof STATUS_LABEL] || s}
-          </button>
-        ))}
-      </div>
+      <FilterPill items={statusFilters} value={filter} onChange={setFilter} className="mb-6" />
 
       <div className="relative min-h-[200px]">
         {(isLoading || isFetching) && (

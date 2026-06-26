@@ -13,6 +13,7 @@ export function useRoleSwitch(options?: UseRoleSwitchOptions) {
   const navigate = useNavigate();
   const switchRole = useAuthStore((s) => s.switchRole);
   const [switching, setSwitching] = useState(false);
+  const [switchingRole, setSwitchingRole] = useState<RoleName | null>(null);
   const [successModal, setSuccessModal] = useState<{
     title: string;
     message: string;
@@ -22,6 +23,7 @@ export function useRoleSwitch(options?: UseRoleSwitchOptions) {
   const switchToRole = useCallback(
     async (role: RoleName, redirectTo: string) => {
       setSwitching(true);
+      setSwitchingRole(role);
       try {
         const res = await switchUserRole(role);
         switchRole(role, res.accessToken, res.userRoles);
@@ -35,6 +37,7 @@ export function useRoleSwitch(options?: UseRoleSwitchOptions) {
         options?.onError?.(role, error as Error);
       } finally {
         setSwitching(false);
+        setSwitchingRole(null);
       }
     },
     [switchRole, options]
@@ -49,6 +52,7 @@ export function useRoleSwitch(options?: UseRoleSwitchOptions) {
 
   return {
     switching,
+    switchingRole,
     successModal,
     switchToRole,
     closeSuccessModal,

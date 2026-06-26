@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import useDebounce from "../../../shared/hooks/useDebounce";
 import Button from "../../../shared/components/ui/Button";
 import AlertModal from "../../../shared/components/ui/AlertModal";
+import FilterPill from "../../../shared/components/ui/FilterPill";
 import Spinner from "../../../shared/components/ui/Spinner";
 import { CATEGORY_SHORT, CATEGORIES } from "../../../shared/constants/product";
 import type { Product, ProductCategory } from "../../../types";
@@ -58,31 +59,15 @@ const ProductManagementPage: React.FC = () => {
         placeholder="Cari produk..."
       />
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setCategoryFilter("ALL")}
-          className={`text-xs font-semibold px-3 py-1.5 rounded-full border-3 transition-colors ${
-            categoryFilter === "ALL"
-              ? "bg-brand-deep text-white border-brand-deep"
-              : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-          }`}
-        >
-          Semua
-        </button>
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.key}
-            onClick={() => setCategoryFilter(cat.key)}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full border-3 transition-colors ${
-              categoryFilter === cat.key
-                ? "bg-brand-deep text-white border-brand-deep"
-                : "border-border bg-white text-text-secondary hover:bg-brand-subtle"
-            }`}
-          >
-            {CATEGORY_SHORT[cat.key]}
-          </button>
-        ))}
-      </div>
+      <FilterPill
+        items={[
+          { key: "ALL", label: "Semua" },
+          ...CATEGORIES.map((cat) => ({ key: cat.key, label: CATEGORY_SHORT[cat.key] })),
+        ]}
+        value={categoryFilter}
+        onChange={(key) => setCategoryFilter(key as ProductCategory | "ALL")}
+        className="mb-6"
+      />
 
       {isLoading && (
         <div className="flex justify-center py-12">
@@ -236,7 +221,11 @@ const ProductManagementPage: React.FC = () => {
       <AlertModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        icon="🗑️"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        }
         title="Hapus Produk"
         message={`Yakin ingin menghapus "${deleteTarget?.name}"? Tindakan ini tidak dapat dibatalkan.`}
         actionLabel="Hapus"
@@ -246,7 +235,11 @@ const ProductManagementPage: React.FC = () => {
       <AlertModal
         isOpen={successModal.open}
         onClose={() => setSuccessModal({ open: false, message: "" })}
-        icon="✅"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        }
         title="Berhasil"
         message={successModal.message}
       />

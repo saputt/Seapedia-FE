@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
+import { getParentRoute } from "../../utils/backNavigation";
 import useAuthStore from "../../../features/auth/store/authStore";
 import useCartStore from "../../../features/cart/store/cartStore";
 import ProfileDropdown from "../ui/ProfileDropdown";
@@ -88,10 +89,10 @@ const DefaultNavbar = () => {
             {(location.pathname !== "/" || searchQuery || categoryQuery) && (
               <button
                 onClick={() => {
-                  if (location.pathname === "/" && (searchQuery || categoryQuery)) {
-                    setSearchParams({}, { replace: true });
+                  if (location.pathname === "/") {
+                    navigate("/");
                   } else {
-                    navigate(-1);
+                    navigate(getParentRoute(location.pathname));
                   }
                 }}
                 className="md:hidden p-2 -ml-2 hover:bg-brand-subtle rounded-lg transition-colors"
