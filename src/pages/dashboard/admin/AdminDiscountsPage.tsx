@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
+import FilterPill from "../../../shared/components/ui/FilterPill";
 import Spinner from "../../../shared/components/ui/Spinner";
 import AlertModal from "../../../shared/components/ui/AlertModal";
 import DiscountForm from "../../../features/discount/components/DiscountForm";
@@ -79,18 +80,8 @@ const AdminDiscountsPage: React.FC = () => {
       )}
 
       <div className="card">
-        <div className="flex items-center gap-1 mb-4 border-b-2 border-border pb-2">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`text-sm font-semibold !py-1.5 !px-4 rounded transition-colors ${
-                tab === t.key ? "bg-brand-deep text-white" : "text-text-secondary hover:text-brand-deep"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="mb-4">
+          <FilterPill items={TABS} value={tab} onChange={setTab} />
         </div>
 
         {filtered.length === 0 ? (
@@ -145,7 +136,11 @@ const AdminDiscountsPage: React.FC = () => {
       <AlertModal
         isOpen={!!deleteId}
         onClose={() => setDeleteId(null)}
-        icon="🗑️"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        }
         title="Hapus Diskon"
         message="Apakah Anda yakin ingin menghapus diskon ini? Tindakan ini tidak dapat dibatalkan."
         actionLabel="Hapus"
