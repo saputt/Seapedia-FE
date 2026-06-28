@@ -6,6 +6,7 @@ import { getMyDriverReviews } from "../../../features/driver/api/driverReview.ap
 import Spinner from "../../../shared/components/ui/Spinner";
 import StatCard from "../../../shared/components/ui/StatCard";
 import StarRating from "../../../shared/components/ui/StarRating";
+import DriverEarningsChart from "../../../features/driver/components/DriverEarningsChart";
 import { useQuery } from "@tanstack/react-query";
 
 const DriverDashboardPage: React.FC = () => {
@@ -179,6 +180,10 @@ const DriverDashboardPage: React.FC = () => {
             <p className="text-[10px] text-text-muted mt-1">{Math.round((stats.todayEarnings / stats.weekEarnings) * 100)}% dari total minggu ini</p>
           </div>
         )}
+      </div>
+
+      <div className="mt-6">
+        <DriverEarningsChart jobs={jobs} />
       </div>
     </>
   );
