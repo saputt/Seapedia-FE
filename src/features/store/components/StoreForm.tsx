@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
@@ -6,7 +6,6 @@ import Input from "@/shared/components/ui/Input";
 import Avatar from "@/shared/components/ui/Avatar";
 import { uploadStoreImage } from "@/api/upload";
 import { storeSchema, type StoreInput } from "@/shared/validations";
-import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface StoreFormProps {
   onSubmit: (data: StoreInput) => void;
@@ -18,6 +17,7 @@ interface StoreFormProps {
 export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel }: StoreFormProps) => {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(defaultValues?.imageUrl || null);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const form = useForm<StoreInput>({
     resolver: zodResolver(storeSchema),
@@ -35,16 +35,16 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
     handleSubmit,
     setValue,
     formState: { errors },
-    watch,
   } = form;
-
-  const { persist: persistForm, clearPersisted } = useFormPersist("store", form as any);
-  const formValues = watch();
-  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("Ukuran gambar maksimal 5MB");
+      return;
+    }
+    setImageError(null);
     setUploading(true);
     try {
       const result = await uploadStoreImage(file);
@@ -57,7 +57,6 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
   };
 
   const handleFormSubmit = (data: StoreInput) => {
-    clearPersisted();
     onSubmit(data);
   };
 
@@ -71,6 +70,7 @@ export const StoreForm = ({ onSubmit, isPending = false, defaultValues, onCancel
             <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
           </label>
           {uploading && <p className="text-xs text-text-muted mt-1">Mengupload...</p>}
+          {imageError && <p className="text-danger text-xs mt-1">{imageError}</p>}
         </div>
       </div>
 
