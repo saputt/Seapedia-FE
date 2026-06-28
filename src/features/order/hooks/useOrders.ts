@@ -109,6 +109,7 @@ export const useUpdateOrderStatus = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["sellerOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["availableJobs"] });
     },
   });
 };
