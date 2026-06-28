@@ -40,6 +40,10 @@ export const useCreateProductReview = () => {
       if (context?.prevReviews) queryClient.setQueryData(context.reviewKey, context.prevReviews);
       if (context?.prevProduct) queryClient.setQueryData(["product", context.productId], context.prevProduct);
     },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["buyer-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", (variables as any).orderId] });
+    },
     onSettled: (_data, _err, variables) => {
       queryClient.invalidateQueries({ queryKey: ["productReviews", variables.productId] });
       queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
