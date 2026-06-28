@@ -61,6 +61,7 @@ const DriverJobsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverJo
 const DriverHistoryPage = lazyLoad(() => import("../pages/dashboard/driver/DriverHistoryPage"));
 const DriverIncomePage = lazyLoad(() => import("../pages/dashboard/driver/DriverIncomePage"));
 const DriverRatingsPage = lazyLoad(() => import("../pages/dashboard/driver/DriverRatingsPage"));
+const DriverProfilePage = lazyLoad(() => import("../pages/dashboard/driver/DriverProfilePage"));
 const AdminDashboardPage = lazyLoad(() => import("../pages/dashboard/admin/AdminDashboardPage"));
 const AdminUsersPage = lazyLoad(() => import("../pages/dashboard/admin/AdminUsersPage"));
 const AdminStoresPage = lazyLoad(() => import("../pages/dashboard/admin/AdminStoresPage"));
@@ -247,6 +248,7 @@ const AppRoutes = () => {
         <Route path="history" element={<DriverHistoryPage />} />
         <Route path="income" element={<DriverIncomePage />} />
         <Route path="ratings" element={<DriverRatingsPage />} />
+        <Route path="profile" element={<DriverProfilePage />} />
       </Route>
 
       <Route

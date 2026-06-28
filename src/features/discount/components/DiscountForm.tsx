@@ -8,7 +8,6 @@ import NeoCalendar from "../../../shared/components/ui/NeoCalendar";
 import { discountSchema } from "@/shared/validations";
 import type { DiscountInput } from "@/shared/validations";
 import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
-import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 const DISCOUNT_TYPE_OPTIONS: [string, string][] = [
   ["PROMO", "Promo"],
@@ -51,10 +50,6 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
     },
   });
 
-  const { persist: persistForm, clearPersisted } = useFormPersist("discount", { watch, setValue } as any);
-  const formValues = watch();
-  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
-
   const discountType = watch("type");
   const expiredAt = watch("expiredAt");
   const isPercent = watch("isPercent");
@@ -68,7 +63,6 @@ const DiscountForm = ({ onSubmit, isPending, onCancel }: DiscountFormProps) => {
   const selectedDate = expiredAt ? new Date(expiredAt + "T00:00:00") : null;
 
   const onSubmitForm = (data: DiscountInput) => {
-    clearPersisted();
     onSubmit({
       code: data.code,
       type: data.type,

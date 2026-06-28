@@ -9,7 +9,7 @@ import ReviewModal from "../../../features/review/components/ReviewModal";
 import DriverReviewModal from "../../../features/driver/components/DriverReviewModal";
 import { useBuyerOrders, useCancelOrder, useBuyerConfirmOrder } from "../../../features/order/hooks/useOrders";
 import { useCreateProductReview } from "../../../features/review/hooks/useReviews";
-import { createDriverReview } from "../../../features/driver/api/driverReview.api";
+import { useCreateDriverReview } from "../../../features/driver/hooks/useDriverJobs";
 import { STATUS_COLOR, STATUS_LABEL } from "../../../shared/constants/order";
 import { PLACEHOLDER_IMAGE } from "../../../shared/constants/image";
 import Spinner from "../../../shared/components/ui/Spinner";
@@ -26,6 +26,7 @@ const OrderHistoryPage: React.FC = () => {
   const cancelMutation = useCancelOrder();
   const confirmMutation = useBuyerConfirmOrder();
   const reviewMutation = useCreateProductReview();
+  const driverReviewMutation = useCreateDriverReview();
   const [filter, setFilter] = useState("ALL");
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -88,7 +89,7 @@ const OrderHistoryPage: React.FC = () => {
     setDriverReviewError(null);
     setDriverReviewLoading(true);
     try {
-      await createDriverReview(driverReviewOrder.id, { rating, comment });
+      await driverReviewMutation.mutateAsync({ orderId: driverReviewOrder.id, rating, comment });
       setDriverReviewOrder(null);
     } catch (err: any) {
       setDriverReviewError(err?.message || "Gagal mengirim review driver");

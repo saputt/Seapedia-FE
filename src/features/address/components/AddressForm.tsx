@@ -1,10 +1,8 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
 import Input from "@/shared/components/ui/Input";
 import { addressSchema, type AddressInput } from "@/shared/validations";
-import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface AddressFormProps {
   onSubmit: (data: AddressInput) => void;
@@ -27,15 +25,9 @@ export const AddressForm = ({ onSubmit, isPending = false, defaultValues, onCanc
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = form;
 
-  const { persist: persistForm, clearPersisted } = useFormPersist("address", form as any);
-  const formValues = watch();
-  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
-
   const handleSubmitForm = (data: AddressInput) => {
-    clearPersisted();
     onSubmit(data);
   };
 

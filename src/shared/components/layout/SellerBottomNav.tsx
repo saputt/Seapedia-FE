@@ -26,7 +26,6 @@ const SellerBottomNav = () => {
   const [logoutModal, setLogoutModal] = useState(false);
   const [switching, setSwitching] = useState(false);
   const [switchingRole, setSwitchingRole] = useState<RoleName | null>(null);
-  const [successModal, setSuccessModal] = useState<{ title: string; message: string; redirectTo: string } | null>(null);
 
   const isVisible = location.pathname.startsWith("/dashboard/seller");
 
@@ -51,12 +50,14 @@ const SellerBottomNav = () => {
     try {
       const res = await switchUserRole("BUYER");
       switchRole("BUYER", res.accessToken, res.userRoles);
-      setSuccessModal({ title: "Role Berhasil Diganti", message: "Anda sekarang berada di mode Buyer.", redirectTo: "/" });
+      setSwitching(false);
+      setSwitchingRole(null);
+      navigate("/", { replace: true });
     } catch {
       setSwitching(false);
       setSwitchingRole(null);
     }
-  }, [switchRole]);
+  }, [switchRole, navigate]);
 
   const handleDriverClick = useCallback(async () => {
     setShowAccountSheet(false);
@@ -65,12 +66,14 @@ const SellerBottomNav = () => {
     try {
       const res = await switchUserRole("DRIVER");
       switchRole("DRIVER", res.accessToken, res.userRoles);
-      setSuccessModal({ title: "Role Berhasil Diganti", message: "Anda sekarang berada di mode Driver.", redirectTo: "/dashboard/driver" });
+      setSwitching(false);
+      setSwitchingRole(null);
+      navigate("/dashboard/driver", { replace: true });
     } catch {
       setSwitching(false);
       setSwitchingRole(null);
     }
-  }, [switchRole]);
+  }, [switchRole, navigate]);
 
   const handleLogout = () => {
     setLogoutModal(false);
@@ -229,29 +232,6 @@ const SellerBottomNav = () => {
         onAction={handleLogout}
       />
 
-      <AlertModal
-        isOpen={!!successModal}
-        onClose={() => {
-          if (successModal) {
-            navigate(successModal.redirectTo, { replace: true });
-          }
-          setSuccessModal(null);
-        }}
-        icon={
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        }
-        title={successModal?.title || ""}
-        message={successModal?.message || ""}
-        actionLabel="OK"
-        onAction={() => {
-          if (successModal) {
-            navigate(successModal.redirectTo, { replace: true });
-          }
-          setSuccessModal(null);
-        }}
-      />
     </>
   );
 };

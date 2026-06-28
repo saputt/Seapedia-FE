@@ -33,7 +33,7 @@ const DriverHistoryPage: React.FC = () => {
       {deliveryDoneMutation.isSuccess && (
         <div className="card !p-4 mb-6 border-success">
           <p className="text-success font-semibold text-sm">
-            Pengiriman ditandai selesai! Menunggu konfirmasi pembeli.
+            Pesanan berhasil diselesaikan!
           </p>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "../../../shared/components/ui/Button";
 import Input from "../../../shared/components/ui/Input";
 import ImageUpload from "../../../shared/components/ui/ImageUpload";
@@ -8,7 +8,7 @@ import type { ProductInput, ProductCategory } from "../../../types";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { productSchema, type ProductInput as ProductInputType } from "@/shared/validations";
 import { handleNumberInput, handleNumberKeyDown } from "@/shared/utils/numberInput";
-import { useFormPersist } from "@/shared/hooks/useFormPersist";
+
 
 interface ProductFormProps {
   initialData?: ProductInput | null;
@@ -30,12 +30,13 @@ const ProductForm = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.imageUrl || null);
   const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const form = useZodForm(productSchema, {
     name: initialData?.name || "",
     description: initialData?.description || "",
-    price: initialData?.price?.toString() || "",
-    stock: initialData?.stock?.toString() || "",
+    price: initialData?.price ?? 0,
+    stock: initialData?.stock ?? 0,
     category: initialData?.category || "HOBBY",
     images: initialData?.imageUrl ? [initialData.imageUrl] : [],
   });
@@ -48,19 +49,18 @@ const ProductForm = ({
     watch,
   } = form;
 
-  const { persist: persistForm, clearPersisted } = useFormPersist("product", form as any);
-  const formValues = watch();
-  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
-
   const handleImageChange = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("Ukuran gambar maksimal 5MB");
+      return;
+    }
+    setImageError(null);
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
-    // Update images array in form
     setValue("images", [URL.createObjectURL(file)]);
   };
 
   const onSubmitForm = async (data: ProductInputType) => {
-    clearPersisted();
     const payload: ProductInput = {
       name: data.name,
       description: data.description,
@@ -85,7 +85,10 @@ const ProductForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmitForm)}>
       <div className="flex gap-8 flex-col md:flex-row">
-        <ImageUpload preview={imagePreview} onChange={handleImageChange} />
+        <div>
+          <ImageUpload preview={imagePreview} onChange={handleImageChange} />
+          {imageError && <p className="text-danger text-sm mt-2 text-center">{imageError}</p>}
+        </div>
 
         <div className="flex-1 space-y-4">
           <div>
@@ -112,10 +115,10 @@ const ProductForm = ({
               <Input
                 type="text"
                 inputMode="numeric"
-                {...register("price")}
+                {...register("price", { valueAsNumber: true })}
                 onChange={(e) => {
                   handleNumberInput(e, (val) => {
-                    setValue("price", val, { shouldValidate: true });
+                    setValue("price", val === "" ? 0 : parseInt(val, 10), { shouldValidate: true });
                   });
                 }}
                 onKeyDown={handleNumberKeyDown}
@@ -129,10 +132,10 @@ const ProductForm = ({
               <Input
                 type="text"
                 inputMode="numeric"
-                {...register("stock")}
+                {...register("stock", { valueAsNumber: true })}
                 onChange={(e) => {
                   handleNumberInput(e, (val) => {
-                    setValue("stock", val, { shouldValidate: true });
+                    setValue("stock", val === "" ? 0 : parseInt(val, 10), { shouldValidate: true });
                   });
                 }}
                 onKeyDown={handleNumberKeyDown}

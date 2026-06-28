@@ -1,11 +1,9 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/components/ui/Button";
 import Input from "@/shared/components/ui/Input";
 import { reviewSchema, type ReviewInput } from "@/shared/validations";
 import StarRating from "@/shared/components/ui/StarRating";
-import { useFormPersist } from "@/shared/hooks/useFormPersist";
 
 interface ReviewFormProps {
   onSubmit: (data: ReviewInput) => void;
@@ -34,10 +32,6 @@ export const ReviewForm = ({ onSubmit, isPending = false, defaultValues, onCance
     setValue,
   } = form;
 
-  const { persist: persistForm, clearPersisted } = useFormPersist("review", form as any);
-  const formValues = watch();
-  useEffect(() => { persistForm(formValues); }, [formValues, persistForm]);
-
   const rating = watch("rating");
 
   const handleRatingChange = (value: number) => {
@@ -45,7 +39,6 @@ export const ReviewForm = ({ onSubmit, isPending = false, defaultValues, onCance
   };
 
   const handleSubmitForm = (data: ReviewInput) => {
-    clearPersisted();
     onSubmit(data);
   };
 

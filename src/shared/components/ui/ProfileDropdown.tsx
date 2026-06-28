@@ -2,11 +2,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
+import { switchUserRole } from "../../../features/auth/api/auth.api";
 import { getMyStore } from "../../../features/store/api/store.api";
 import SwitchRoleModal from "./SwitchRoleModal";
 import AlertModal from "./AlertModal";
 import Avatar from "./Avatar";
-import { useRoleSwitch } from "../../hooks/useRoleSwitch";
 import { prefetchMyStore, prefetchAdminDashboard } from "@/shared/utils/prefetch";
 import type { RoleName } from "../../../types";
 
@@ -15,6 +15,7 @@ const ProfileDropdown = () => {
   const user = useAuthStore((s) => s.user);
   const activeRole = useAuthStore((s) => s.activeRole);
   const userRoles = useAuthStore((s) => s.userRoles);
+  const switchRole = useAuthStore((s) => s.switchRole);
   const logout = useAuthStore((s) => s.logout);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,11 +24,6 @@ const ProfileDropdown = () => {
   const profileRef = useRef<HTMLDivElement>(null);
 
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
-
-  const { switchToRole } = useRoleSwitch({
-    onSuccess: () => setSwitchingRole(null),
-    onError: () => setSwitchingRole(null),
-  });
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,26 +52,38 @@ const ProfileDropdown = () => {
       const store = await getMyStore();
       if (store) {
         setSwitchingRole("SELLER");
-        await switchToRole("SELLER", "/dashboard/seller");
+        const res = await switchUserRole("SELLER");
+        switchRole("SELLER", res.accessToken, res.userRoles);
+        navigate("/dashboard/seller", { replace: true });
       } else {
         navigate("/dashboard/seller/create-store");
       }
     } catch {
       navigate("/dashboard/seller/create-store");
     }
-  }, [navigate, switchToRole]);
+  }, [navigate, switchRole]);
 
   const handleBuyerClick = useCallback(() => {
     setDropdownOpen(false);
     setSwitchingRole("BUYER");
-    switchToRole("BUYER", "/");
-  }, [switchToRole]);
+    switchUserRole("BUYER").then((res) => {
+      switchRole("BUYER", res.accessToken, res.userRoles);
+      navigate("/", { replace: true });
+    }).catch(() => {
+      setSwitchingRole(null);
+    });
+  }, [switchRole, navigate]);
 
   const handleDriverClick = useCallback(() => {
     setDropdownOpen(false);
     setSwitchingRole("DRIVER");
-    switchToRole("DRIVER", "/dashboard/driver");
-  }, [switchToRole]);
+    switchUserRole("DRIVER").then((res) => {
+      switchRole("DRIVER", res.accessToken, res.userRoles);
+      navigate("/dashboard/driver", { replace: true });
+    }).catch(() => {
+      setSwitchingRole(null);
+    });
+  }, [switchRole, navigate]);
 
   return (
     <>
@@ -151,7 +159,7 @@ const ProfileDropdown = () => {
             )}
 
             <div className="border-t-[2px] border-bg-tertiary mt-1 pt-1">
-              {activeRole === "BUYER" && !userRoles.includes("SELLER") && (
+              {activeRole !== "ADMIN" && activeRole === "BUYER" && !userRoles.includes("SELLER") && (
                 <Link
                   to="/onboarding/seller"
                   onClick={() => setDropdownOpen(false)}
@@ -160,7 +168,7 @@ const ProfileDropdown = () => {
                   Buka Toko
                 </Link>
               )}
-              {activeRole === "BUYER" && !userRoles.includes("DRIVER") && (
+              {activeRole !== "ADMIN" && activeRole === "BUYER" && !userRoles.includes("DRIVER") && (
                 <Link
                   to="/onboarding/driver"
                   onClick={() => setDropdownOpen(false)}
@@ -169,7 +177,7 @@ const ProfileDropdown = () => {
                   Jadi Driver
                 </Link>
               )}
-              {activeRole !== "BUYER" && userRoles.includes("BUYER") && (
+              {activeRole !== "ADMIN" && activeRole !== "BUYER" && userRoles.includes("BUYER") && (
                 <button
                   onClick={handleBuyerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -177,7 +185,7 @@ const ProfileDropdown = () => {
                   Buyer
                 </button>
               )}
-              {activeRole !== "SELLER" && userRoles.includes("SELLER") && (
+              {activeRole !== "ADMIN" && activeRole !== "SELLER" && userRoles.includes("SELLER") && (
                 <button
                   onClick={handleSellerClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
@@ -185,7 +193,7 @@ const ProfileDropdown = () => {
                   Seller
                 </button>
               )}
-              {activeRole !== "DRIVER" && userRoles.includes("DRIVER") && (
+              {activeRole !== "ADMIN" && activeRole !== "DRIVER" && userRoles.includes("DRIVER") && (
                 <button
                   onClick={handleDriverClick}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-brand-deep hover:bg-brand-subtle rounded transition-colors"
