@@ -63,6 +63,7 @@ const CheckoutPage: React.FC = () => {
   const checkoutMutation = useCheckoutOrder();
 
   const handleCheckout = () => {
+    if (checkoutMutation.isPending) return;
     if (!selectedAddress) {
       setCheckoutError("Silakan pilih alamat pengiriman terlebih dahulu.");
       return;
@@ -202,7 +203,7 @@ const CheckoutPage: React.FC = () => {
               size="lg"
               fullWidth
               loading={checkoutMutation.isPending}
-              disabled={!selectedAddress}
+              disabled={checkoutMutation.isPending || !selectedAddress}
             >
               {checkoutMutation.isPending ? "Memproses..." : "Buat Pesanan"}
             </Button>
