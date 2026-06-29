@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import { getParentRoute } from "../../utils/backNavigation";
@@ -40,9 +40,15 @@ const DefaultNavbar = () => {
   const categoryQuery = searchParams.get("category") || "";
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showDesktopHistory, setShowDesktopHistory] = useState(false);
   const [history, setHistory] = useState<string[]>(getSearchHistory);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
 
   const isLoggedIn = !!token;
+
+  const filteredHistory = searchInput
+    ? history.filter((h) => h.toLowerCase().includes(searchInput.toLowerCase()))
+    : history;
 
   useEffect(() => {
     if (isLoggedIn) refreshCart();
@@ -51,6 +57,16 @@ const DefaultNavbar = () => {
   useEffect(() => {
     setSearchInput(searchQuery);
   }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target as Node)) {
+        setShowDesktopHistory(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useLockBodyScroll(showMobileSearch);
 
@@ -66,6 +82,7 @@ const DefaultNavbar = () => {
         setSearchParams({ q: query.trim() }, { replace: true });
       }
       setShowMobileSearch(false);
+      setShowDesktopHistory(false);
     },
     [navigate, setSearchParams]
   );
@@ -73,6 +90,9 @@ const DefaultNavbar = () => {
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       doSearch(searchInput);
+    }
+    if (e.key === "Escape") {
+      setShowDesktopHistory(false);
     }
   };
 
@@ -107,15 +127,60 @@ const DefaultNavbar = () => {
             </Link>
           </div>
 
-          <div className="hidden md:block flex-1 sm:max-w-md sm:mx-auto">
+          <div className="hidden md:block flex-1 sm:max-w-md sm:mx-auto relative" ref={desktopSearchRef}>
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              onFocus={() => setShowDesktopHistory(true)}
               onKeyDown={handleSearchKeyDown}
               className="input-neo w-full !py-1.5 !text-sm"
               placeholder="Cari produk..."
             />
+            {showDesktopHistory && filteredHistory.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-brand-deep/20 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="px-3 py-2 flex items-center justify-between border-b border-gray-100">
+                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Riwayat Pencarian</span>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(SEARCH_HISTORY_KEY);
+                      setHistory([]);
+                    }}
+                    className="text-xs text-danger hover:underline"
+                  >
+                    Hapus Semua
+                  </button>
+                </div>
+                {filteredHistory.map((query) => (
+                  <div
+                    key={query}
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-bg-secondary transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSearchInput(query);
+                      doSearch(query);
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted shrink-0">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span className="flex-1 text-sm text-text-primary truncate">{query}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteHistory(query);
+                      }}
+                      className="p-1 hover:bg-bg-tertiary rounded-lg transition-colors shrink-0"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
@@ -174,7 +239,7 @@ const DefaultNavbar = () => {
             />
           </div>
 
-          {history.length > 0 && (
+          {filteredHistory.length > 0 && (
             <div className="flex-1 overflow-y-auto">
               <div className="px-4 py-3 flex items-center justify-between">
                 <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Riwayat Pencarian</span>
@@ -188,7 +253,7 @@ const DefaultNavbar = () => {
                   Hapus Semua
                 </button>
               </div>
-              {history.map((query) => (
+              {filteredHistory.map((query) => (
                 <div
                   key={query}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-bg-secondary transition-colors"
@@ -217,6 +282,13 @@ const DefaultNavbar = () => {
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+          {searchInput && filteredHistory.length === 0 && history.length > 0 && (
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4 py-3">
+                <span className="text-xs text-text-muted">Tidak ada riwayat yang cocok</span>
+              </div>
             </div>
           )}
         </div>
