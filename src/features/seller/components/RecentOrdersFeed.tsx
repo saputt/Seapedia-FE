@@ -6,11 +6,11 @@ interface RecentOrdersFeedProps {
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Menunggu",
-  READY_FOR_DELIVERY: "Siap Kirim",
-  ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Selesai",
-  CANCELLED: "Dibatalkan",
+  PENDING: "Sedang Dikemas",
+  READY_FOR_DELIVERY: "Menunggu Pengirim",
+  ON_DELIVERY: "Sedang Dikirim",
+  DELIVERED: "Pesanan Selesai",
+  CANCELLED: "Dikembalikan",
 };
 
 const STATUS_COLORS: Record<string, string> = {
