@@ -1,36 +1,16 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { getWallet, getTransactions, topUp } from "../api/wallet.api";
 import useAuthStore from "../../auth/store/authStore";
-import type { WalletTransaction } from "../../types";
+import { prependTransaction, restoreTransactions } from "../../../shared/utils/transaction";
 
 const DEFAULT_LIMIT = 5;
-
-const prependTransaction = (queryClient: ReturnType<typeof useQueryClient>, tx: WalletTransaction) => {
-  const all = queryClient.getQueriesData({ queryKey: ["transactions"] });
-  const prev: Record<string, unknown> = {};
-  all.forEach(([key, old]) => {
-    if (!old) return;
-    const k = JSON.stringify(key);
-    prev[k] = old;
-    queryClient.setQueryData(key, (data: any) => {
-      if (!data?.pages?.length) return data;
-      const [first, ...rest] = data.pages;
-      return { ...data, pages: [{ ...first, data: [tx, ...first.data] }, ...rest] };
-    });
-  });
-  return prev;
-};
-
-const restoreTransactions = (queryClient: ReturnType<typeof useQueryClient>, prev: Record<string, unknown>) => {
-  Object.entries(prev).forEach(([key, data]) => queryClient.setQueryData(JSON.parse(key), data));
-};
 
 export const useWallet = (options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: ["wallet"],
     queryFn: getWallet,
     enabled: options?.enabled,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
   });
 
 export const useTransactions = (filters?: { startDate?: string; endDate?: string; type?: string }, limit = DEFAULT_LIMIT) => {
@@ -43,7 +23,7 @@ export const useTransactions = (filters?: { startDate?: string; endDate?: string
     initialPageParam: 1,
     placeholderData: keepPreviousData,
     staleTime: 30000,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
   });
 };
 

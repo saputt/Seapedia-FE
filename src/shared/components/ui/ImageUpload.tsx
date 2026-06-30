@@ -51,7 +51,7 @@ const ImageUpload = ({ preview, onChange, onClear }: ImageUploadProps) => {
       {preview && (
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => { onClear?.(); fileInputRef.current?.click(); }}
           className="text-xs text-brand-deep font-semibold mt-2 hover:underline"
         >
           Ganti Gambar

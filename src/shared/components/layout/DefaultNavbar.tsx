@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { memo, useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import { getParentRoute } from "../../utils/backNavigation";
@@ -297,4 +297,4 @@ const DefaultNavbar = () => {
   );
 };
 
-export default DefaultNavbar;
+export default memo(DefaultNavbar);
