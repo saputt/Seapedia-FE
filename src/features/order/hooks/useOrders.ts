@@ -1,26 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getBuyerOrders, cancelOrder, getSellerOrders, updateOrderStatus, checkoutOrder } from "../api/order.api";
-import type { WalletTransaction } from "../../types";
-
-const prependTransaction = (queryClient: ReturnType<typeof useQueryClient>, tx: WalletTransaction) => {
-  const all = queryClient.getQueriesData({ queryKey: ["transactions"] });
-  const prev: Record<string, unknown> = {};
-  all.forEach(([key, old]) => {
-    if (!old) return;
-    const k = JSON.stringify(key);
-    prev[k] = old;
-    queryClient.setQueryData(key, (data: any) => {
-      if (!data?.pages?.length) return data;
-      const [first, ...rest] = data.pages;
-      return { ...data, pages: [{ ...first, data: [tx, ...first.data] }, ...rest] };
-    });
-  });
-  return prev;
-};
-
-const restoreTransactions = (queryClient: ReturnType<typeof useQueryClient>, prev: Record<string, unknown>) => {
-  Object.entries(prev).forEach(([key, data]) => queryClient.setQueryData(JSON.parse(key), data));
-};
+import { prependTransaction, restoreTransactions } from "../../../shared/utils/transaction";
 
 export const useBuyerOrders = () =>
   useQuery({
