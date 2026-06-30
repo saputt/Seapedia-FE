@@ -30,7 +30,7 @@ export const useWallet = (options?: { enabled?: boolean }) =>
     queryKey: ["wallet"],
     queryFn: getWallet,
     enabled: options?.enabled,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
   });
 
 export const useTransactions = (filters?: { startDate?: string; endDate?: string; type?: string }, limit = DEFAULT_LIMIT) => {
@@ -43,7 +43,7 @@ export const useTransactions = (filters?: { startDate?: string; endDate?: string
     initialPageParam: 1,
     placeholderData: keepPreviousData,
     staleTime: 30000,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
   });
 };
 

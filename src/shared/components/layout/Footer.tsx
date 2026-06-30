@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { VTLink as Link } from "../../utils/VTLink";
 
 const Footer = () => {
@@ -54,4 +55,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default memo(Footer);

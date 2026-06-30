@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useLocation } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import { SidebarLink } from "../../../types";
@@ -50,4 +51,4 @@ const BottomTabBar = ({ links, badgeCounts = {} }: BottomTabBarProps) => {
   );
 };
 
-export default BottomTabBar;
+export default memo(BottomTabBar);

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { memo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
@@ -138,4 +138,4 @@ const BuyerBottomNav = () => {
   );
 };
 
-export default BuyerBottomNav;
+export default memo(BuyerBottomNav);

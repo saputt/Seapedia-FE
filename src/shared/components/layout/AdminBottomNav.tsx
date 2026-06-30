@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VTLink as Link } from "../../utils/VTLink";
 import useAuthStore from "../../../features/auth/store/authStore";
@@ -137,4 +137,4 @@ const AdminBottomNav = () => {
   );
 };
 
-export default AdminBottomNav;
+export default memo(AdminBottomNav);
