@@ -208,7 +208,7 @@ Semua akun di bawah sudah dibuat otomatis saat menjalankan `npx prisma db seed` 
 ### Data Tambahan
 
 - **210+ produk** (Elektronik, Fashion, Home, Food, Hobby)
-- **Toko**: "Toko Seapedia" (milik `seller@seapedia.com`)
+- **Toko**: "Toko Seapedia" (milik `seller@seapedia.com`), "Toko Multi Role" (milik `multirole@seapedia.com`)
 - **Diskon**: `HEMAT10` (10%), `DISKON20RB` (Rp20.000), `PROMO50` (50%), `FLAT5RB` (Rp5.000), `WELCOME25` (25%)
 
 ---
