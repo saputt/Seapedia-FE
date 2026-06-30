@@ -53,8 +53,8 @@ Optimistic updates implemented in all mutations: save snapshot in `onMutate`, ro
 
 - **Project**: SEAPEDIA — E-commerce multi-role (Buyer, Seller, Driver, Admin)
 - **Demo Guide**: `docs/demo-guide.md`
-- **Business Rules**: `Backend/docs/business-rules.md`
-- **ADR**: `Backend/docs/architecture-decision-record.md`
+- **Business Rules**: `Backend/docs/business-rules.md` (lihat di [Backend repo](https://github.com/saputt/Seapedia-BE))
+- **ADR**: `Backend/docs/architecture-decision-record.md` (lihat di [Backend repo](https://github.com/saputt/Seapedia-BE))
 - **Deployed FE**: [seapedia-nine.vercel.app](https://seapedia-nine.vercel.app)
 - **Deployed API**: [saukiputraa-seapedia-be.hf.space](https://saukiputraa-seapedia-be.hf.space)
 - **Swagger**: [saukiputraa-seapedia-be.hf.space/docs](https://saukiputraa-seapedia-be.hf.space/docs)
@@ -63,6 +63,6 @@ Optimistic updates implemented in all mutations: save snapshot in `onMutate`, ro
 
 **Related:**
 - [Demo Guide](./docs/demo-guide.md)
-- [Backend README](../Backend/README.md)
+- [Backend Repository](https://github.com/saputt/Seapedia-BE)
 
 **Back to:** [Project Root](../README.md)

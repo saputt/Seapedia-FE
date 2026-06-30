@@ -85,8 +85,8 @@ Seed juga mencakup: 2 toko ("Toko Seapedia" + "Toko Multi Role"), 210+ produk (5
 ---
 
 **Related:**
-- [Business Rules](../Backend/docs/business-rules.md) — aturan bisnis detail
-- [Checkout Flow](../Backend/docs/checkout-flow.md) — detail 2-step checkout
-- [Order Lifecycle](../Backend/docs/order-lifecycle.md) — state machine
+- [Business Rules](https://github.com/saputt/Seapedia-BE/blob/main/docs/business-rules.md) — aturan bisnis detail
+- [Checkout Flow](https://github.com/saputt/Seapedia-BE/blob/main/docs/checkout-flow.md) — detail 2-step checkout
+- [Order Lifecycle](https://github.com/saputt/Seapedia-BE/blob/main/docs/order-lifecycle.md) — state machine
 
 **Back to:** [README](../README.md)
