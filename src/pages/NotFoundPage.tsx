@@ -1,4 +1,4 @@
-import { VTLink as Link } from "../../shared/utils/VTLink";
+import { VTLink as Link } from "../shared/utils/VTLink";
 import Button from "../shared/components/ui/Button";
 
 const NotFoundPage = () => (

@@ -1,11 +1,11 @@
 import type { OrderStatus, ShippingMethod, ShippingOption } from "../../types";
 
 export const STATUS_LABEL: Record<OrderStatus, string> & { [key: string]: string } = {
-  PENDING: "Menunggu Konfirmasi",
-  READY_FOR_DELIVERY: "Siap Dikirim",
-  ON_DELIVERY: "Dalam Pengiriman",
-  DELIVERED: "Diterima",
-  CANCELLED: "Dibatalkan",
+  PENDING: "Sedang Dikemas",
+  READY_FOR_DELIVERY: "Menunggu Pengirim",
+  ON_DELIVERY: "Sedang Dikirim",
+  DELIVERED: "Pesanan Selesai",
+  CANCELLED: "Dikembalikan",
 };
 
 export const STATUS_COLOR: Record<OrderStatus, string> & { [key: string]: string } = {

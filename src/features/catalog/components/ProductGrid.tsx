@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
-import Spinner from "../../shared/components/ui/Spinner";
+import Spinner from "@/shared/components/ui/Spinner";
 import useAuthStore from "../../../features/auth/store/authStore";
 
 interface ProductGridProps {
