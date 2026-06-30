@@ -5,16 +5,22 @@ import Spinner from "../shared/components/ui/Spinner";
 describe("Spinner", () => {
   it("renders with default size", () => {
     const { container } = render(<Spinner />);
-    expect(container.firstChild).toHaveClass("w-6 h-6");
+    const outerSpan = container.firstChild;
+    expect(outerSpan).toHaveClass("gap-1.5");
+    expect(outerSpan?.firstChild).toHaveClass("w-2 h-2");
   });
 
   it("renders with sm size", () => {
     const { container } = render(<Spinner size="sm" />);
-    expect(container.firstChild).toHaveClass("w-4 h-4");
+    const outerSpan = container.firstChild;
+    expect(outerSpan).toHaveClass("gap-1");
+    expect(outerSpan?.firstChild).toHaveClass("w-1.5 h-1.5");
   });
 
   it("renders with lg size", () => {
     const { container } = render(<Spinner size="lg" />);
-    expect(container.firstChild).toHaveClass("w-8 h-8");
+    const outerSpan = container.firstChild;
+    expect(outerSpan).toHaveClass("gap-2");
+    expect(outerSpan?.firstChild).toHaveClass("w-2.5 h-2.5");
   });
 });

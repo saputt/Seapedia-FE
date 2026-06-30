@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import ScrollToTop from "../shared/components/ui/ScrollToTop";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,7 +14,6 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ScrollToTop />
         {children}
       </BrowserRouter>
     </QueryClientProvider>
