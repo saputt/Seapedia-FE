@@ -72,8 +72,7 @@ const AdminDiscountsPage = lazyLoad(() => import("../pages/dashboard/admin/Admin
 const AdminSimulatePage = lazyLoad(() => import("../pages/dashboard/admin/AdminSimulatePage"));
 const SellerOnboarding = lazyLoad(() => import("../pages/onboarding/SellerOnboarding"));
 const DriverOnboarding = lazyLoad(() => import("../pages/onboarding/DriverOnboarding"));
-
-
+const NotFoundPageOnly = lazyLoad(() => import("../pages/NotFoundPage"));
 
 const AppRoutes = () => {
   return (
@@ -276,6 +275,8 @@ const AppRoutes = () => {
         <Route path="discounts" element={<AdminDiscountsPage />} />
         <Route path="simulate" element={<AdminSimulatePage />} />
       </Route>
+
+      <Route path="*" element={<NotFoundPageOnly />} />
     </Routes>
     </>
   );
