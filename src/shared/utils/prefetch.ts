@@ -1,4 +1,4 @@
-import { queryClient } from "@/context/Providers";
+import { queryClient } from "@/shared/lib/queryClient";
 import { getProductById } from "@/features/catalog/api/catalog.api";
 import { getStoreById, getMyStore } from "@/features/store/api/store.api";
 import { getOrderById, getOrderSummary, type OrderSummaryInput } from "@/features/order/api/order.api";
